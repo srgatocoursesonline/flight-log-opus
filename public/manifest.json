@@ -1,0 +1,67 @@
+{
+  "name": "Flight Simulator 2024 Career Manager",
+  "short_name": "FS24 Career",
+  "description": "Manage your Microsoft Flight Simulator 2024 career mode with detailed flight logging, statistics, and progression tracking.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1e40af",
+  "background_color": "#0f1419",
+  "categories": ["productivity", "games", "utilities"],
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Flight",
+      "short_name": "New Flight",
+      "description": "Log a new flight",
+      "url": "/flights/new",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your flight statistics",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}
