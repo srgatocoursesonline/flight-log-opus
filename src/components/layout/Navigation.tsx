@@ -5,22 +5,27 @@ import {
   TrendingUp, 
   History, 
   Target, 
+  DollarSign,
   Settings,
   User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { MSFSLogo } from "@/components/ui/msfs-logo";
 
 const navItems = [
-  { to: "/", icon: Home, label: "Dashboard" },
-  { to: "/flights", icon: Plane, label: "Flights" },
-  { to: "/ranking", icon: TrendingUp, label: "Ranking" },
-  { to: "/history", icon: History, label: "History" },
-  { to: "/goals", icon: Target, label: "Goals" },
-  { to: "/profile", icon: User, label: "Profile" },
-  { to: "/settings", icon: Settings, label: "Settings" },
+  { to: "/", icon: Home, labelKey: "navigation.dashboard" },
+  { to: "/flights", icon: Plane, labelKey: "navigation.flights" },
+  { to: "/ranking", icon: TrendingUp, labelKey: "navigation.ranking" },
+  { to: "/history", icon: History, labelKey: "navigation.history" },
+  { to: "/goals", icon: Target, labelKey: "navigation.goals" },
+  { to: "/financial", icon: DollarSign, labelKey: "navigation.financial" },
+  { to: "/profile", icon: User, labelKey: "navigation.profile" },
+  { to: "/settings", icon: Settings, labelKey: "navigation.settings" },
 ];
 
 export const Navigation = () => {
+  const { t } = useTranslation();
   return (
     <>
       {/* Desktop Sidebar */}
@@ -28,13 +33,7 @@ export const Navigation = () => {
         <div className="glass-panel flex grow flex-col gap-y-5 px-6 pb-4 pt-20">
           <div className="flex shrink-0 items-center">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-                <Plane className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">FS24 Career</h1>
-                <p className="text-xs text-muted-foreground">Manager</p>
-              </div>
+              <MSFSLogo size="lg" className="pulse-glow" />
             </div>
           </div>
           <nav className="flex flex-1 flex-col">
@@ -53,7 +52,7 @@ export const Navigation = () => {
                     }
                   >
                     <item.icon className="h-5 w-5 shrink-0" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </NavLink>
                 </li>
               ))}
@@ -66,7 +65,7 @@ export const Navigation = () => {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
         <nav className="glass-panel border-t border-border/50">
           <div className="flex justify-around items-center py-2">
-            {navItems.slice(0, 5).map((item) => (
+            {navItems.slice(0, 6).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -80,7 +79,7 @@ export const Navigation = () => {
                 }
               >
                 <item.icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{item.label}</span>
+                <span className="text-xs font-medium">{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </div>

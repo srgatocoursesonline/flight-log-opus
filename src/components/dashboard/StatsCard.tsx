@@ -22,7 +22,7 @@ export const StatsCard = ({
   className 
 }: StatsCardProps) => {
   return (
-    <div className={cn("hud-display p-6 relative overflow-hidden", className)}>
+    <div className={cn("hud-display stats-card fade-in p-6 relative overflow-hidden", className)}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
@@ -34,7 +34,7 @@ export const StatsCard = ({
             </p>
             {trend && (
               <span className={cn(
-                "text-sm font-medium",
+                "text-sm font-medium transition-all duration-300",
                 trend.isPositive ? "text-success" : "text-destructive"
               )}>
                 {trend.isPositive ? "+" : ""}{trend.value}%
@@ -48,7 +48,7 @@ export const StatsCard = ({
           )}
         </div>
         {icon && (
-          <div className="rounded-lg bg-primary/10 p-3">
+          <div className="rounded-lg bg-primary/10 p-3 icon-hover">
             <div className="text-primary">
               {icon}
             </div>
@@ -57,10 +57,10 @@ export const StatsCard = ({
       </div>
       
       {/* HUD-style corner decorations */}
-      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary/30" />
-      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary/30" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary/30" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary/30" />
+      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary/30 transition-all duration-300" />
+      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary/30 transition-all duration-300" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary/30 transition-all duration-300" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary/30 transition-all duration-300" />
     </div>
   );
 };

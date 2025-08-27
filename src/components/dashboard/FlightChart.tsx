@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const mockData = [
   { date: '2024-01', flights: 8, cr: 85 },
@@ -10,14 +11,16 @@ const mockData = [
 ];
 
 export const FlightChart = () => {
+  const { t } = useTranslation();
+  
   return (
-    <div className="hud-display p-6">
+    <div className="hud-display chart-container fade-in p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-foreground mb-1">Flight Activity</h3>
-        <p className="text-sm text-muted-foreground">Monthly progression overview</p>
+        <h3 className="text-lg font-semibold text-foreground mb-1">{t('flightChart.title')}</h3>
+        <p className="text-sm text-muted-foreground">{t('flightChart.subtitle')}</p>
       </div>
       
-      <div className="h-80">
+      <div className="h-80 relative">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mockData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -50,6 +53,8 @@ export const FlightChart = () => {
               strokeWidth={3}
               dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+              animationDuration={2000}
+              animationEasing="ease-out"
             />
             <Line 
               type="monotone" 
@@ -58,6 +63,8 @@ export const FlightChart = () => {
               strokeWidth={3}
               dot={{ fill: 'hsl(var(--accent))', strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6, stroke: 'hsl(var(--accent))', strokeWidth: 2 }}
+              animationDuration={2000}
+              animationEasing="ease-out"
             />
           </LineChart>
         </ResponsiveContainer>
@@ -66,11 +73,11 @@ export const FlightChart = () => {
       <div className="flex justify-center gap-6 mt-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary" />
-          <span className="text-sm text-muted-foreground">Flights</span>
+          <span className="text-sm text-muted-foreground">{t('flightChart.flights')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-accent" />
-          <span className="text-sm text-muted-foreground">Career Rating</span>
+          <span className="text-sm text-muted-foreground">{t('flightChart.careerRating')}</span>
         </div>
       </div>
     </div>

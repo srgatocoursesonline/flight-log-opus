@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flight Simulator 2024 Career Manager</title>
-    <meta name="description" content="Manage your Microsoft Flight Simulator 2024 career mode with detailed flight logging, statistics, and progression tracking." />
+    <title>Microsoft Flight Simulator 2024 - Career Manager</title>
+    <meta name="description" content="Gerencie sua carreira no Microsoft Flight Simulator 2024 com registro detalhado de voos, estatísticas e acompanhamento de progressão." />
     <meta name="author" content="FS24 Career Manager" />
     <meta name="theme-color" content="#1e40af" />
 
@@ -28,6 +28,11 @@
   </head>
 
   <body>
+    <script>
+      // Aplicar tema escuro como padrão
+      const theme = localStorage.getItem('flight-log-theme') || 'dark';
+      document.documentElement.className = theme;
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

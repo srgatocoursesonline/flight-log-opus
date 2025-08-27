@@ -8,7 +8,7 @@ export const AppLayout = () => {
       <StatusBar />
       <div className="flex">
         <Navigation />
-        <main className="flex-1 lg:ml-64">
+        <main className="flex-1 lg:ml-64 pt-16 lg:pt-12">
           <div className="p-4 lg:p-6">
             <Outlet />
           </div>

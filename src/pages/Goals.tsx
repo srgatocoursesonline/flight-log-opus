@@ -1,59 +1,69 @@
 import { Target, Plus, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import { autoRefresh } from "@/utils/autoRefresh";
 
 const Goals = () => {
+  const { t } = useTranslation();
+  
+  const handleSetNewGoal = () => {
+    // TODO: Implementar nova meta
+    console.log('Criando nova meta...');
+    autoRefresh();
+  };
+  
   return (
     <div className="space-y-6 pb-20 lg:pb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
-            Career Goals
+          <h1 className="text-3xl font-bold tracking-tight gradient-title">
+            {t('goals.title')}
           </h1>
           <p className="text-muted-foreground">
-            Set and track your career milestones and achievements.
+            {t('goals.subtitle')}
           </p>
         </div>
-        <Button variant="hud">
+        <Button variant="hud" className="icon-hover" onClick={handleSetNewGoal}>
           <Plus className="h-4 w-4 mr-2" />
-          Set New Goal
+          {t('goals.setNewGoal')}
         </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="hud-display p-6">
+        <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-3 mb-6">
-            <Target className="h-6 w-6 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">Active Goals</h3>
+            <Target className="h-6 w-6 text-primary icon-hover" />
+            <h3 className="text-lg font-semibold text-foreground">{t('goals.activeGoals')}</h3>
           </div>
           
           <div className="space-y-4">
-            <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-primary">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-foreground">Reach CR 100</h4>
-                <span className="text-sm text-primary font-medium">In Progress</span>
+            <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-primary quick-action-card">
+              <div className="flex items-center justify-between mb-2 relative z-10">
+                <h4 className="font-medium text-foreground">{t('goals.reachCR100')}</h4>
+                <span className="text-sm text-primary font-medium">{t('goals.inProgress')}</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                Achieve a perfect career rating of 100 points
+              <p className="text-sm text-muted-foreground mb-3 relative z-10">
+                {t('goals.reachCR100Desc')}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 relative z-10">
                 <div className="flex-1 bg-muted/50 rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: '94%' }}></div>
+                  <div className="bg-primary h-2 rounded-full transition-all duration-1000 pulse-glow" style={{ width: '94%' }}></div>
                 </div>
                 <span className="text-sm font-mono text-foreground">94/100</span>
               </div>
             </div>
             
-            <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-accent">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-foreground">100 Flight Hours</h4>
-                <span className="text-sm text-accent font-medium">In Progress</span>
+            <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-accent quick-action-card">
+              <div className="flex items-center justify-between mb-2 relative z-10">
+                <h4 className="font-medium text-foreground">{t('goals.flightHours100')}</h4>
+                <span className="text-sm text-accent font-medium">{t('goals.inProgress')}</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                Log 100 total flight hours this quarter
+              <p className="text-sm text-muted-foreground mb-3 relative z-10">
+                {t('goals.flightHours100Desc')}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 relative z-10">
                 <div className="flex-1 bg-muted/50 rounded-full h-2">
-                  <div className="bg-accent h-2 rounded-full" style={{ width: '72%' }}></div>
+                  <div className="bg-accent h-2 rounded-full transition-all duration-1000" style={{ width: '72%' }}></div>
                 </div>
                 <span className="text-sm font-mono text-foreground">72/100</span>
               </div>
@@ -61,33 +71,33 @@ const Goals = () => {
           </div>
         </div>
 
-        <div className="hud-display p-6">
+        <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center gap-3 mb-6">
-            <CheckCircle className="h-6 w-6 text-success" />
-            <h3 className="text-lg font-semibold text-foreground">Completed Goals</h3>
+            <CheckCircle className="h-6 w-6 text-success icon-hover" />
+            <h3 className="text-lg font-semibold text-foreground">{t('goals.completedGoals')}</h3>
           </div>
           
           <div className="space-y-4">
-            <div className="p-4 bg-success/10 rounded-lg border-l-4 border-success">
+            <div className="p-4 bg-success/10 rounded-lg border-l-4 border-success flight-item">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-foreground">First Solo Flight</h4>
-                <CheckCircle className="h-5 w-5 text-success" />
+                <h4 className="font-medium text-foreground">{t('goals.firstSolo')}</h4>
+                <CheckCircle className="h-5 w-5 text-success icon-hover" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Complete your first flight without penalties
+                {t('goals.firstSoloDesc')}
               </p>
-              <p className="text-xs text-success mt-2">Completed 2 months ago</p>
+              <p className="text-xs text-success mt-2">{t('goals.completedAgo', { time: t('goals.monthsAgo', { count: 2 }) })}</p>
             </div>
             
-            <div className="p-4 bg-success/10 rounded-lg border-l-4 border-success">
+            <div className="p-4 bg-success/10 rounded-lg border-l-4 border-success flight-item">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-foreground">Atlantic Crossing</h4>
-                <CheckCircle className="h-5 w-5 text-success" />
+                <h4 className="font-medium text-foreground">{t('goals.atlanticCrossing')}</h4>
+                <CheckCircle className="h-5 w-5 text-success icon-hover" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Complete a transatlantic flight
+                {t('goals.atlanticCrossingDesc')}
               </p>
-              <p className="text-xs text-success mt-2">Completed 3 weeks ago</p>
+              <p className="text-xs text-success mt-2">{t('goals.completedAgo', { time: t('goals.weeksAgo', { count: 3 }) })}</p>
             </div>
           </div>
         </div>

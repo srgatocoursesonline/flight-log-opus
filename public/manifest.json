@@ -1,7 +1,7 @@
 {
-  "name": "Flight Simulator 2024 Career Manager",
-  "short_name": "FS24 Career",
-  "description": "Manage your Microsoft Flight Simulator 2024 career mode with detailed flight logging, statistics, and progression tracking.",
+  "name": "Microsoft Flight Simulator 2024 - Career Manager",
+  "short_name": "MSFS 2024",
+  "description": "Gerencie sua carreira no Microsoft Flight Simulator 2024 com registro detalhado de voos, estatísticas e acompanhamento de progressão.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
