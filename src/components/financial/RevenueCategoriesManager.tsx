@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, TrendingUp, Trash2, Edit, RotateCcw } from 'lucide-react';
-import { useRevenueCategories, type RevenueCategory } from '@/hooks/useRevenueCategories';
+import { useSupabaseRevenueCategories, type RevenueCategory } from '@/hooks/useSupabaseRevenueCategories';
 import { useToast } from '@/hooks/use-toast';
 
 export const RevenueCategoriesManager = () => {
@@ -35,7 +35,7 @@ export const RevenueCategoriesManager = () => {
     deleteCategory, 
     toggleCategoryActive,
     resetToDefaults 
-  } = useRevenueCategories();
+  } = useSupabaseRevenueCategories();
   const { toast } = useToast();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

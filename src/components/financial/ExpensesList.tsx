@@ -14,16 +14,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Edit, Trash2, Receipt } from 'lucide-react';
-import { useFinancial } from '@/hooks/useFinancial';
-import { useExpenseCategories } from '@/hooks/useExpenseCategories';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
+import { useSupabaseExpenseCategories } from '@/hooks/useSupabaseExpenseCategories';
 import { useToast } from '@/hooks/use-toast';
 import { AddExpenseModal } from './AddExpenseModal';
 
 export const ExpensesList = () => {
-  const { expenses, deleteExpense } = useFinancial();
-  const { categories } = useExpenseCategories();
+  const { expenses, deleteExpense } = useSupabaseFinancial();
+  const { categories } = useSupabaseExpenseCategories();
   const { toast } = useToast();
-  const [editingExpense, setEditingExpense] = useState(null);
+  const [editingExpense, setEditingExpense] = useState<Transaction | null>(null);
 
   const formatCR = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -33,7 +33,18 @@ export const ExpensesList = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    // Create date object from the date string (which is in YYYY-MM-DD format)
+    // Using Date.UTC to avoid timezone conversion issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    
+    // Format to Brazilian date format without timezone conversion
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'UTC' // Ensure we use UTC to avoid timezone shifts
+    });
   };
 
   const getCategoryInfo = (categoryId: string) => {
@@ -175,13 +186,12 @@ export const ExpensesList = () => {
       </Card>
 
       {/* Modal de Edição */}
-      {editingExpense && (
-        <AddExpenseModal
-          expense={editingExpense}
-          trigger={null}
-          onClose={() => setEditingExpense(null)}
-        />
-      )}
+      <AddExpenseModal
+        key={editingExpense?.id || 'new'}
+        expense={editingExpense || undefined}
+        trigger={null}
+        onClose={() => setEditingExpense(null)}
+      />
     </>
   );
 };

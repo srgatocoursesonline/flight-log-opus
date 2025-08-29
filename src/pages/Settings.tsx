@@ -1,13 +1,14 @@
-import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { autoRefresh } from "@/utils/autoRefresh";
 import { ExpenseCategoriesManager } from "@/components/financial/ExpenseCategoriesManager";
 import { RevenueCategoriesManager } from "@/components/financial/RevenueCategoriesManager";
 import { FlightConfigManager } from "@/components/flight/FlightConfigManager";
+import { CareerRatingManager } from "@/components/career/CareerRatingManager";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const Settings = () => {
     notifications: false,
     financial: false,
     flight: false,
+    career: false,
     app: false,
     data: false,
     security: false
@@ -28,6 +30,22 @@ const Settings = () => {
       [section]: !prev[section]
     }));
   };
+  
+  // Ouvir o evento para abrir a seção de carreira
+  useEffect(() => {
+    const handleOpenCareerSection = () => {
+      setOpenSections(prev => ({
+        ...prev,
+        career: true
+      }));
+    };
+
+    window.addEventListener('openCareerSection', handleOpenCareerSection);
+    
+    return () => {
+      window.removeEventListener('openCareerSection', handleOpenCareerSection);
+    };
+  }, []);
   
   const handleExportData = () => {
     // TODO: Implementar export de dados
@@ -167,6 +185,33 @@ const Settings = () => {
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <FlightConfigManager />
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        {/* Seção: Configurações de Carreira */}
+        <Collapsible open={openSections.career} onOpenChange={() => toggleSection('career')}>
+          <div className="hud-display stats-card settings-section fade-in" style={{ animationDelay: '0.4s' }}>
+            <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
+              <div className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-3">
+                  <Trophy className="h-6 w-6 text-accent icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">Configurações de Carreira</h3>
+                </div>
+                <div data-chevron>
+                  {openSections.career ? (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform" />
+                  )}
+                </div>
+              </div>
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent className="settings-content">
+              <div className="px-6 pb-6 border-t border-border/50">
+                <CareerRatingManager />
               </div>
             </CollapsibleContent>
           </div>

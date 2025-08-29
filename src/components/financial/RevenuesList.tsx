@@ -14,16 +14,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Edit, Trash2, TrendingUp } from 'lucide-react';
-import { useFinancial } from '@/hooks/useFinancial';
-import { useRevenueCategories } from '@/hooks/useRevenueCategories';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
+import { useSupabaseRevenueCategories } from '@/hooks/useSupabaseRevenueCategories';
 import { useToast } from '@/hooks/use-toast';
 import { AddRevenueModal } from './AddRevenueModal';
 
 export const RevenuesList = () => {
-  const { revenues, deleteRevenue } = useFinancial();
-  const { categories } = useRevenueCategories();
+  const { revenues, deleteRevenue } = useSupabaseFinancial();
+  const { categories } = useSupabaseRevenueCategories();
   const { toast } = useToast();
-  const [editingRevenue, setEditingRevenue] = useState(null);
+  const [editingRevenue, setEditingRevenue] = useState<Transaction | null>(null);
 
   const formatCR = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -33,7 +33,18 @@ export const RevenuesList = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    // Create date object from the date string (which is in YYYY-MM-DD format)
+    // Using Date.UTC to avoid timezone conversion issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    
+    // Format to Brazilian date format without timezone conversion
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'UTC' // Ensure we use UTC to avoid timezone shifts
+    });
   };
 
   const getCategoryInfo = (categoryId: string) => {
@@ -175,13 +186,12 @@ export const RevenuesList = () => {
       </Card>
 
       {/* Modal de Edição */}
-      {editingRevenue && (
-        <AddRevenueModal
-          revenue={editingRevenue}
-          trigger={null}
-          onClose={() => setEditingRevenue(null)}
-        />
-      )}
+      <AddRevenueModal
+        key={editingRevenue?.id || 'new'}
+        revenue={editingRevenue || undefined}
+        trigger={null}
+        onClose={() => setEditingRevenue(null)}
+      />
     </>
   );
 };

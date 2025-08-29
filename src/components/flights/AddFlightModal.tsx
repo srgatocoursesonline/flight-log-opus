@@ -19,10 +19,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Plane } from 'lucide-react';
-import { useFlights, type Flight } from '@/hooks/useFlights';
-import { useAircraftManager } from '@/hooks/useAircraftManager';
-import { useFlightStatusManager } from '@/hooks/useFlightStatusManager';
+import { useSupabaseFlights, type Flight } from '@/hooks/useSupabaseFlights';
+import { useSupabaseAircraftManager } from '@/hooks/useSupabaseAircraftManager';
+import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
 import { autoRefresh } from '@/utils/autoRefresh';
+import { useToast } from '@/hooks/use-toast';
+import { useFlightDraft, type FlightFormData } from '@/hooks/useFlightDraft';
 
 interface AddFlightModalProps {
   trigger?: React.ReactNode;
@@ -36,33 +38,59 @@ export interface AddFlightModalRef {
 
 export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>(({ trigger, flight, onClose }, ref) => {
   const { t } = useTranslation();
-  const { addFlight, updateFlight } = useFlights();
-  const aircraftManager = useAircraftManager();
-  const statusManager = useFlightStatusManager();
-  const [open, setOpen] = useState(false);
+  const { addFlight, updateFlight } = useSupabaseFlights();
+  const aircraftManager = useSupabaseAircraftManager();
+  const statusManager = useSupabaseFlightStatusManager();
+  const { toast } = useToast();
+  
+  // Hook de persistência (só ativo quando não estiver editando)
+  const {
+    saveDraftData,
+    loadDraftData,
+    clearDraftData,
+    saveModalState,
+    loadModalState,
+    hasDraftData,
+    getDefaultFormData
+  } = useFlightDraft(!!flight);
+  
+  // Estado do modal com persistência
+  const [open, setOpen] = useState(() => {
+    return flight ? false : loadModalState();
+  });
 
   // Expor método para abrir modal externamente
   useImperativeHandle(ref, () => ({
     openModal: () => setOpen(true)
   }));
 
-  const [formData, setFormData] = useState({
-    callsign: flight?.callsign || '',
-    aircraft: flight?.aircraft || '',
-    departure: flight?.departure || '',
-    arrival: flight?.arrival || '',
-    departureTime: flight?.departureTime || '',
-    arrivalTime: flight?.arrivalTime || '',
-    flightTime: flight?.flightTime || '',
-    distance: flight?.distance?.toString() || '',
-    fuelUsed: flight?.fuelUsed?.toString() || '',
-    landingRate: flight?.landingRate?.toString() || '',
-    experiencePoints: flight?.experiencePoints?.toString() || '',
-    careerRating: flight?.careerRating?.toString() || '',
-    status: flight?.status || 'planned',
-    date: flight?.date || new Date().toISOString().split('T')[0],
-    route: flight?.route || '',
-    notes: flight?.notes || ''
+  // Estado do formulário com carregamento de rascunho
+  const [formData, setFormData] = useState<FlightFormData>(() => {
+    if (flight) {
+      // Se está editando, usar dados do voo
+      return {
+        callsign: flight.callsign,
+        aircraft: flight.aircraft,
+        departure: flight.departure,
+        arrival: flight.arrival,
+        departureTime: flight.departureTime,
+        arrivalTime: flight.arrivalTime,
+        flightTime: flight.flightTime,
+        distance: flight.distance?.toString() || '',
+        fuelUsed: flight.fuelUsed?.toString() || '',
+        landingRate: flight.landingRate?.toString() || '',
+        experiencePoints: flight.experiencePoints?.toString() || '',
+        careerRating: flight.careerRating?.toString() || '',
+        status: flight.status,
+        date: flight.date,
+        route: flight.route || '',
+        notes: flight.notes || ''
+      };
+    } else {
+      // Se é novo voo, tentar carregar rascunho
+      const draftData = loadDraftData();
+      return draftData || getDefaultFormData();
+    }
   });
 
   // Atualizar formData quando flight prop mudar (para edição)
@@ -88,6 +116,70 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       });
     }
   }, [flight]);
+
+  // Salvar estado do modal sempre que mudar
+  useEffect(() => {
+    saveModalState(open);
+  }, [open, saveModalState]);
+
+  // Auto-salvar dados do formulário (debounced)
+  useEffect(() => {
+    if (!flight && open) {
+      const timeoutId = setTimeout(() => {
+        saveDraftData(formData);
+      }, 1000); // Salvar após 1 segundo de inatividade
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [formData, flight, open, saveDraftData]);
+
+  // Gerenciar eventos de foco da janela para manter modal aberto
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && !flight) {
+        const shouldBeOpen = loadModalState();
+        if (shouldBeOpen && !open) {
+          setOpen(true);
+        }
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (!flight) {
+        const shouldBeOpen = loadModalState();
+        if (shouldBeOpen && !open) {
+          setOpen(true);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [open, flight, loadModalState]);
+
+  // Interceptar fechamento do modal para confirmação
+  const handleModalClose = (newOpen: boolean) => {
+    if (!newOpen && !flight) {
+      // Se está tentando fechar e tem dados preenchidos
+      if (hasDraftData()) {
+        const shouldClose = window.confirm('Você tem dados não salvos. Deseja realmente fechar? Os dados serão mantidos como rascunho.');
+        if (!shouldClose) {
+          return; // Não fechar
+        }
+      }
+    }
+    
+    setOpen(newOpen);
+    
+    if (!newOpen && onClose) {
+      onClose();
+    }
+  };
 
   // Verificar se campos são obrigatórios baseado no status
   const isCompleted = formData.status === 'completed';
@@ -129,153 +221,53 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
   // Obter opções de aeronaves: aeronaves customizadas ativas + aeronaves padrão
   const aircraftOptions = [
     // Aeronaves customizadas ativas
-    ...aircraftManager.customAircraft
-      .filter(aircraft => aircraft.isActive)
-      .map(aircraft => aircraft.name),
+    ...aircraftManager.getAllAircraftNames(),
     
-    // Aeronaves padrão (MSFS)
-    'Airbus A310-300',
-    'Airbus A320neo',
-    'Airbus A321LR',
-    'Airbus A330-200',
-    'Airbus A330-300',
-    'Airbus A330-300P2F',
-    'Boeing 737 MAX 8',
-    'Boeing 747-8i',
-    'Boeing 747-8F',
-    'Boeing 787-10 Dreamliner',
-    'Boeing 707-320C',
-    'ATR 42-600',
-    'ATR 72-600',
-    'Saab 340B',
-    'Boeing 307 Stratoliner',
-    'Cessna Citation CJ4',
-    'Cessna Citation Longitude',
-    'Cirrus Vision SF50',
-    'Pilatus PC-24',
-    'Daher TBM 930',
-    'Cessna 152',
-    'Cessna 152 Aerobat',
-    'Cessna 172 Skyhawk',
-    'Cessna 172 Skyhawk (G1000)',
-    'Cessna 188 AGTruck',
-    'Cessna 195 Businessliner',
-    'Cessna 207T',
-    'Cessna 208 B Grand Caravan EX',
-    'Cessna 400 Corvalis TT',
-    'Cessna 404 Titan',
-    'Cessna 408 SkyCourier',
-    'Beechcraft Bonanza G36',
-    'Beechcraft Bonanza V35',
-    'Beechcraft Baron G58',
-    'Beechcraft C90 GTX King Air',
-    'Beechcraft King Air 350i',
-    'Beechcraft Model 17 Staggerwing',
-    'Beechcraft Model 18 Twin Beech',
-    'Diamond DA40 NG',
-    'Diamond DA40 TDI',
-    'Diamond DA62',
-    'Diamond DV20',
-    'Cirrus SR22',
-    'Pilatus PC-6 B2',
-    'Pilatus PC-12 NGX',
-    'Pipistrel Virus SW121',
-    'Pipistrel Taurus M',
-    'JMB VL-3',
-    'Flight Design CTSL',
-    'CubCrafters NXCub',
-    'CubCrafters XCub',
-    'Zlin Savage Cub',
-    'Zlin Savage Norden',
-    'Draco X',
-    'ICON A5',
-    'De Havilland Canada DHC-2 Beaver',
-    'De Havilland Canada DHC-4 Caribou',
-    'De Havilland Canada DHC-6 Twin Otter',
-    'EXTRA 330LT',
-    'Aviat Pitts Special S1S',
-    'Aviat Pitts Special S2S',
-    'Zivko Edge 540',
-    'Robin CAP 10',
-    'Robin DR400-100 Cadet',
-    'MX Aircraft MXS-R',
-    'Zlin Shock Ultra',
-    'Granville Gee Bee R2',
-    'Granville Gee Bee Z',
-    'DG Aviation DG-1001E',
-    'DG Aviation LS8-18',
-    'Stemme S12G',
-    'Bell 407',
-    'Bell 47J Ranger',
-    'Guimbal Cabri G2',
-    'Airbus Helicopter H125',
-    'Airbus Helicopter H225',
-    'Robinson R66',
-    'Magni Gyro M-24 Orion',
-    'Boeing CH47D Chinook',
-    'Erickson S-64F Aircrane',
-    'Westland Scout',
-    'Westland Wasp',
-    'Boeing F/A-18E Super Hornet',
-    'Fairchild Republic A-10 Thunderbolt II',
-    'Airbus A400M Atlas',
-    'Boeing C-17 Globemaster III',
-    'Curtiss C-46 Commando',
-    'Douglas C-47D Skytrain',
-    'Waco CG-4A Glider',
-    'Saab 17 B',
-    'Air Tractor AT-802',
-    'De Havilland Canada CL-415',
-    'Boeing 747-400 Global Supertanker',
-    'Grumman G-21A Goose',
-    'Amphibian Aerospace Albatross G111/HU16',
-    'Dornier Seastar',
-    'Airbus A330-743L Beluga XL',
-    'Boeing 747-400 LCF Dreamlifter',
-    'Hughes H-4 Hercules (Spruce Goose)',
-    'Mitsubishi MU-2',
-    'Short SC.7 Skyvan',
-    'North American P-51D Mustang',
-    'North American T-6 Texan',
-    'Curtiss JN-4 Jenny',
-    'Douglas DC-3',
-    'Ryan NYP "Spirit of St. Louis"',
-    'Wright Cycle Company Wright Flyer',
-    'Ford 4AT Trimotor',
-    'Junkers F13',
-    'Junkers JU 52',
-    'Focke-Wulf FW 200 Condor',
-    'Fokker F.VII',
-    'Dornier Do J Wal',
-    'Dornier Do X',
-    'Dornier Do 31',
-    'Savoia-Marchetti S.55',
-    'Latécoère 631',
-    'Aero Ae-45',
-    'Aero Ae-145',
-    'Antonov An-2',
-    'Antonov An-225',
-    'CGS Hawk Arrow II',
-    'AeroElvira Optica',
-    'Powrachute Sky Rascal',
-    'Aero Vodochody L-39',
-    'Archer Midnight',
-    'Heart Aerospace ES-30',
-    'Jetson One',
-    'Joby Aviation S4',
-    'Volocopter VoloCity',
-    'Airship Industries Skyship 600',
-    'Hot Air Balloon',
-    'FlyDoo Hot Air Balloon'
+    // Fallback para aeronaves padrão se não houver customizadas
+    ...(aircraftManager.getAllAircraftNames().length === 0 ? [
+      'Boeing 737-800',
+      'Airbus A320',
+      'Boeing 777-300ER',
+      'Airbus A350-900',
+      'Embraer E-Jet E175',
+      'ATR 72-600',
+      'Boeing 787-9 Dreamliner',
+      'Airbus A330-300',
+      'Cessna Citation CJ4',
+      'Gulfstream G650',
+      'Boeing 747-8F',
+      'Airbus A380-800',
+      'Cessna 172',
+      'Piper PA-28 Cherokee',
+      'Diamond DA40',
+      'Cirrus SR22',
+      'Beechcraft Bonanza G36',
+      'Bell 407',
+      'Robinson R44',
+      'Airbus H125'
+    ] : [])
   ];
 
   // Obter opções de status: status customizados ativos + conversão para formato compatível
   const statusOptions = [
     // Status customizados ativos
-    ...statusManager.getActiveStatuses().map(status => ({
-      value: status.id,
-      label: `${status.icon} ${status.name}`
-    })),
+    ...statusManager.getActiveStatuses().map(status => {
+      // Determinar o valor real baseado no nome do status para compatibilidade
+      let statusValue = status.id;
+      
+      // Se o status tiver um nome correspondente aos tipos padrão, use o tipo em vez do ID
+      if (status.name === 'Planejado') statusValue = 'planned';
+      if (status.name === 'Em Voo') statusValue = 'active';
+      if (status.name === 'Completado') statusValue = 'completed';
+      if (status.name === 'Cancelado') statusValue = 'cancelled';
+      
+      return {
+        value: statusValue,
+        label: `${status.icon} ${status.name}`,
+        id: status.id, // Preservar o ID original para referência
+        originalName: status.name // Preservar o nome original para referência
+      };
+    }),
     
     // Fallback para status padrão se não houver customizados
     ...(statusManager.getActiveStatuses().length === 0 ? [
@@ -286,58 +278,103 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
     ] : [])
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const flightData = {
-      callsign: formData.callsign,
-      aircraft: formData.aircraft,
-      departure: formData.departure.toUpperCase(),
-      arrival: formData.arrival.toUpperCase(),
-      departureTime: formData.departureTime,
-      arrivalTime: formData.arrivalTime,
-      flightTime: formData.flightTime,
-      distance: formData.distance ? parseInt(formData.distance) : 0,
-      fuelUsed: formData.fuelUsed ? parseInt(formData.fuelUsed) : 0,
-      landingRate: formData.landingRate ? parseInt(formData.landingRate) : 0,
-      experiencePoints: formData.experiencePoints ? parseInt(formData.experiencePoints) : 0,
-      careerRating: formData.careerRating ? parseInt(formData.careerRating) : 0,
-      status: formData.status as Flight['status'],
-      date: formData.date,
-      route: formData.route.toUpperCase(),
-      notes: formData.notes
-    };
-
-    if (flight) {
-      updateFlight(flight.id, flightData);
-    } else {
-      addFlight(flightData);
-      // Trigger automatic refresh after adding new flight to update all dashboard cards
-      autoRefresh();
-    }
-
-    setOpen(false);
-    if (onClose) onClose();
+    try {
+      // Validação para campos obrigatórios baseado no status
+      const requiredFields = ['callsign', 'aircraft', 'departure', 'arrival', 'date'];
+      
+      // Campos adicionais obrigatórios para voos completados
+      if (formData.status === 'completed') {
+        requiredFields.push('departureTime', 'arrivalTime', 'flightTime', 'distance', 'fuelUsed', 'landingRate', 'experiencePoints', 'careerRating');
+      }
+      
+      // Campos adicionais obrigatórios para voos ativos
+      if (formData.status === 'active') {
+        requiredFields.push('departureTime');
+      }
+      
+      // Verificar campos em falta
+      const missingFields = requiredFields.filter(field => {
+        const value = formData[field as keyof typeof formData];
+        return !value || value.toString().trim() === '';
+      });
+      
+      if (missingFields.length > 0) {
+        toast({
+          title: "Campos obrigatórios",
+          description: `Por favor, preencha os campos: ${missingFields.join(', ')}`,
+          variant: "destructive",
+        });
+        return;
+      }
     
-    // Reset form
-    if (!flight) {
-      setFormData({
-        callsign: '',
-        aircraft: '',
-        departure: '',
-        arrival: '',
-        departureTime: '',
-        arrivalTime: '',
-        flightTime: '',
-        distance: '',
-        fuelUsed: '',
-        landingRate: '',
-        experiencePoints: '',
-        careerRating: '',
-        status: 'planned',
-        date: new Date().toISOString().split('T')[0],
-        route: '',
-        notes: ''
+      const flightData = {
+        callsign: formData.callsign,
+        aircraft: formData.aircraft,
+        departure: formData.departure.toUpperCase(),
+        arrival: formData.arrival.toUpperCase(),
+        departureTime: formData.departureTime,
+        arrivalTime: formData.arrivalTime,
+        flightTime: formData.flightTime,
+        distance: formData.distance ? parseInt(formData.distance) : 0,
+        fuelUsed: formData.fuelUsed ? parseInt(formData.fuelUsed) : 0,
+        landingRate: formData.landingRate ? parseInt(formData.landingRate) : 0,
+        experiencePoints: formData.experiencePoints ? parseInt(formData.experiencePoints) : 0,
+        careerRating: formData.careerRating ? parseInt(formData.careerRating) : 0,
+        status: formData.status as Flight['status'],
+        date: formData.date,
+        route: formData.route.toUpperCase(),
+        notes: formData.notes
+      };
+
+      if (flight) {
+        await updateFlight(flight.id, flightData);
+        toast({
+          title: "Sucesso!",
+          description: "Voo atualizado com sucesso",
+        });
+      } else {
+        await addFlight(flightData);
+        toast({
+          title: "Sucesso!",
+          description: "Voo salvo com sucesso",
+        });
+        // Trigger automatic refresh after adding new flight
+        autoRefresh();
+        
+        // Limpar dados de rascunho após salvar com sucesso
+        clearDraftData();
+      }
+
+      setOpen(false);
+      if (onClose) onClose();
+      
+      // Reset form
+      if (!flight) {
+        const defaultData = getDefaultFormData();
+        setFormData(defaultData);
+      }
+    } catch (error) {
+      console.error('Erro ao salvar voo:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar voo. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para limpar rascunho manualmente
+  const handleClearDraft = () => {
+    if (window.confirm('Deseja limpar todos os dados do rascunho?')) {
+      clearDraftData();
+      const defaultData = getDefaultFormData();
+      setFormData(defaultData);
+      toast({
+        title: "Rascunho limpo",
+        description: "Todos os dados foram removidos",
       });
     }
   };
@@ -350,7 +387,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleModalClose}>
       {trigger !== null && (
         <DialogTrigger asChild>
           {trigger || defaultTrigger}
@@ -358,9 +395,26 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       )}
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-panel">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">
-            <Plane className="h-5 w-5 text-primary" />
-            {flight ? 'Editar Voo' : t('flights.logNewFlight')}
+          <DialogTitle className="flex items-center justify-between text-foreground">
+            <div className="flex items-center gap-2">
+              <Plane className="h-5 w-5 text-primary" />
+              {flight ? 'Editar Voo' : t('flights.logNewFlight')}
+              {!flight && hasDraftData() && (
+                <span className="text-xs bg-yellow-500/20 text-yellow-600 px-2 py-1 rounded-md border border-yellow-500/30">
+                  📝 Rascunho
+                </span>
+              )}
+            </div>
+            {!flight && hasDraftData() && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearDraft}
+                className="text-xs text-muted-foreground hover:text-destructive"
+              >
+                Limpar Rascunho
+              </Button>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -599,3 +653,5 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
     </Dialog>
   );
 });
+
+AddFlightModal.displayName = 'AddFlightModal';

@@ -32,13 +32,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Plane, Settings2, Trash2, Edit, RotateCcw, Clock } from 'lucide-react';
-import { useAircraftManager, type CustomAircraft } from '@/hooks/useAircraftManager';
-import { useFlightStatusManager, type FlightStatus } from '@/hooks/useFlightStatusManager';
+import { useSupabaseAircraftManager, type CustomAircraft } from '@/hooks/useSupabaseAircraftManager';
+import { useSupabaseFlightStatusManager, type FlightStatus } from '@/hooks/useSupabaseFlightStatusManager';
 import { useToast } from '@/hooks/use-toast';
 
 export const FlightConfigManager = () => {
-  const aircraftManager = useAircraftManager();
-  const statusManager = useFlightStatusManager();
+  const aircraftManager = useSupabaseAircraftManager();
+  const statusManager = useSupabaseFlightStatusManager();
   const { toast } = useToast();
   
   // Estados para modais de aeronaves

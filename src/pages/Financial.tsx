@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFinancial } from '@/hooks/useFinancial';
+import { useSupabaseFinancial } from '@/hooks/useSupabaseFinancial';
 import { AddExpenseModal } from '@/components/financial/AddExpenseModal';
 import { ExpensesList } from '@/components/financial/ExpensesList';
 import { AddRevenueModal } from '@/components/financial/AddRevenueModal';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Receipt, TrendingUp, DollarSign } from 'lucide-react';
 
 const Financial = () => {
-  const { getFinancialStats } = useFinancial();
+  const { getFinancialStats } = useSupabaseFinancial();
   const financialStats = getFinancialStats();
   
   // Receita baseada APENAS no CR dos voos reais que você lançar

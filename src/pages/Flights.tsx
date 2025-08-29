@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Plane } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useFlights } from '@/hooks/useFlights';
-import { useFlightStatusManager } from '@/hooks/useFlightStatusManager';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSupabaseFlights } from '@/hooks/useSupabaseFlights';
+import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
 import { AddFlightModal, AddFlightModalRef } from '@/components/flights/AddFlightModal';
 import { FlightCard } from '@/components/flights/FlightCard';
 import { FlightStats } from '@/components/flights/FlightStats';
@@ -17,15 +18,33 @@ import {
 
 const Flights = () => {
   const { t } = useTranslation();
-  const { flights, isLoading } = useFlights();
-  const statusManager = useFlightStatusManager();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { flights, isLoading } = useSupabaseFlights();
+  const statusManager = useSupabaseFlightStatusManager();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date-desc');
   const addFlightModalRef = useRef<AddFlightModalRef>(null);
 
-  // Escutar evento para abrir modal automaticamente
+  // Escutar evento para abrir modal automaticamente ou verificar URL params
   useEffect(() => {
+    // Verificar se deve abrir modal via URL params
+    if (searchParams.get('openModal') === 'true') {
+      // Limpar o parâmetro da URL
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('openModal');
+      setSearchParams(newSearchParams, { replace: true });
+      
+      // Abrir modal após um pequeno delay para garantir que o componente foi renderizado
+      setTimeout(() => {
+        if (addFlightModalRef.current) {
+          addFlightModalRef.current.openModal();
+        }
+      }, 100);
+    }
+
+    // Manter suporte ao evento customizado como fallback
     const handleOpenModal = () => {
       if (addFlightModalRef.current) {
         addFlightModalRef.current.openModal();
@@ -36,7 +55,7 @@ const Flights = () => {
     return () => {
       window.removeEventListener('openAddFlightModal', handleOpenModal);
     };
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   // Filtrar e ordenar voos
   const filteredAndSortedFlights = useMemo(() => {
@@ -56,9 +75,21 @@ const Flights = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date-desc':
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
+          // Create date objects from the date strings (which are in YYYY-MM-DD format)
+          // Using Date.UTC to avoid timezone conversion issues
+          const [aYearDesc, aMonthDesc, aDayDesc] = a.date.split('-').map(Number);
+          const [bYearDesc, bMonthDesc, bDayDesc] = b.date.split('-').map(Number);
+          const dateA = new Date(Date.UTC(aYearDesc, aMonthDesc - 1, aDayDesc));
+          const dateB = new Date(Date.UTC(bYearDesc, bMonthDesc - 1, bDayDesc));
+          return dateB.getTime() - dateA.getTime();
         case 'date-asc':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
+          // Create date objects from the date strings (which are in YYYY-MM-DD format)
+          // Using Date.UTC to avoid timezone conversion issues
+          const [aYearAsc, aMonthAsc, aDayAsc] = a.date.split('-').map(Number);
+          const [bYearAsc, bMonthAsc, bDayAsc] = b.date.split('-').map(Number);
+          const dateAAsc = new Date(Date.UTC(aYearAsc, aMonthAsc - 1, aDayAsc));
+          const dateBAsc = new Date(Date.UTC(bYearAsc, bMonthAsc - 1, bDayAsc));
+          return dateAAsc.getTime() - dateBAsc.getTime();
         case 'rating-desc':
           return b.careerRating - a.careerRating;
         case 'rating-asc':

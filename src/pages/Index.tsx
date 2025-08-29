@@ -10,14 +10,15 @@ import {
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { FlightChart } from "@/components/dashboard/FlightChart";
 import { RecentFlights } from "@/components/dashboard/RecentFlights";
+import { CareerRatingCard } from "@/components/dashboard/CareerRatingCard";
 import { useTranslation } from "react-i18next";
 import { useFlightNavigation } from "@/hooks/useFlightNavigation";
-import { useFlights } from "@/hooks/useFlights";
+import { useSupabaseFlights } from "@/hooks/useSupabaseFlights";
 
 const Index = () => {
   const { t } = useTranslation();
   const { navigateToAddFlight } = useFlightNavigation();
-  const { getFlightStats } = useFlights();
+  const { getFlightStats } = useSupabaseFlights();
   const stats = getFlightStats();
   
   return (
@@ -33,14 +34,7 @@ const Index = () => {
 
       {/* Key Performance Indicators */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
-          title={t('dashboard.careerRating')}
-          value={stats.averageRating.toString()}
-          subtitle={t('dashboard.excellentPerformance')}
-          icon={<Star className="h-6 w-6" />}
-          trend={{ value: 5.2, isPositive: true }}
-          className="pulse-glow"
-        />
+        <CareerRatingCard />
         <StatsCard
           title={t('dashboard.totalFlights')}
           value={stats.totalFlights.toString()}

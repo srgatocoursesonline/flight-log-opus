@@ -4,15 +4,8 @@ export const useFlightNavigation = () => {
   const navigate = useNavigate();
 
   const navigateToAddFlight = () => {
-    // Navegar para a página de voos
-    navigate('/flights');
-    
-    // Aguardar um breve momento para garantir que a página carregou
-    // e então disparar evento para abrir o modal
-    setTimeout(() => {
-      const event = new CustomEvent('openAddFlightModal');
-      window.dispatchEvent(event);
-    }, 100);
+    // Navegar para a página de voos com parâmetro para abrir modal
+    navigate('/flights?openModal=true');
   };
 
   return { navigateToAddFlight };

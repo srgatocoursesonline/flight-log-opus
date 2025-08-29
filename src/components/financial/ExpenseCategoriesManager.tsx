@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Settings, Trash2, Edit, RotateCcw } from 'lucide-react';
-import { useExpenseCategories, type ExpenseCategory } from '@/hooks/useExpenseCategories';
+import { useSupabaseExpenseCategories, type ExpenseCategory } from '@/hooks/useSupabaseExpenseCategories';
 import { useToast } from '@/hooks/use-toast';
 
 export const ExpenseCategoriesManager = () => {
@@ -35,7 +35,7 @@ export const ExpenseCategoriesManager = () => {
     deleteCategory, 
     toggleCategoryActive,
     resetToDefaults 
-  } = useExpenseCategories();
+  } = useSupabaseExpenseCategories();
   const { toast } = useToast();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

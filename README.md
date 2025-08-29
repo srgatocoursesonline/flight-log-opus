@@ -109,15 +109,30 @@ npm run lint     # 🧹 Verificação de código
 flight-log-opus/
 ├── src/
 │   ├── components/          # Componentes React
-│   │   ├── dashboard/      # Dashboard específico
+│   │   ├── career/        # Componentes de carreira
+│   │   ├── dashboard/     # Componentes do dashboard
+│   │   ├── flights/       # Componentes de voos
+│   │   ├── financial/     # Componentes financeiros
 │   │   ├── layout/        # Layout e navegação
-│   │   └── ui/           # Componentes base (shadcn)
-│   ├── pages/            # Páginas da aplicação
-│   ├── hooks/           # Custom React hooks
-│   ├── lib/            # Utilitários
-│   └── types/          # Tipos TypeScript
-├── public/             # Assets estáticos
-└── docs/              # Documentação
+│   │   └── ui/            # Componentes base (shadcn)
+│   ├── contexts/          # Contextos React (AuthContext)
+│   ├── db/                # Arquivos relacionados ao banco de dados
+│   │   ├── supabase/      # Supabase específicos
+│   │   │   ├── functions/ # Funções RPC
+│   │   │   ├── schema/    # Definições de schema
+│   │   │   └── fixes/     # Scripts de correção
+│   │   ├── docs/          # Documentação do banco de dados
+│   │   └── README.md      # Documentação da estrutura do BD
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utilitários e cliente Supabase
+│   ├── pages/             # Páginas da aplicação
+│   ├── utils/             # Funções utilitárias
+│   ├── App.tsx            # Componente raiz
+│   └── main.tsx           # Ponto de entrada da aplicação
+├── public/                # Assets estáticos
+├── docs/                  # Documentação
+├── CHANGELOG.md           # Registro de mudanças
+└── PROJECT_STRUCTURE.md   # Documentação da estrutura
 ```
 
 ## 🎨 Design System
@@ -224,6 +239,8 @@ interface Pilot {
 **Configurações**: ✅ Aeronaves e status personalizáveis
 **Internacionalização**: ✅ PT-BR/EN-US
 **Temas**: ✅ Dark/Light mode
+**Banco de Dados**: ✅ Esquema completo e organizado
+**Documentação**: ✅ Estrutura e procedimentos documentados
 **Status Geral**: 🟢 **PRODUÇÃO**
 
 ## 🤝 Contribuição
@@ -236,7 +253,11 @@ interface Pilot {
 
 ## 📜 Documentação Adicional
 
-- [PROJETO_ANALISE.md](./PROJETO_ANALISE.md) - Análise detalhada do projeto
+- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) - Estrutura completa do projeto
+- [CHANGELOG.md](./CHANGELOG.md) - Histórico de alterações
+- [src/db/README.md](./src/db/README.md) - Documentação da estrutura do banco de dados
+- [src/db/docs/CORRECAO_DADOS_CARREIRA.md](./src/db/docs/CORRECAO_DADOS_CARREIRA.md) - Solução para problemas com dados de carreira
+- [src/db/docs/SUPABASE_SETUP_INSTRUCTIONS.md](./src/db/docs/SUPABASE_SETUP_INSTRUCTIONS.md) - Instruções para configuração do Supabase
 - [Componentes shadcn/ui](https://ui.shadcn.com/) - Documentação dos componentes
 - [TailwindCSS](https://tailwindcss.com/) - Documentação do CSS framework
 - [React Router](https://reactrouter.com/) - Roteamento

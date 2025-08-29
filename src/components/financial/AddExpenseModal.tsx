@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -19,8 +19,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Receipt } from 'lucide-react';
-import { useFinancial, type Transaction } from '@/hooks/useFinancial';
-import { useExpenseCategories } from '@/hooks/useExpenseCategories';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
+import { useSupabaseExpenseCategories } from '@/hooks/useSupabaseExpenseCategories';
 import { useToast } from '@/hooks/use-toast';
 
 interface AddExpenseModalProps {
@@ -35,10 +35,10 @@ export interface AddExpenseModalRef {
 
 export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalProps>(({ trigger, expense, onClose }, ref) => {
   const { t } = useTranslation();
-  const { addExpense, updateExpense } = useFinancial();
-  const { getActiveCategories } = useExpenseCategories();
+  const { addExpense, updateExpense } = useSupabaseFinancial();
+  const { getActiveCategories } = useSupabaseExpenseCategories();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!expense);
 
   // Expor método para abrir modal externamente
   useImperativeHandle(ref, () => ({
@@ -48,10 +48,31 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
   const [formData, setFormData] = useState({
     description: expense?.description || '',
     amount: expense?.amount?.toString() || '',
-    date: expense?.date || new Date().toISOString().split('T')[0],
+    date: expense?.date || (() => {
+      // Get today's date in YYYY-MM-DD format without timezone issues
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })(),
     category: expense?.category || '',
     notes: ''
   });
+
+  // Abrir modal automaticamente quando for para edição
+  useEffect(() => {
+    if (expense) {
+      setOpen(true);
+      setFormData({
+        description: expense.description,
+        amount: expense.amount.toString(),
+        date: expense.date,
+        category: expense.category,
+        notes: ''
+      });
+    }
+  }, [expense]);
 
   const activeCategories = getActiveCategories();
 
@@ -112,10 +133,17 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
       
       // Reset form se não for edição
       if (!expense) {
+        // Get today's date in YYYY-MM-DD format without timezone issues
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayString = `${year}-${month}-${day}`;
+        
         setFormData({
           description: '',
           amount: '',
-          date: new Date().toISOString().split('T')[0],
+          date: todayString,
           category: '',
           notes: ''
         });
@@ -144,8 +172,13 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {trigger !== null && (
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen && onClose) {
+        onClose();
+      }
+    }}>
+      {trigger !== null && !expense && (
         <DialogTrigger asChild>
           {trigger || defaultTrigger}
         </DialogTrigger>

@@ -32,9 +32,10 @@ import {
   Route,
   Calendar
 } from 'lucide-react';
-import { Flight, useFlights } from '@/hooks/useFlights';
-import { useFlightStatusManager } from '@/hooks/useFlightStatusManager';
+import { Flight, useSupabaseFlights } from '@/hooks/useSupabaseFlights';
+import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
 import { AddFlightModal, AddFlightModalRef } from './AddFlightModal';
+import { QuickStatusEdit } from './QuickStatusEdit';
 import { cn } from '@/lib/utils';
 
 interface FlightCardProps {
@@ -43,14 +44,14 @@ interface FlightCardProps {
 
 export const FlightCard = ({ flight }: FlightCardProps) => {
   const { t } = useTranslation();
-  const { deleteFlight } = useFlights();
-  const statusManager = useFlightStatusManager();
+  const { deleteFlight } = useSupabaseFlights();
+  const statusManager = useSupabaseFlightStatusManager();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const editModalRef = useRef<AddFlightModalRef>(null);
 
   const getStatusBadge = (status: Flight['status']) => {
     // Tentar encontrar status customizado primeiro
-    const customStatus = statusManager.getStatusById(status);
+    const customStatus = statusManager.getStatusByName(status);
     
     if (customStatus) {
       return (
@@ -105,11 +106,17 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Create date object from the date string (which is in YYYY-MM-DD format)
+    // Using Date.UTC to avoid timezone conversion issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    
+    // Format to Brazilian date format without timezone conversion
     return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'UTC' // Ensure we use UTC to avoid timezone shifts
     });
   };
 
@@ -136,7 +143,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {getStatusBadge(flight.status)}
+              <QuickStatusEdit flight={flight} />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

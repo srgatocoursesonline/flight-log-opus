@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plane, Clock, Route, Star } from 'lucide-react';
-import { useFlights } from '@/hooks/useFlights';
+import { useSupabaseFlights } from '@/hooks/useSupabaseFlights';
 
 export const FlightStats = () => {
   const { t } = useTranslation();
-  const { getFlightStats } = useFlights();
+  const { getFlightStats } = useSupabaseFlights();
   const stats = getFlightStats();
 
   const statCards = [

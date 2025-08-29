@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
-import { useFlights } from '@/hooks/useFlights';
+import { useSupabaseFlights } from '@/hooks/useSupabaseFlights';
 import { useFlightNavigation } from '@/hooks/useFlightNavigation';
 
 export const RecentFlights = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { flights, isLoading } = useFlights();
+  const { flights, isLoading } = useSupabaseFlights();
   const { navigateToAddFlight } = useFlightNavigation();
   
   const handleViewAll = () => {
@@ -18,7 +18,15 @@ export const RecentFlights = () => {
   // Pegar os 3 voos mais recentes
   const recentFlights = flights
     .filter(flight => flight.status === 'completed')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => {
+      // Create date objects from the date strings (which are in YYYY-MM-DD format)
+      // Using Date.UTC to avoid timezone conversion issues
+      const [aYear, aMonth, aDay] = a.date.split('-').map(Number);
+      const [bYear, bMonth, bDay] = b.date.split('-').map(Number);
+      const dateA = new Date(Date.UTC(aYear, aMonth - 1, aDay));
+      const dateB = new Date(Date.UTC(bYear, bMonth - 1, bDay));
+      return dateB.getTime() - dateA.getTime();
+    })
     .slice(0, 3);
   
   return (

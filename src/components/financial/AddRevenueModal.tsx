@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -19,8 +19,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, TrendingUp } from 'lucide-react';
-import { useFinancial, type Transaction } from '@/hooks/useFinancial';
-import { useRevenueCategories } from '@/hooks/useRevenueCategories';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
+import { useSupabaseRevenueCategories } from '@/hooks/useSupabaseRevenueCategories';
 import { useToast } from '@/hooks/use-toast';
 
 interface AddRevenueModalProps {
@@ -35,10 +35,10 @@ export interface AddRevenueModalRef {
 
 export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalProps>(({ trigger, revenue, onClose }, ref) => {
   const { t } = useTranslation();
-  const { addRevenue, updateRevenue } = useFinancial();
-  const { getActiveCategories } = useRevenueCategories();
+  const { addRevenue, updateRevenue } = useSupabaseFinancial();
+  const { getActiveCategories } = useSupabaseRevenueCategories();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!revenue);
 
   // Expor método para abrir modal externamente
   useImperativeHandle(ref, () => ({
@@ -48,10 +48,31 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
   const [formData, setFormData] = useState({
     description: revenue?.description || '',
     amount: revenue?.amount?.toString() || '',
-    date: revenue?.date || new Date().toISOString().split('T')[0],
+    date: revenue?.date || (() => {
+      // Get today's date in YYYY-MM-DD format without timezone issues
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })(),
     category: revenue?.category || '',
     notes: ''
   });
+
+  // Abrir modal automaticamente quando for para edição
+  useEffect(() => {
+    if (revenue) {
+      setOpen(true);
+      setFormData({
+        description: revenue.description,
+        amount: revenue.amount.toString(),
+        date: revenue.date,
+        category: revenue.category,
+        notes: ''
+      });
+    }
+  }, [revenue]);
 
   const activeCategories = getActiveCategories();
 
@@ -112,10 +133,17 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
       
       // Reset form se não for edição
       if (!revenue) {
+        // Get today's date in YYYY-MM-DD format without timezone issues
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayString = `${year}-${month}-${day}`;
+        
         setFormData({
           description: '',
           amount: '',
-          date: new Date().toISOString().split('T')[0],
+          date: todayString,
           category: '',
           notes: ''
         });
@@ -144,8 +172,13 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {trigger !== null && (
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen && onClose) {
+        onClose();
+      }
+    }}>
+      {trigger !== null && !revenue && (
         <DialogTrigger asChild>
           {trigger || defaultTrigger}
         </DialogTrigger>
