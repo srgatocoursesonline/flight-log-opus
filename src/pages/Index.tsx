@@ -5,15 +5,18 @@ import {
   Trophy,
   Timer,
   Users,
-  Star
+  Star,
+  AlertTriangle
 } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { FlightChart } from "@/components/dashboard/FlightChart";
 import { RecentFlights } from "@/components/dashboard/RecentFlights";
 import { CareerRatingCard } from "@/components/dashboard/CareerRatingCard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useFlightNavigation } from "@/hooks/useFlightNavigation";
-import { useSupabaseFlights } from "@/hooks/useSupabaseFlights";
+import { useFlightNavigation } from "@/hooks/business/useFlightNavigation";
+import { useSupabaseFlights } from "@/hooks/supabase/useSupabaseFlights";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -31,6 +34,8 @@ const Index = () => {
           {t('dashboard.subtitle')}
         </p>
       </div>
+
+
 
       {/* Key Performance Indicators */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

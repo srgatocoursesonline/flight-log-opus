@@ -22,6 +22,11 @@ export interface FlightFormData {
   date: string;
   route: string;
   notes: string;
+  serviceType: string;
+  originCountry: string;
+  destinationCountry: string;
+  originAirportName: string;
+  destinationAirportName: string;
 }
 
 // Função para obter dados padrão do formulário
@@ -49,7 +54,12 @@ const getDefaultFormData = (): FlightFormData => {
     status: 'planned',
     date: todayString,
     route: '',
-    notes: ''
+    notes: '',
+    serviceType: 'employee',
+    originCountry: '',
+    destinationCountry: '',
+    originAirportName: '',
+    destinationAirportName: ''
   };
 }
 

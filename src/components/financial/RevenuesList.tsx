@@ -14,9 +14,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Edit, Trash2, TrendingUp } from 'lucide-react';
-import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
-import { useSupabaseRevenueCategories } from '@/hooks/useSupabaseRevenueCategories';
-import { useToast } from '@/hooks/use-toast';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupabaseFinancial';
+import { useSupabaseRevenueCategories } from '@/hooks/supabase/useSupabaseRevenueCategories';
+import { useToast } from '@/hooks/ui/use-toast';
 import { AddRevenueModal } from './AddRevenueModal';
 
 export const RevenuesList = () => {

@@ -14,9 +14,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Edit, Trash2, Receipt } from 'lucide-react';
-import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
-import { useSupabaseExpenseCategories } from '@/hooks/useSupabaseExpenseCategories';
-import { useToast } from '@/hooks/use-toast';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupabaseFinancial';
+import { useSupabaseExpenseCategories } from '@/hooks/supabase/useSupabaseExpenseCategories';
+import { useToast } from '@/hooks/ui/use-toast';
 import { AddExpenseModal } from './AddExpenseModal';
 
 export const ExpensesList = () => {

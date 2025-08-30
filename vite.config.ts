@@ -11,12 +11,22 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === 'development' && componentTagger(),
   ].filter(Boolean),
+  
+  // Log environment variable info when starting
+  define: {
+    '__ENV_DEBUG__': JSON.stringify({
+      NODE_ENV: process.env.NODE_ENV,
+      MODE: mode,
+      HAS_VITE_VARS: !!process.env.VITE_SUPABASE_URL,
+    }),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Garantir que as variáveis de ambiente sejam carregadas corretamente
+  envDir: process.cwd(),
 }));

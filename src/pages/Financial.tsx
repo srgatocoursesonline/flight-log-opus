@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSupabaseFinancial } from '@/hooks/useSupabaseFinancial';
+import { useSupabaseFinancial } from '@/hooks/supabase/useSupabaseFinancial';
 import { AddExpenseModal } from '@/components/financial/AddExpenseModal';
 import { ExpensesList } from '@/components/financial/ExpensesList';
 import { AddRevenueModal } from '@/components/financial/AddRevenueModal';

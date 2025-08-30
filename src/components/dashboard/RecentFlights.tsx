@@ -1,9 +1,9 @@
-  import { Plane, Clock, MapPin } from "lucide-react";
+import { Plane, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
-import { useSupabaseFlights } from '@/hooks/useSupabaseFlights';
-import { useFlightNavigation } from '@/hooks/useFlightNavigation';
+import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { useFlightNavigation } from '@/hooks/business/useFlightNavigation';
 
 export const RecentFlights = () => {
   const { t } = useTranslation();

@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Settings, Trash2, Edit, RotateCcw } from 'lucide-react';
-import { useSupabaseExpenseCategories, type ExpenseCategory } from '@/hooks/useSupabaseExpenseCategories';
-import { useToast } from '@/hooks/use-toast';
+import { useSupabaseExpenseCategories, type ExpenseCategory } from '@/hooks/supabase/useSupabaseExpenseCategories';
+import { useToast } from '@/hooks/ui/use-toast';
 
 export const ExpenseCategoriesManager = () => {
   const { 

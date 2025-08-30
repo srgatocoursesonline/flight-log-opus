@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth event:', event, 'Previous user:', !!user, 'New session:', !!session);
+
         
         const previousUser = user;
         setSession(session);
@@ -92,12 +92,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             break;
           case 'TOKEN_REFRESHED':
             // Nunca mostrar toast para refresh de token
-            console.log('Token refreshed successfully');
+
             break;
           case 'USER_UPDATED':
             // Só mostrar para atualizações reais do perfil (não durante navegação)
             // Este toast será controlado manualmente nos componentes de perfil
-            console.log('User data updated');
+
             break;
         }
       }

@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, TrendingUp, Trash2, Edit, RotateCcw } from 'lucide-react';
-import { useSupabaseRevenueCategories, type RevenueCategory } from '@/hooks/useSupabaseRevenueCategories';
-import { useToast } from '@/hooks/use-toast';
+import { useSupabaseRevenueCategories, type RevenueCategory } from '@/hooks/supabase/useSupabaseRevenueCategories';
+import { useToast } from '@/hooks/ui/use-toast';
 
 export const RevenueCategoriesManager = () => {
   const { 

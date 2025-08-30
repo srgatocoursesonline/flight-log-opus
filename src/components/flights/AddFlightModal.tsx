@@ -18,13 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Plane } from 'lucide-react';
-import { useSupabaseFlights, type Flight } from '@/hooks/useSupabaseFlights';
-import { useSupabaseAircraftManager } from '@/hooks/useSupabaseAircraftManager';
-import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
+import { Plus, Plane, Briefcase, Building2 } from 'lucide-react';
+import { useSupabaseFlights, type Flight } from '@/hooks/supabase/useSupabaseFlights';
+import { useSupabaseAircraftManager } from '@/hooks/supabase/useSupabaseAircraftManager';
+import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { autoRefresh } from '@/utils/autoRefresh';
-import { useToast } from '@/hooks/use-toast';
-import { useFlightDraft, type FlightFormData } from '@/hooks/useFlightDraft';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useFlightDraft, type FlightFormData } from '@/hooks/business/useFlightDraft';
+import { countries } from '@/lib/data/countries';
+import { fetchAirportByIcao } from '@/lib/services/airportService';
 
 interface AddFlightModalProps {
   trigger?: React.ReactNode;
@@ -84,7 +86,12 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         status: flight.status,
         date: flight.date,
         route: flight.route || '',
-        notes: flight.notes || ''
+        notes: flight.notes || '',
+        serviceType: flight.serviceType || 'employee',
+        originCountry: flight.originCountry || '',
+        destinationCountry: flight.destinationCountry || '',
+        originAirportName: flight.originAirportInfo?.name || '',
+        destinationAirportName: flight.destinationAirportInfo?.name || ''
       };
     } else {
       // Se é novo voo, tentar carregar rascunho
@@ -112,7 +119,12 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         status: flight.status,
         date: flight.date,
         route: flight.route || '',
-        notes: flight.notes || ''
+        notes: flight.notes || '',
+        serviceType: flight.serviceType || 'employee',
+        originCountry: flight.originCountry || '',
+        destinationCountry: flight.destinationCountry || '',
+        originAirportName: flight.originAirportInfo?.name || '',
+        destinationAirportName: flight.destinationAirportInfo?.name || ''
       });
     }
   }, [flight]);
@@ -132,6 +144,38 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       return () => clearTimeout(timeoutId);
     }
   }, [formData, flight, open, saveDraftData]);
+
+  // Buscar informações do aeroporto de origem quando o código ICAO mudar
+  useEffect(() => {
+    const icaoCode = formData.departure.trim();
+    if (icaoCode.length === 4) {
+      fetchAirportByIcao(icaoCode).then(airportInfo => {
+        if (airportInfo) {
+          setFormData(prev => ({
+            ...prev,
+            originAirportName: airportInfo.name || '',
+            originCountry: prev.originCountry || airportInfo.country_code || ''
+          }));
+        }
+      });
+    }
+  }, [formData.departure]);
+
+  // Buscar informações do aeroporto de destino quando o código ICAO mudar
+  useEffect(() => {
+    const icaoCode = formData.arrival.trim();
+    if (icaoCode.length === 4) {
+      fetchAirportByIcao(icaoCode).then(airportInfo => {
+        if (airportInfo) {
+          setFormData(prev => ({
+            ...prev,
+            destinationAirportName: airportInfo.name || '',
+            destinationCountry: prev.destinationCountry || airportInfo.country_code || ''
+          }));
+        }
+      });
+    }
+  }, [formData.arrival]);
 
   // Gerenciar eventos de foco da janela para manter modal aberto
   useEffect(() => {
@@ -326,7 +370,18 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         status: formData.status as Flight['status'],
         date: formData.date,
         route: formData.route.toUpperCase(),
-        notes: formData.notes
+        notes: formData.notes,
+        serviceType: formData.serviceType as 'employee' | 'freelance',
+        originCountry: formData.originCountry,
+        destinationCountry: formData.destinationCountry,
+        originAirportInfo: {
+          name: formData.originAirportName,
+          icao_code: formData.departure.toUpperCase()
+        },
+        destinationAirportInfo: {
+          name: formData.destinationAirportName,
+          icao_code: formData.arrival.toUpperCase()
+        }
       };
 
       if (flight) {
@@ -626,7 +681,100 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
             />
           </div>
 
-          {/* Linha 7: Observações */}
+          {/* Linha 7: Tipo de Serviço */}
+          <div>
+            <Label htmlFor="serviceType" className="text-foreground">Tipo de Serviço</Label>
+            <Select 
+              value={formData.serviceType} 
+              onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="employee">
+                  <div className="flex items-center">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    <span>Funcionário</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="freelance">
+                  <div className="flex items-center">
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    <span>Autônomo</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Linha 8: Informações de aeroportos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="originAirportName" className="text-foreground">Aeroporto de Origem</Label>
+              <Input
+                id="originAirportName"
+                placeholder="Nome do aeroporto será buscado automaticamente"
+                value={formData.originAirportName}
+                onChange={(e) => setFormData({ ...formData, originAirportName: e.target.value })}
+                className="mt-1"
+                readOnly
+              />
+            </div>
+            <div>
+              <Label htmlFor="destinationAirportName" className="text-foreground">Aeroporto de Destino</Label>
+              <Input
+                id="destinationAirportName"
+                placeholder="Nome do aeroporto será buscado automaticamente"
+                value={formData.destinationAirportName}
+                onChange={(e) => setFormData({ ...formData, destinationAirportName: e.target.value })}
+                className="mt-1"
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Linha 9: Países de origem e destino */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="originCountry" className="text-foreground">País de Origem</Label>
+              <Select 
+                value={formData.originCountry} 
+                onValueChange={(value) => setFormData({ ...formData, originCountry: value })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Selecione o país de origem" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {countries.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="destinationCountry" className="text-foreground">País de Destino</Label>
+              <Select 
+                value={formData.destinationCountry} 
+                onValueChange={(value) => setFormData({ ...formData, destinationCountry: value })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Selecione o país de destino" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {countries.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Linha 10: Observações */}
           <div>
             <Label htmlFor="notes" className="text-foreground">Observações</Label>
             <Textarea

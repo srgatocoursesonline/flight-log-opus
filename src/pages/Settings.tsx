@@ -49,20 +49,17 @@ const Settings = () => {
   
   const handleExportData = () => {
     // TODO: Implementar export de dados
-    console.log('Exportando dados...');
     autoRefresh();
   };
   
   const handleBackup = () => {
     // TODO: Implementar backup
-    console.log('Criando backup...');
     autoRefresh();
   };
   
   const handleResetData = () => {
     // TODO: Implementar reset de dados
     if (confirm('Tem certeza que deseja resetar todos os dados?')) {
-      console.log('Resetando dados...');
       // Aqui seria implementado o reset real
       autoRefresh();
     }
@@ -70,7 +67,6 @@ const Settings = () => {
   
   const handleConnectSupabase = () => {
     // TODO: Implementar conexão Supabase
-    console.log('Conectando ao Supabase...');
     autoRefresh();
   };
   

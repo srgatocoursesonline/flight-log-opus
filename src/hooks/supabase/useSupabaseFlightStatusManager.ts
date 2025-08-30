@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -120,7 +120,7 @@ export const useSupabaseFlightStatusManager = () => {
 
       // If no status data exists, create default statuses
       if (statuses.length === 0) {
-        console.log('No flight statuses found, creating default statuses...');
+  
         await createDefaultStatuses();
         // Fetch again after creating defaults
         setTimeout(() => fetchStatuses(), 1000);
@@ -147,7 +147,7 @@ export const useSupabaseFlightStatusManager = () => {
     if (!user) return;
 
     try {
-      console.log('Creating default flight statuses for user:', user.id);
+
       
       const defaultStatusData = defaultStatuses.map(status => ({
         user_id: user.id,
@@ -169,7 +169,7 @@ export const useSupabaseFlightStatusManager = () => {
         return;
       }
 
-      console.log('Default flight statuses created successfully');
+
       toast.success('Status de voo padrão criados com sucesso!');
     } catch (error) {
       console.error('Error in createDefaultStatuses:', error);

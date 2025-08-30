@@ -6,8 +6,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Flight, useSupabaseFlights } from '@/hooks/useSupabaseFlights';
-import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
+import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { cn } from '@/lib/utils';
 
 interface QuickStatusEditProps {

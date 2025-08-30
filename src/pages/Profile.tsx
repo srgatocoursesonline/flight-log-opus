@@ -8,7 +8,7 @@ const Profile = () => {
   
   const handleEditProfile = () => {
     // TODO: Implementar edição de perfil
-    console.log('Editando perfil...');
+
     autoRefresh();
   };
   

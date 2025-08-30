@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ui/useTheme";
 import Index from "./pages/Index";
 import Flights from "./pages/Flights";
 import Ranking from "./pages/Ranking";
@@ -17,6 +17,9 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { LoginPage } from "./pages/Login";
 import { SignupPage } from "./pages/Signup";
+import SuperDiagnostic from "./pages/super-diagnostic";
+import Diagnostic from "./pages/Diagnostic";
+
 
 const queryClient = new QueryClient();
 
@@ -52,6 +55,9 @@ const AppContent = () => {
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/diagnostic" element={<Diagnostic />} />
+        <Route path="/super-diagnostic" element={<SuperDiagnostic />} />
+
         
         {/* Protected Routes */}
         <Route path="/" element={

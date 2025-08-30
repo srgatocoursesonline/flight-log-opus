@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { autoRefresh } from '@/utils/autoRefresh';
@@ -28,6 +28,22 @@ export interface Flight {
   route?: string;
   notes?: string;
   isExample?: boolean; // For distinguishing mock vs real flights
+  // Novos campos
+  serviceType?: 'employee' | 'freelance';
+  originCountry?: string;
+  destinationCountry?: string;
+  originAirportInfo?: {
+    name?: string;
+    iata_code?: string;
+    city?: string;
+    state?: string;
+  };
+  destinationAirportInfo?: {
+    name?: string;
+    iata_code?: string;
+    city?: string;
+    state?: string;
+  };
 }
 
 export const useSupabaseFlights = () => {
@@ -81,6 +97,11 @@ export const useSupabaseFlights = () => {
         route: item.route,
         notes: item.notes,
         isExample: item.is_example || false,
+        serviceType: item.service_type || 'employee',
+        originCountry: item.origin_country || '',
+        destinationCountry: item.destination_country || '',
+        originAirportInfo: item.origin_airport_info || undefined,
+        destinationAirportInfo: item.destination_airport_info || undefined
       }));
 
       setFlights(flightData);
@@ -100,7 +121,7 @@ export const useSupabaseFlights = () => {
 
   // Add new flight
   const addFlight = async (flight: Omit<Flight, 'id'>) => {
-    console.log('useSupabaseFlights.addFlight chamado com:', flight);
+
     
     if (!user) {
       console.error('Usuário não autenticado');
@@ -109,7 +130,7 @@ export const useSupabaseFlights = () => {
     }
 
     try {
-      console.log('Usuário autenticado:', user.id);
+
       
       const insertData = {
         user_id: user.id,
@@ -130,9 +151,14 @@ export const useSupabaseFlights = () => {
         route: flight.route,
         notes: flight.notes,
         is_example: flight.isExample || false,
+        service_type: flight.serviceType || 'employee',
+        origin_country: flight.originCountry || null,
+        destination_country: flight.destinationCountry || null,
+        origin_airport_info: flight.originAirportInfo ? JSON.stringify(flight.originAirportInfo) : null,
+        destination_airport_info: flight.destinationAirportInfo ? JSON.stringify(flight.destinationAirportInfo) : null
       };
       
-      console.log('Dados para inserção no Supabase:', insertData);
+
       
       const { data, error } = await supabase
         .from('flights')
@@ -146,11 +172,11 @@ export const useSupabaseFlights = () => {
         throw error;
       }
       
-      console.log('Voo inserido com sucesso no Supabase:', data);
+
 
       // Refresh data
       await fetchFlights();
-      console.log('Lista de voos atualizada');
+
       
       toast.success(`Voo "${flight.callsign}" adicionado com sucesso!`);
       
@@ -192,6 +218,11 @@ export const useSupabaseFlights = () => {
       if (updates.route !== undefined) dbUpdates.route = updates.route;
       if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
       if (updates.isExample !== undefined) dbUpdates.is_example = updates.isExample;
+      if (updates.serviceType !== undefined) dbUpdates.service_type = updates.serviceType;
+      if (updates.originCountry !== undefined) dbUpdates.origin_country = updates.originCountry;
+      if (updates.destinationCountry !== undefined) dbUpdates.destination_country = updates.destinationCountry;
+      if (updates.originAirportInfo !== undefined) dbUpdates.origin_airport_info = updates.originAirportInfo ? JSON.stringify(updates.originAirportInfo) : null;
+      if (updates.destinationAirportInfo !== undefined) dbUpdates.destination_airport_info = updates.destinationAirportInfo ? JSON.stringify(updates.destinationAirportInfo) : null;
 
       const { error } = await supabase
         .from('flights')

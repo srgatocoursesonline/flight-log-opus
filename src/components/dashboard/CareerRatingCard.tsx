@@ -1,7 +1,7 @@
 import { Trophy, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useSupabaseCareerManager } from '@/hooks/useSupabaseCareerManager';
+import { useSupabaseCareerManager } from '@/hooks/supabase/useSupabaseCareerManager';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -11,10 +11,7 @@ export const CareerRatingCard = () => {
   const [showReminder, setShowReminder] = useState(true);
   const navigate = useNavigate();
   
-  // Debug: Log career data changes
-  useEffect(() => {
-    console.log('CareerRatingCard - careerData updated:', careerData);
-  }, [careerData]);
+
   
   // Verificar se o lembrete deve ser exibido (baseado em localStorage)
   useEffect(() => {
@@ -129,10 +126,7 @@ export const CareerRatingCard = () => {
               <p className="text-sm text-muted-foreground">
                 {getPerformanceText(careerData.careerClass)}
               </p>
-              {/* Debug information */}
-              <p className="text-xs text-muted-foreground mt-1">
-                Última atualização: {careerData.lastUpdated ? new Date(careerData.lastUpdated).toLocaleTimeString() : 'N/A'}
-              </p>
+
             </div>
           )}
         </div>

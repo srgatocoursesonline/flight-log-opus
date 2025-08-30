@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -131,7 +131,7 @@ export const useSupabaseAircraftManager = () => {
 
       // If no aircraft data exists, create default aircraft
       if (aircraft.length === 0) {
-        console.log('No aircraft found, creating default aircraft...');
+  
         await createDefaultAircraft();
         // Fetch again after creating defaults
         setTimeout(() => fetchAircraft(), 1000);
@@ -158,7 +158,7 @@ export const useSupabaseAircraftManager = () => {
     if (!user) return;
 
     try {
-      console.log('Creating default aircraft for user:', user.id);
+
       
       const defaultAircraftData = defaultAircraft.map(name => ({
         user_id: user.id,
@@ -180,7 +180,7 @@ export const useSupabaseAircraftManager = () => {
         return;
       }
 
-      console.log('Default aircraft created successfully');
+
       toast.success('Aeronaves padrão criadas com sucesso!');
     } catch (error) {
       console.error('Error in createDefaultAircraft:', error);

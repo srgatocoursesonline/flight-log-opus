@@ -32,8 +32,8 @@ import {
   Route,
   Calendar
 } from 'lucide-react';
-import { Flight, useSupabaseFlights } from '@/hooks/useSupabaseFlights';
-import { useSupabaseFlightStatusManager } from '@/hooks/useSupabaseFlightStatusManager';
+import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { AddFlightModal, AddFlightModalRef } from './AddFlightModal';
 import { QuickStatusEdit } from './QuickStatusEdit';
 import { cn } from '@/lib/utils';

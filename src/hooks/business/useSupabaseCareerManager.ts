@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -25,7 +25,7 @@ export const useSupabaseCareerManager = () => {
     }
 
     try {
-      console.log('Atualizando dados de carreira (método simples):', updates);
+  
       
       // Garantir que o banco de dados está inicializado
       await initializeDatabase();
@@ -39,7 +39,7 @@ export const useSupabaseCareerManager = () => {
       };
       
       // 1. ABORDAGEM 1: Tentar RPC
-      console.log('Tentativa 1: Usando função RPC para atualizar');
+
       const { data: result, error: rpcError } = await supabase.rpc(
         'update_career_data', 
         { user_id: user.id, data_json: JSON.stringify(data) }
@@ -49,11 +49,11 @@ export const useSupabaseCareerManager = () => {
         console.error('Erro ao atualizar via RPC:', rpcError);
         throw new Error(`Erro RPC: ${rpcError.message}`);
       } else {
-        console.log('Atualização via RPC bem-sucedida:', result);
+
       }
       
       // 2. ABORDAGEM 2: Atualização direta na tabela
-      console.log('Tentativa 2: Atualização direta na tabela');
+
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -67,11 +67,11 @@ export const useSupabaseCareerManager = () => {
       if (updateError) {
         console.error('Erro ao atualizar diretamente:', updateError);
       } else {
-        console.log('Atualização direta bem-sucedida');
+
       }
       
       // 3. ABORDAGEM 3: Upsert
-      console.log('Tentativa 3: Usando upsert para garantir');
+
       const { error: upsertError } = await supabase
         .from('profiles')
         .upsert({
@@ -86,11 +86,11 @@ export const useSupabaseCareerManager = () => {
       if (upsertError) {
         console.error('Erro ao fazer upsert:', upsertError);
       } else {
-        console.log('Upsert bem-sucedido');
+
       }
       
       // 4. ABORDAGEM 4: SQL direto
-      console.log('Tentativa 4: SQL direto via RPC');
+
       const sqlQuery = `
         UPDATE profiles 
         SET 
@@ -109,7 +109,7 @@ export const useSupabaseCareerManager = () => {
       if (sqlError) {
         console.error('Erro ao executar SQL direto:', sqlError);
       } else {
-        console.log('SQL direto executado com sucesso');
+
       }
       
       // Atualizar estado local
@@ -147,12 +147,12 @@ export const useSupabaseCareerManager = () => {
   const initializeDatabase = async () => {
     if (!user) return false;
     
-    console.log('Inicializando banco de dados para usuário:', user.id);
+    
     
     try {
       // ABORDAGEM 1: RPC para criar colunas
       try {
-        console.log('Tentativa 1: Usando RPC para criar colunas');
+  
         // Primeiro tentar criar colunas via RPC personalizada
         const { data: rpcResult, error: rpcError } = await supabase.rpc(
           'fetch_career_data',
@@ -160,7 +160,7 @@ export const useSupabaseCareerManager = () => {
         );
         
         if (!rpcError) {
-          console.log('Inicialização via RPC bem-sucedida');
+  
           return true;
         }
         
@@ -171,7 +171,7 @@ export const useSupabaseCareerManager = () => {
       
       // ABORDAGEM 2: SQL direto para criar colunas
       try {
-        console.log('Tentativa 2: SQL direto para criar colunas');
+  
         const sqlQuery = `
           BEGIN;
           
@@ -201,7 +201,7 @@ export const useSupabaseCareerManager = () => {
           throw error;
         }
         
-        console.log('Inicialização via SQL direto bem-sucedida');
+
         return true;
       } catch (sqlError) {
         console.error('Erro ao executar SQL de inicialização:', sqlError);
@@ -209,7 +209,7 @@ export const useSupabaseCareerManager = () => {
       
       // ABORDAGEM 3: Upsert direto
       try {
-        console.log('Tentativa 3: Upsert direto');
+  
         // Tentar inserir/atualizar diretamente na tabela profiles
         const { error } = await supabase
           .from('profiles')
@@ -228,7 +228,7 @@ export const useSupabaseCareerManager = () => {
           throw error;
         }
         
-        console.log('Upsert do perfil bem-sucedido');
+
         return true;
       } catch (upsertError) {
         console.error('Erro no upsert direto:', upsertError);
@@ -255,7 +255,7 @@ export const useSupabaseCareerManager = () => {
       setIsLoading(true);
       setError(null);
 
-      console.log('Buscando dados de carreira para usuário:', user.id);
+  
       
       // Primeiro, inicializar o banco de dados
       await initializeDatabase();
@@ -264,7 +264,7 @@ export const useSupabaseCareerManager = () => {
       
       // ABORDAGEM 1: Tentar via RPC personalizada
       try {
-        console.log('Tentativa 1: Buscando via RPC');
+  
         const { data: sqlResult, error: rpcError } = await supabase.rpc(
           'fetch_career_data',
           { user_id: user.id }
@@ -276,7 +276,7 @@ export const useSupabaseCareerManager = () => {
         }
         
         if (sqlResult && sqlResult.length > 0) {
-          console.log('Dados recebidos via RPC:', sqlResult[0]);
+  
           profileData = sqlResult[0];
         }
       } catch (rpcError) {
@@ -286,7 +286,7 @@ export const useSupabaseCareerManager = () => {
       // ABORDAGEM 2: Busca direta na tabela profiles
       if (!profileData) {
         try {
-          console.log('Tentativa 2: Buscando direto na tabela profiles');
+  
           const { data, error } = await supabase
             .from('profiles')
             .select('total_rating, career_level, career_class, updated_at')
@@ -299,7 +299,7 @@ export const useSupabaseCareerManager = () => {
           }
           
           if (data) {
-            console.log('Dados recebidos via tabela:', data);
+  
             profileData = data;
           }
         } catch (tableError) {
@@ -310,7 +310,7 @@ export const useSupabaseCareerManager = () => {
       // ABORDAGEM 3: SQL direto
       if (!profileData) {
         try {
-          console.log('Tentativa 3: SQL direto');
+  
           const sqlQuery = `
             SELECT total_rating, career_level, career_class, updated_at 
             FROM profiles 
@@ -336,7 +336,7 @@ export const useSupabaseCareerManager = () => {
             .single();
           
           if (!directError && directData) {
-            console.log('Dados obtidos após SQL direto:', directData);
+  
             profileData = directData;
           }
         } catch (sqlError) {
@@ -354,7 +354,7 @@ export const useSupabaseCareerManager = () => {
           lastUpdated: profileData.updated_at || new Date().toISOString()
         };
         
-        console.log('Setting career data to:', newData);
+  
         setCareerData(newData);
       } else {
         // Se todas as tentativas falharam, usar valores padrão
@@ -366,7 +366,7 @@ export const useSupabaseCareerManager = () => {
           lastUpdated: new Date().toISOString()
         };
         
-        console.log('Setting default career data:', defaultData);
+
         setCareerData(defaultData);
         
         // Tentar criar perfil padrão
@@ -385,7 +385,7 @@ export const useSupabaseCareerManager = () => {
           if (error) {
             console.error('Erro ao criar perfil padrão:', error);
           } else {
-            console.log('Perfil padrão criado com sucesso');
+    
           }
         } catch (createError) {
           console.error('Erro ao tentar criar perfil padrão:', createError);
@@ -403,7 +403,7 @@ export const useSupabaseCareerManager = () => {
         lastUpdated: new Date().toISOString()
       };
       
-      console.log('Setting default career data due to error:', defaultData);
+      
       setCareerData(defaultData);
     } finally {
       setIsLoading(false);

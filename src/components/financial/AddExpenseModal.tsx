@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Receipt } from 'lucide-react';
-import { useSupabaseFinancial, type Transaction } from '@/hooks/useSupabaseFinancial';
-import { useSupabaseExpenseCategories } from '@/hooks/useSupabaseExpenseCategories';
-import { useToast } from '@/hooks/use-toast';
+import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupabaseFinancial';
+import { useSupabaseExpenseCategories } from '@/hooks/supabase/useSupabaseExpenseCategories';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface AddExpenseModalProps {
   trigger?: React.ReactNode;
