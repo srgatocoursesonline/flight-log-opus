@@ -1,12 +1,13 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Plane } from "lucide-react";
+import { Plus, Search, Filter, Plane, LayoutGrid, List } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { AddFlightModal, AddFlightModalRef } from '@/components/flights/AddFlightModal';
 import { FlightCard } from '@/components/flights/FlightCard';
+import { FlightCardCompact } from '@/components/flights/FlightCardCompact';
 import { FlightStats } from '@/components/flights/FlightStats';
 import {
   Select,
@@ -25,6 +26,7 @@ const Flights = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date-desc');
+  const [viewMode, setViewMode] = useState<'compact' | 'detailed'>('detailed');
   const addFlightModalRef = useRef<AddFlightModalRef>(null);
 
   // Escutar evento para abrir modal automaticamente ou verificar URL params
@@ -150,6 +152,28 @@ const Flights = () => {
         </div>
         
         <div className="flex gap-2">
+          {/* Toggle de Visualização */}
+          <div className="flex border border-border rounded-lg p-1 bg-muted/30">
+            <Button
+              variant={viewMode === 'compact' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('compact')}
+              className="h-8 px-3"
+              title="Visualização Resumida"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'detailed' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('detailed')}
+              className="h-8 px-3"
+              title="Visualização Detalhada"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Status" />
@@ -213,7 +237,11 @@ const Flights = () => {
               className="fade-in" 
               style={{ animationDelay: `${0.1 + (index * 0.05)}s` }}
             >
-              <FlightCard flight={flight} />
+              {viewMode === 'compact' ? (
+                <FlightCardCompact flight={flight} />
+              ) : (
+                <FlightCard flight={flight} />
+              )}
             </div>
           ))}
         </div>
