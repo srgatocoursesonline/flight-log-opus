@@ -20,7 +20,7 @@ const ptBR = {
     // Dashboard
     dashboard: {
       title: "Centro de Operações de Voo",
-      subtitle: "Bem-vindo de volta, Capitão. Visão geral da progressão da sua carreira.",
+      subtitle: "{{greeting}}. Visão geral da progressão da sua carreira.",
       careerRating: "Rating de Carreira",
       totalFlights: "Total de Voos",
       flightHours: "Horas de Voo",
@@ -311,7 +311,7 @@ const enUS = {
     // Dashboard
     dashboard: {
       title: "Flight Operations Center",
-      subtitle: "Welcome back, Captain. Your career progression overview.",
+      subtitle: "{{greeting}}. Your career progression overview.",
       careerRating: "Career Rating",
       totalFlights: "Total Flights",
       flightHours: "Flight Hours",

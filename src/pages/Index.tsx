@@ -17,11 +17,13 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFlightNavigation } from "@/hooks/business/useFlightNavigation";
 import { useSupabaseFlights } from "@/hooks/supabase/useSupabaseFlights";
+import { useGreeting } from "@/hooks/useGreeting";
 
 const Index = () => {
   const { t } = useTranslation();
   const { navigateToAddFlight } = useFlightNavigation();
   const { getFlightStats } = useSupabaseFlights();
+  const { greeting, isLoading: greetingLoading } = useGreeting();
   const stats = getFlightStats();
   
   return (
@@ -31,7 +33,7 @@ const Index = () => {
           {t('dashboard.title')}
         </h1>
         <p className="text-muted-foreground">
-          {t('dashboard.subtitle')}
+          {greetingLoading ? 'Carregando...' : t('dashboard.subtitle', { greeting })}
         </p>
       </div>
 
