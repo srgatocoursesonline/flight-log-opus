@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
+import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { AddFlightModal, AddFlightModalRef } from './AddFlightModal';
 import { QuickStatusEdit } from './QuickStatusEdit';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   const { t } = useTranslation();
   const { deleteFlight } = useSupabaseFlights();
   const statusManager = useSupabaseFlightStatusManager();
+  const flightSettings = useFlightSettings();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const editModalRef = useRef<AddFlightModalRef>(null);
 
@@ -233,7 +235,9 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
             <div className="flex items-center gap-2">
               <Fuel className="h-4 w-4 text-warning" />
               <span className="text-muted-foreground">Combustível:</span>
-              <span className="text-foreground font-mono">{flight.fuelUsed ? `${flight.fuelUsed} lb` : 'N/A'}</span>
+              <span className="text-foreground font-mono">
+                {flight.fuelUsed ? `${flight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
+              </span>
             </div>
             {flight.route && (
               <div className="flex items-center gap-2">

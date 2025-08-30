@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Flight } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
+import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -32,6 +33,7 @@ interface FlightDetailModalProps {
 export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailModalProps) => {
   const { t } = useTranslation();
   const statusManager = useSupabaseFlightStatusManager();
+  const flightSettings = useFlightSettings();
 
   if (!flight) return null;
 
@@ -212,7 +214,7 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
                 <div>
                   <p className="text-sm text-muted-foreground">Combustível Usado</p>
                   <p className="text-lg font-semibold font-mono">
-                    {flight.fuelUsed ? `${flight.fuelUsed} lb` : 'N/A'}
+                    {flight.fuelUsed ? `${flight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
                   </p>
                 </div>
               </div>

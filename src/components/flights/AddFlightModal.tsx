@@ -25,6 +25,7 @@ import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlig
 import { autoRefresh } from '@/utils/autoRefresh';
 import { useToast } from '@/hooks/ui/use-toast';
 import { useFlightDraft, type FlightFormData } from '@/hooks/business/useFlightDraft';
+import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { countries } from '@/lib/data/countries';
 import { fetchAirportByIcao } from '@/lib/services/airportService';
 
@@ -44,6 +45,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
   const aircraftManager = useSupabaseAircraftManager();
   const statusManager = useSupabaseFlightStatusManager();
   const { toast } = useToast();
+  const flightSettings = useFlightSettings();
   
   // Hook de persistência (só ativo quando não estiver editando)
   const {
@@ -262,8 +264,8 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
     }
   }, [formData.departureTime, formData.arrivalTime]);
 
-  // Obter opções de aeronaves: aeronaves customizadas ativas + aeronaves padrão
-  const aircraftOptions = [
+  // Obter opções de aeronaves: aeronaves customizadas ativas + aeronaves padrão (sem duplicatas)
+  const aircraftOptions = Array.from(new Set([
     // Aeronaves customizadas ativas
     ...aircraftManager.getAllAircraftNames(),
     
@@ -290,7 +292,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       'Robinson R44',
       'Airbus H125'
     ] : [])
-  ];
+  ]));
 
   // Obter opções de status: status customizados ativos + conversão para formato compatível
   const statusOptions = [
@@ -588,11 +590,13 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
               />
             </div>
             <div>
-              <Label htmlFor="fuelUsed" className="text-foreground">Combustível (lb)</Label>
+              <Label htmlFor="fuelUsed" className="text-foreground">
+                {flightSettings.getFuelUnitLabel()}
+              </Label>
               <Input
                 id="fuelUsed"
                 type="number"
-                placeholder="6283"
+                placeholder={flightSettings.getFuelUnitPlaceholder()}
                 value={formData.fuelUsed}
                 onChange={(e) => setFormData({ ...formData, fuelUsed: e.target.value })}
                 className="mt-1"

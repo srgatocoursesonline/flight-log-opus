@@ -97,7 +97,7 @@ export const useSupabaseMSFSFlights = () => {
     try {
       // Buscar estatísticas usando RPC function
       const { data, error } = await supabase
-        .rpc('get_msfs_flight_stats', { user_id: user.id });
+        .rpc('get_msfs_flight_stats', { p_user_id: user.id });
 
       if (error) {
         console.error('Erro ao buscar estatísticas MSFS:', error);

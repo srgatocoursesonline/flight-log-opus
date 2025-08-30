@@ -31,14 +31,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Plane, Settings2, Trash2, Edit, RotateCcw, Clock } from 'lucide-react';
+import { Plus, Plane, Settings2, Trash2, Edit, RotateCcw, Clock, Fuel } from 'lucide-react';
 import { useSupabaseAircraftManager, type CustomAircraft } from '@/hooks/supabase/useSupabaseAircraftManager';
 import { useSupabaseFlightStatusManager, type FlightStatus } from '@/hooks/supabase/useSupabaseFlightStatusManager';
+import { useFlightSettings, type FuelUnit } from '@/hooks/business/useFlightSettings';
 import { useToast } from '@/hooks/ui/use-toast';
 
 export const FlightConfigManager = () => {
   const aircraftManager = useSupabaseAircraftManager();
   const statusManager = useSupabaseFlightStatusManager();
+  const flightSettings = useFlightSettings();
   const { toast } = useToast();
   
   // Estados para modais de aeronaves
@@ -159,8 +161,12 @@ export const FlightConfigManager = () => {
       </CardHeader>
       
       <CardContent>
-        <Tabs defaultValue="aircraft" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="general" className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4" />
+              Geral
+            </TabsTrigger>
             <TabsTrigger value="aircraft" className="flex items-center gap-2">
               <Plane className="h-4 w-4" />
               Aeronaves
@@ -170,6 +176,101 @@ export const FlightConfigManager = () => {
               Status
             </TabsTrigger>
           </TabsList>
+          
+          {/* Tab de Configurações Gerais */}
+          <TabsContent value="general" className="space-y-4">
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-4">Unidades de Medida</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Fuel className="h-5 w-5 text-primary" />
+                      <div>
+                        <Label className="text-sm font-medium">Unidade de Combustível</Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Escolha a unidade para inserir combustível nos voos
+                        </p>
+                      </div>
+                    </div>
+                    <Select 
+                      value={flightSettings.fuelUnit} 
+                      onValueChange={(value: FuelUnit) => {
+                        const success = flightSettings.setFuelUnit(value);
+                        if (success) {
+                          toast({
+                            title: "Configuração salva!",
+                            description: `Unidade de combustível alterada para ${value === 'kg' ? 'quilogramas (kg)' : 'libras (lb)'}`,
+                          });
+                        } else {
+                          toast({
+                            title: "Erro",
+                            description: "Erro ao salvar configuração",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="lb">Libras (lb)</SelectItem>
+                        <SelectItem value="kg">Quilogramas (kg)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-sm font-medium text-foreground">Restaurar Configurações</h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Voltar às configurações padrão do sistema
+                    </p>
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Restaurar Padrões
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="glass-panel">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Restaurar Configurações Padrão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Isso irá restaurar todas as configurações gerais para os valores padrão.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => {
+                          const success = flightSettings.resetToDefaults();
+                          if (success) {
+                            toast({
+                              title: "Configurações restauradas!",
+                              description: "Todas as configurações foram restauradas para os valores padrão",
+                            });
+                          } else {
+                            toast({
+                              title: "Erro",
+                              description: "Erro ao restaurar configurações",
+                              variant: "destructive",
+                            });
+                          }
+                        }}>
+                          Restaurar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
           
           {/* Tab de Aeronaves */}
           <TabsContent value="aircraft" className="space-y-4">
