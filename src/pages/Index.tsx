@@ -12,6 +12,7 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { FlightChart } from "@/components/dashboard/FlightChart";
 import { RecentFlights } from "@/components/dashboard/RecentFlights";
 import { CareerRatingCard } from "@/components/dashboard/CareerRatingCard";
+import { MSFSFlights } from "@/components/dashboard/MSFSFlights";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -73,6 +74,11 @@ const Index = () => {
         <div>
           <RecentFlights />
         </div>
+      </div>
+
+      {/* MSFS Integration */}
+      <div className="grid gap-6">
+        <MSFSFlights limit={3} showHeader={true} showActions={false} />
       </div>
 
       {/* Quick Actions */}

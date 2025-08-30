@@ -9,6 +9,8 @@ const ptBR = {
     navigation: {
       dashboard: "Dashboard",
       flights: "Voos",
+      realtime: "Tempo Real",
+      maps: "Mapas",
       ranking: "Ranking",
       history: "Histórico",
       goals: "Metas",
@@ -300,6 +302,8 @@ const enUS = {
     navigation: {
       dashboard: "Dashboard",
       flights: "Flights",
+      realtime: "Real Time",
+      maps: "Maps",
       ranking: "Ranking",
       history: "History", 
       goals: "Goals",

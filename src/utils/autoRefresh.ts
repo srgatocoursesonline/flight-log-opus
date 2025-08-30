@@ -1,11 +1,15 @@
 /**
  * Função utilitária para refresh automático após operações de CRUD
  * Usado em todos os formulários e operações que modificam dados
+ * NOTA: Removido window.location.reload() para evitar loops infinitos
  */
-export const autoRefresh = (delay: number = 300) => {
-  setTimeout(() => {
-    window.location.reload();
-  }, delay);
+export const autoRefresh = (callback?: () => void, delay: number = 300) => {
+  if (callback) {
+    const timeoutId = setTimeout(callback, delay);
+    return () => clearTimeout(timeoutId);
+  }
+  // Se não há callback, não faz nada (evita reload da página)
+  return () => {};
 };
 
 /**
@@ -15,7 +19,7 @@ export const autoRefresh = (delay: number = 300) => {
 export const useAutoRefresh = () => {
   const refreshAfterOperation = (callback: () => void, delay: number = 300) => {
     callback();
-    autoRefresh(delay);
+    // Não chama mais autoRefresh automaticamente para evitar reloads
   };
 
   return { refreshAfterOperation, autoRefresh };

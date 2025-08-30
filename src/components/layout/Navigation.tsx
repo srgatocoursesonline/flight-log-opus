@@ -7,7 +7,9 @@ import {
   Target, 
   DollarSign,
   Settings,
-  User
+  User,
+  Activity,
+  Map
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -16,6 +18,8 @@ import { MSFSLogo } from "@/components/ui/msfs-logo";
 const navItems = [
   { to: "/", icon: Home, labelKey: "navigation.dashboard" },
   { to: "/flights", icon: Plane, labelKey: "navigation.flights" },
+  { to: "/realtime", icon: Activity, labelKey: "navigation.realtime" },
+  { to: "/maps", icon: Map, labelKey: "navigation.maps" },
   { to: "/ranking", icon: TrendingUp, labelKey: "navigation.ranking" },
   { to: "/history", icon: History, labelKey: "navigation.history" },
   { to: "/goals", icon: Target, labelKey: "navigation.goals" },

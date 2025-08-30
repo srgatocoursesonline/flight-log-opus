@@ -19,6 +19,8 @@ import { LoginPage } from "./pages/Login";
 import { SignupPage } from "./pages/Signup";
 import SuperDiagnostic from "./pages/super-diagnostic";
 import Diagnostic from "./pages/Diagnostic";
+import RealTimeTracking from "./pages/RealTimeTracking";
+import FlightMaps from "./pages/FlightMaps";
 
 
 const queryClient = new QueryClient();
@@ -68,6 +70,8 @@ const AppContent = () => {
           <Route index element={<Index />} />
           <Route path="dashboard" element={<Index />} />
           <Route path="flights" element={<Flights />} />
+          <Route path="realtime" element={<RealTimeTracking />} />
+          <Route path="maps" element={<FlightMaps />} />
           <Route path="ranking" element={<Ranking />} />
           <Route path="history" element={<History />} />
           <Route path="goals" element={<Goals />} />
