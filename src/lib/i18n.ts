@@ -291,6 +291,14 @@ const ptBR = {
       showing: "Exibindo",
       of: "de",
       flights: "voos"
+    },
+
+    // Auth
+    auth: {
+      signOut: "Sair",
+      signOutSuccess: "Logout realizado com sucesso",
+      signOutError: "Erro ao fazer logout",
+      signingOut: "Saindo..."
     }
   }
 };
@@ -572,6 +580,14 @@ const enUS = {
       save: "Save",
       cancel: "Cancel",
       loading: "Loading..."
+    },
+
+    // Auth
+    auth: {
+      signOut: "Sign Out",
+      signOutSuccess: "Successfully signed out",
+      signOutError: "Error signing out",
+      signingOut: "Signing out..."
     }
   }
 };

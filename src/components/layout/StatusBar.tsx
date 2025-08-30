@@ -3,6 +3,7 @@ import { Wifi, WifiOff, Battery, Signal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 export const StatusBar = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -41,9 +42,11 @@ export const StatusBar = () => {
         </div>
         
         <div className="flex items-center gap-2 lg:gap-4">
+          <ProfileDropdown />
+          <div className="h-4 w-px bg-border hidden sm:block" />
           <LanguageSwitcher />
           <ThemeToggle />
-          <div className="text-xs font-mono text-foreground">
+          <div className="text-xs font-mono text-foreground hidden md:block">
             {currentTime.toLocaleTimeString('en-US', { 
               hour12: false,
               hour: '2-digit',
