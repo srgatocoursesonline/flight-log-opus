@@ -98,6 +98,10 @@ export interface Database {
           career_level: number;
           career_class: 'S' | 'A' | 'B' | 'C' | 'D';
           world_ranking: number;
+          career_started: string | null;
+          achievements: string | null;
+          perfect_flights: number | null;
+          description: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -113,6 +117,10 @@ export interface Database {
           career_level?: number;
           career_class?: 'S' | 'A' | 'B' | 'C' | 'D';
           world_ranking?: number;
+          career_started?: string | null;
+          achievements?: string | null;
+          perfect_flights?: number | null;
+          description?: string | null;
         };
         Update: {
           display_name?: string;
@@ -125,6 +133,10 @@ export interface Database {
           career_level?: number;
           career_class?: 'S' | 'A' | 'B' | 'C' | 'D';
           world_ranking?: number;
+          career_started?: string | null;
+          achievements?: string | null;
+          perfect_flights?: number | null;
+          description?: string | null;
         };
       };
       expense_categories: {
