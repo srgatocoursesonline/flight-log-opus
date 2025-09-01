@@ -11,7 +11,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import RealTimeTracker from '@/components/flight/RealTimeTracker';
+import LiveTrackingMap from '@/components/maps/LiveTrackingMap';
 
 export default function RealTimeTracking() {
   const { t } = useTranslation();
@@ -49,7 +49,7 @@ export default function RealTimeTracking() {
                 <div>
                   <p className="font-medium">Conexão WebSocket</p>
                   <p className="text-sm text-muted-foreground">
-                    Dados em tempo real via ws://localhost:3002
+                    Dados em tempo real via ws://localhost:3001
                   </p>
                 </div>
               </div>
@@ -106,14 +106,16 @@ export default function RealTimeTracking() {
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   <li>• Inicie o MSFS 2024</li>
                   <li>• Execute o companion service</li>
+                  <li>• Execute o flight tracking server</li>
                   <li>• Carregue uma aeronave no simulador</li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-medium mb-2">2. Tracking</h4>
                 <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>• Os dados aparecem automaticamente</li>
-                  <li>• Voos são detectados e salvos automaticamente</li>
+                  <li>• Visualização em tempo real no mapa</li>
+                  <li>• Voos detectados e salvos automaticamente</li>
+                  <li>• Caminho do voo mostrado em tempo real</li>
                   <li>• Histórico disponível na página de voos</li>
                 </ul>
               </div>
@@ -130,7 +132,7 @@ export default function RealTimeTracking() {
       </Card>
 
       {/* Componente Principal de Tracking */}
-      <RealTimeTracker />
+      <LiveTrackingMap />
 
       {/* Links Úteis */}
       <Card>
@@ -147,9 +149,9 @@ export default function RealTimeTracking() {
               </a>
             </Button>
             <Button variant="outline" className="justify-start" asChild>
-              <a href="http://localhost:3003/status" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+              <a href="http://localhost:3001/health" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
-                Status do Companion Service
+                Status do Flight Tracking Service
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </a>
             </Button>

@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 interface AddRevenueModalProps {
   trigger?: React.ReactNode;
   revenue?: Transaction;
+  initialValues?: Partial<Transaction>;
   onClose?: () => void;
 }
 
@@ -33,12 +34,14 @@ export interface AddRevenueModalRef {
   openModal: () => void;
 }
 
-export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalProps>(({ trigger, revenue, onClose }, ref) => {
+export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalProps>(({ trigger, revenue, initialValues, onClose }, ref) => {
   const { t } = useTranslation();
   const { addRevenue, updateRevenue } = useSupabaseFinancial();
-  const { getActiveCategories } = useSupabaseRevenueCategories();
+  const { getActiveCategories, categories } = useSupabaseRevenueCategories();
+  const [prefillCategoryName, setPrefillCategoryName] = useState<string | null>(null);
   const { toast } = useToast();
-  const [open, setOpen] = useState(!!revenue);
+  // Open if editing or if initialValues were provided (clone)
+  const [open, setOpen] = useState(!!revenue || !!initialValues);
 
   // Expor método para abrir modal externamente
   useImperativeHandle(ref, () => ({
@@ -46,9 +49,9 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
   }));
 
   const [formData, setFormData] = useState({
-    description: revenue?.description || '',
-    amount: revenue?.amount?.toString() || '',
-    date: revenue?.date || (() => {
+  description: revenue?.description || initialValues?.description || '',
+  amount: revenue?.amount?.toString() || initialValues?.amount?.toString?.() || '',
+  date: revenue?.date || initialValues?.date || (() => {
       // Get today's date in YYYY-MM-DD format without timezone issues
       const today = new Date();
       const year = today.getFullYear();
@@ -72,9 +75,49 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
         notes: ''
       });
     }
-  }, [revenue]);
+    // If initialValues (clone) were provided, prefill but do not mark as editing
+    else if (initialValues) {
+      setOpen(true);
+      setFormData({
+        description: initialValues.description || '',
+        amount: initialValues.amount?.toString?.() || '',
+        date: initialValues.date || (() => {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = String(today.getMonth() + 1).padStart(2, '0');
+          const day = String(today.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        })(),
+        category: initialValues.category || '',
+        notes: initialValues.notes || ''
+      });
+    }
+  }, [revenue, initialValues]);
 
   const activeCategories = getActiveCategories();
+
+  // If modal opened with initialValues and categories load later, ensure the category id is reapplied
+  useEffect(() => {
+    if (initialValues?.category && activeCategories.length > 0) {
+      const exists = activeCategories.find(c => c.id === initialValues.category);
+      if (exists) {
+        setFormData(fd => ({ ...fd, category: initialValues.category || '' }));
+        setPrefillCategoryName(null);
+      } else {
+        const cat = categories.find(c => c.id === initialValues.category);
+        if (cat) {
+          setFormData(fd => ({ ...fd, category: initialValues.category || '' }));
+          setPrefillCategoryName(cat.name || null);
+        }
+      }
+    }
+  }, [activeCategories, initialValues]);
+
+  useEffect(() => {
+    if (formData.category && activeCategories.find(c => c.id === formData.category)) {
+      setPrefillCategoryName(null);
+    }
+  }, [formData.category, activeCategories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,7 +253,7 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="category" className="text-foreground">Categoria *</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Selecione a categoria" />
                 </SelectTrigger>
@@ -222,6 +265,9 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
                   ))}
                 </SelectContent>
               </Select>
+                {prefillCategoryName && (
+                  <p className="text-xs text-muted-foreground mt-1">Categoria selecionada: {prefillCategoryName}</p>
+                )}
             </div>
             
             <div>

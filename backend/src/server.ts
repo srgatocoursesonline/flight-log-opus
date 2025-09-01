@@ -14,9 +14,6 @@ import { WebSocketServer } from 'ws';
 
 // Importar rotas
 import msfsRoutes from './routes/msfs.js';
-import airportsRoutes from './routes/airports.js';
-import flightsRoutes from './routes/flights.js';
-import { initializeAirportService } from './services/airportService.js';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -130,8 +127,6 @@ class FlightLogServer {
 
     // API routes
     this.app.use('/api/msfs', msfsRoutes);
-    this.app.use('/api/airports', airportsRoutes);
-    this.app.use('/api/flights', flightsRoutes);
 
     // 404 handler
     this.app.use('*', (req, res) => {
@@ -244,7 +239,8 @@ class FlightLogServer {
 // INICIALIZAÇÃO
 // ============================================
 
-if (require.main === module) {
+// Iniciar servidor se executado diretamente
+if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new FlightLogServer();
   server.start();
 

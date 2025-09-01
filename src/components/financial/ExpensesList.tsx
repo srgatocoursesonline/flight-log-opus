@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Edit, Trash2, Receipt } from 'lucide-react';
+import { Edit, Trash2, Receipt, Copy } from 'lucide-react';
 import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupabaseFinancial';
 import { useSupabaseExpenseCategories } from '@/hooks/supabase/useSupabaseExpenseCategories';
 import { useToast } from '@/hooks/ui/use-toast';
@@ -24,6 +24,7 @@ export const ExpensesList = () => {
   const { categories } = useSupabaseExpenseCategories();
   const { toast } = useToast();
   const [editingExpense, setEditingExpense] = useState<Transaction | null>(null);
+  const [prefillExpense, setPrefillExpense] = useState<Partial<Transaction> | null>(null);
 
   const formatCR = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -146,6 +147,27 @@ export const ExpensesList = () => {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          // Ensure we're not in edit mode
+                          setEditingExpense(null);
+                          setPrefillExpense({
+                            description: expense.description,
+                            category: expense.category,
+                            amount: '', // keep as empty string so modal shows blank
+                            date: undefined,
+                            notes: '',
+                            _prefillKey: Date.now()
+                          } as any);
+                        }}
+                        className="icon-hover"
+                        title="Clonar"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -187,10 +209,14 @@ export const ExpensesList = () => {
 
       {/* Modal de Edição */}
       <AddExpenseModal
-        key={editingExpense?.id || 'new'}
+  key={editingExpense?.id || (prefillExpense ? `prefill-${(prefillExpense as any)._prefillKey}` : 'new')}
         expense={editingExpense || undefined}
+        initialValues={prefillExpense || undefined}
         trigger={null}
-        onClose={() => setEditingExpense(null)}
+        onClose={() => {
+          setEditingExpense(null);
+          setPrefillExpense(null);
+        }}
       />
     </>
   );

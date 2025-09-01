@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Edit, Trash2, TrendingUp } from 'lucide-react';
+import { Edit, Trash2, TrendingUp, Copy } from 'lucide-react';
 import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupabaseFinancial';
 import { useSupabaseRevenueCategories } from '@/hooks/supabase/useSupabaseRevenueCategories';
 import { useToast } from '@/hooks/ui/use-toast';
@@ -24,6 +24,7 @@ export const RevenuesList = () => {
   const { categories } = useSupabaseRevenueCategories();
   const { toast } = useToast();
   const [editingRevenue, setEditingRevenue] = useState<Transaction | null>(null);
+  const [prefillRevenue, setPrefillRevenue] = useState<Partial<Transaction> | null>(null);
 
   const formatCR = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -146,6 +147,27 @@ export const RevenuesList = () => {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          // Prefill only description and category; leave amount empty, date will default to today in modal, notes empty
+                          setEditingRevenue(null);
+                          setPrefillRevenue({
+                            description: revenue.description,
+                            category: revenue.category,
+                            amount: '',
+                            date: undefined,
+                            notes: '',
+                            _prefillKey: Date.now()
+                          } as any);
+                        }}
+                        className="icon-hover"
+                        title="Clonar"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -187,10 +209,14 @@ export const RevenuesList = () => {
 
       {/* Modal de Edição */}
       <AddRevenueModal
-        key={editingRevenue?.id || 'new'}
+  key={editingRevenue?.id || (prefillRevenue ? `prefill-${(prefillRevenue as any)._prefillKey}` : 'new')}
         revenue={editingRevenue || undefined}
+        initialValues={prefillRevenue || undefined}
         trigger={null}
-        onClose={() => setEditingRevenue(null)}
+        onClose={() => {
+          setEditingRevenue(null);
+          setPrefillRevenue(null);
+        }}
       />
     </>
   );

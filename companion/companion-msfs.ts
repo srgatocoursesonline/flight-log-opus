@@ -8,7 +8,7 @@ import { open, Protocol, ConnectionHandle } from 'node-simconnect';
 import axios from 'axios';
 import express from 'express';
 import cors from 'cors';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 
 // ============================================
 // CONFIGURAÇÕES
@@ -23,6 +23,10 @@ const CONFIG = {
   
   // Backend do Flight Log Opus
   BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:3001',
+  
+  // Flight Tracking WebSocket
+  FLIGHT_TRACKING_WS: process.env.FLIGHT_TRACKING_WS || 'ws://localhost:3001/flight-tracking',
+  DEVICE_TOKEN: process.env.DEVICE_TOKEN || '',
   
   // Configurações de detecção de voo
   FLIGHT_DETECTION: {
@@ -41,15 +45,32 @@ const CONFIG = {
 // ============================================
 
 interface FlightData {
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  speed: number;
-  onGround: boolean;
+  // Posição
+  latitude: number;           // LAT - Latitude em graus
+  longitude: number;          // LON - Longitude em graus
+  altitude: number;           // ALT - Altitude em pés
+  
+  // Velocidades
+  groundSpeed: number;        // GS - Ground Speed em knots
+  indicatedAirspeed: number;  // IAS - Indicated Airspeed em knots
+  verticalSpeed: number;      // VS - Vertical Speed em pés/min
+  
+  // Orientação
+  heading: number;            // HDG - Heading magnético em graus
+  
+  // Estado
+  onGround: boolean;          // OnGround - Se a aeronave está no solo
+  
+  // Metadados
   aircraft: string;
-  heading: number;
-  verticalSpeed: number;
   timestamp: number;
+  
+  // Dados adicionais para análise
+  trueAirspeed?: number;
+  windSpeed?: number;
+  windDirection?: number;
+  fuelQuantity?: number;
+  engineRPM?: number;
 }
 
 interface FlightLog {
@@ -78,11 +99,18 @@ class MSFSCompanion {
   private lastData: FlightData | null = null;
   private dataInterval: NodeJS.Timeout | null = null;
   private clients: Set<any> = new Set();
+  
+  // Flight Tracking WebSocket
+  private flightTrackingWS: WebSocket | null = null;
+  private isFlightTrackingConnected = false;
+  private currentSessionId: string | null = null;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
     this.setupExpress();
     this.setupWebSocket();
     this.setupSimConnect();
+    this.connectToFlightTracking();
   }
 
   // ============================================
@@ -184,15 +212,114 @@ class MSFSCompanion {
   private requestDataDefinitions() {
     if (!this.simConnect) return;
 
-    // Definir dados que queremos receber - cada um individualmente
-    this.simConnect.addToDataDefinition(0, 'PLANE LATITUDE', 'degrees');
-    this.simConnect.addToDataDefinition(0, 'PLANE LONGITUDE', 'degrees');
-    this.simConnect.addToDataDefinition(0, 'PLANE ALTITUDE', 'feet');
-    this.simConnect.addToDataDefinition(0, 'AIRSPEED INDICATED', 'knots');
-    this.simConnect.addToDataDefinition(0, 'SIM ON GROUND', 'bool');
-    this.simConnect.addToDataDefinition(0, 'TITLE', null);
-    this.simConnect.addToDataDefinition(0, 'PLANE HEADING DEGREES TRUE', 'degrees');
-    this.simConnect.addToDataDefinition(0, 'VERTICAL SPEED', 'feet per minute');
+    // Definir estrutura de dados que queremos receber
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'PLANE LATITUDE',
+      'degrees',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'PLANE LONGITUDE', 
+      'degrees',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'PLANE ALTITUDE',
+      'feet',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'GROUND VELOCITY',
+      'knots',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'AIRSPEED INDICATED',
+      'knots', 
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'VERTICAL SPEED',
+      'feet per minute',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'PLANE HEADING DEGREES MAGNETIC',
+      'degrees',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'SIM ON GROUND',
+      'bool',
+      Protocol.SIMCONNECT_DATATYPE_INT32
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'TITLE',
+      null,
+      Protocol.SIMCONNECT_DATATYPE_STRING256
+    );
+    
+    // Dados adicionais para análise
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'AIRSPEED TRUE',
+      'knots',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'AMBIENT WIND VELOCITY',
+      'knots',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'AMBIENT WIND DIRECTION',
+      'degrees',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'FUEL TOTAL QUANTITY',
+      'gallons',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+    
+    this.simConnect.addToDataDefinition(
+      'FlightData',
+      'GENERAL ENG RPM:1',
+      'rpm',
+      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+    );
+
+    // Solicitar dados a cada frame do simulador
+    this.simConnect.requestDataOnSimObject(
+      'FlightData',
+      'FlightData',
+      0, // User aircraft
+      Protocol.SIMCONNECT_PERIOD_SIM_FRAME,
+      Protocol.SIMCONNECT_DATA_REQUEST_FLAG_CHANGED
+    );
   }
 
   // ============================================
@@ -216,52 +343,48 @@ class MSFSCompanion {
 
   private processFlightData(rawData: any) {
     try {
-      // Extrair dados do buffer corretamente
-      const buffer = rawData.data;
-      if (!buffer || !buffer.readDouble) {
-        console.log('❌ Buffer inválido ou sem dados');
-        return;
-      }
-      
-      // Ler dados na ordem definida em requestDataDefinitions
-      const latitude = buffer.readDouble();     // PLANE LATITUDE
-      const longitude = buffer.readDouble();    // PLANE LONGITUDE  
-      const altitude = buffer.readDouble();     // PLANE ALTITUDE
-      const speed = buffer.readDouble();        // AIRSPEED INDICATED
-      const onGround = buffer.readInt() === 1;  // SIM ON GROUND (boolean)
-      
-      // Para TITLE (string), vamos pular por enquanto e usar um valor fixo
-      let aircraft = 'Aircraft';
-      
-      // Calcular e pular os bytes da string TITLE
-      const currentOffset = buffer.buffer.offset;
-      const remainingBytes = buffer.buffer.limit - currentOffset;
-      
-      // Se temos 16 bytes restantes (2 doubles), a string ocupa o espaço entre
-      const stringSize = remainingBytes - 16; // 2 doubles = 16 bytes
-      if (stringSize > 0) {
-        buffer.buffer.offset += stringSize;
-      }
-      
-      const heading = buffer.readDouble();      // PLANE HEADING DEGREES TRUE
-      const verticalSpeed = buffer.readDouble(); // VERTICAL SPEED
-      
-      const flightData: FlightData = {
-        latitude: latitude || 0,
-        longitude: longitude || 0,
-        altitude: altitude || 0,
-        speed: speed || 0,
-        onGround: onGround,
-        aircraft: aircraft,
-        heading: heading || 0,
-        verticalSpeed: verticalSpeed || 0,
+      // Mapear dados do SimConnect para nossa estrutura
+      const data: FlightData = {
+        // Posição
+        latitude: rawData[0] || 0,           // PLANE LATITUDE
+        longitude: rawData[1] || 0,          // PLANE LONGITUDE  
+        altitude: rawData[2] || 0,           // PLANE ALTITUDE
+        
+        // Velocidades
+        groundSpeed: rawData[3] || 0,        // GROUND VELOCITY
+        indicatedAirspeed: rawData[4] || 0,  // AIRSPEED INDICATED
+        verticalSpeed: rawData[5] || 0,      // VERTICAL SPEED
+        
+        // Orientação
+        heading: rawData[6] || 0,            // PLANE HEADING DEGREES MAGNETIC
+        
+        // Estado
+        onGround: Boolean(rawData[7]),       // SIM ON GROUND
+        
+        // Metadados
+        aircraft: rawData[8] || 'Unknown',   // TITLE
         timestamp: Date.now(),
+        
+        // Dados adicionais
+        trueAirspeed: rawData[9] || 0,       // AIRSPEED TRUE
+        windSpeed: rawData[10] || 0,         // AMBIENT WIND VELOCITY
+        windDirection: rawData[11] || 0,     // AMBIENT WIND DIRECTION
+        fuelQuantity: rawData[12] || 0,      // FUEL TOTAL QUANTITY
+        engineRPM: rawData[13] || 0,         // GENERAL ENG RPM:1
       };
 
-      this.lastData = flightData;
-      this.detectFlightPhase(flightData);
-      this.broadcastData(flightData);
-      
+      this.lastData = data;
+      this.detectFlightPhase(data);
+      this.broadcastData(data);
+
+      // Log para debug com dados expandidos
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Flight Data: ${data.aircraft}`);
+        console.log(`  Position: ${data.latitude.toFixed(6)}, ${data.longitude.toFixed(6)} @ ${data.altitude}ft`);
+        console.log(`  Speed: GS=${data.groundSpeed}kts, IAS=${data.indicatedAirspeed}kts, VS=${data.verticalSpeed}fpm`);
+        console.log(`  Heading: ${data.heading}°, OnGround: ${data.onGround}`);
+        console.log(`  Wind: ${data.windSpeed}kts @ ${data.windDirection}°, Fuel: ${data.fuelQuantity}gal`);
+      }
     } catch (error) {
       console.error('❌ Erro ao processar dados de voo:', error);
     }
@@ -272,16 +395,32 @@ class MSFSCompanion {
   // ============================================
 
   private detectFlightPhase(data: FlightData) {
-    const { MIN_SPEED_TAKEOFF, MIN_SPEED_LANDING, MIN_ALTITUDE_FLIGHT } = CONFIG.FLIGHT_DETECTION;
+    const { groundSpeed, indicatedAirspeed, onGround, altitude } = data;
+    const config = CONFIG.FLIGHT_DETECTION;
 
-    // Detectar início de voo
-    if (!this.isFlying && !data.onGround && data.speed > MIN_SPEED_TAKEOFF && data.altitude > MIN_ALTITUDE_FLIGHT) {
+    // Usar ground speed para detecção mais precisa
+    const effectiveSpeed = Math.max(groundSpeed, indicatedAirspeed);
+
+    // Detectar início de voo (takeoff)
+    if (!this.isFlying && !onGround && effectiveSpeed > config.MIN_SPEED_TAKEOFF && altitude > config.MIN_ALTITUDE_FLIGHT) {
       this.startFlight(data);
+      this.broadcastEvent('flight_started', {
+        aircraft: data.aircraft,
+        position: [data.latitude, data.longitude],
+        altitude: data.altitude,
+        timestamp: data.timestamp
+      });
     }
 
-    // Detectar fim de voo
-    if (this.isFlying && data.onGround && data.speed < MIN_SPEED_LANDING) {
+    // Detectar fim de voo (landing)
+    if (this.isFlying && onGround && effectiveSpeed < config.MIN_SPEED_LANDING) {
       this.endFlight(data);
+      this.broadcastEvent('flight_ended', {
+        aircraft: data.aircraft,
+        position: [data.latitude, data.longitude],
+        flightTime: this.currentFlight?.duration || 0,
+        timestamp: data.timestamp
+      });
     }
 
     // Atualizar dados do voo atual
@@ -291,7 +430,7 @@ class MSFSCompanion {
   }
 
   private startFlight(data: FlightData) {
-    console.log('🛫 Início de voo detectado!');
+    console.log('🛫 Iniciando voo:', data.aircraft);
     
     this.isFlying = true;
     this.currentFlight = {
@@ -299,28 +438,84 @@ class MSFSCompanion {
       startTime: data.timestamp,
       departureLatLon: [data.latitude, data.longitude],
       maxAltitude: data.altitude,
-      maxSpeed: data.speed,
+      maxSpeed: Math.max(data.groundSpeed, data.indicatedAirspeed),
       distance: 0,
     };
 
-    this.broadcastEvent('flightStart', this.currentFlight);
+    // Log detalhado do início do voo
+    console.log(`  Posição inicial: ${data.latitude.toFixed(6)}, ${data.longitude.toFixed(6)}`);
+    console.log(`  Altitude inicial: ${data.altitude}ft`);
+    console.log(`  Velocidade inicial: GS=${data.groundSpeed}kts, IAS=${data.indicatedAirspeed}kts`);
+    
+    // Enviar para Flight Tracking WebSocket
+    if (this.isFlightTrackingConnected) {
+      this.sendToFlightTracking({
+        type: 'start_flight',
+        data: {
+          aircraft: data.aircraft,
+          latitude: data.latitude,
+          longitude: data.longitude
+        }
+      });
+    }
   }
 
   private updateCurrentFlight(data: FlightData) {
     if (!this.currentFlight) return;
 
+    const currentSpeed = Math.max(data.groundSpeed, data.indicatedAirspeed);
+
     // Atualizar máximos
     this.currentFlight.maxAltitude = Math.max(this.currentFlight.maxAltitude, data.altitude);
-    this.currentFlight.maxSpeed = Math.max(this.currentFlight.maxSpeed, data.speed);
+    this.currentFlight.maxSpeed = Math.max(this.currentFlight.maxSpeed, currentSpeed);
 
-    // Calcular distância (aproximada)
+    // Calcular distância percorrida
     if (this.lastData) {
       const distance = this.calculateDistance(
-        this.lastData.latitude, this.lastData.longitude,
-        data.latitude, data.longitude
+        this.lastData.latitude,
+        this.lastData.longitude,
+        data.latitude,
+        data.longitude
       );
       this.currentFlight.distance += distance;
     }
+
+    // Broadcast de atualização de voo em tempo real
+    this.broadcastEvent('flight_update', {
+      flightTime: data.timestamp - this.currentFlight.startTime,
+      distance: this.currentFlight.distance,
+      altitude: data.altitude,
+      speed: currentSpeed,
+      position: [data.latitude, data.longitude],
+      heading: data.heading,
+      verticalSpeed: data.verticalSpeed,
+      fuel: data.fuelQuantity
+    });
+    
+    // Enviar telemetria para Flight Tracking WebSocket
+     if (this.isFlightTrackingConnected && this.currentSessionId) {
+       this.sendToFlightTracking({
+         type: 'flight_data',
+         data: {
+           sessionId: this.currentSessionId,
+           latitude: data.latitude,
+           longitude: data.longitude,
+           altitude: data.altitude,
+           groundSpeed: data.groundSpeed,
+           indicatedAirspeed: data.indicatedAirspeed,
+           verticalSpeed: data.verticalSpeed,
+           heading: data.heading,
+           onGround: data.onGround,
+           aircraft: data.aircraft,
+           timestamp: data.timestamp,
+           trueAirspeed: data.trueAirspeed,
+           windSpeed: data.windSpeed,
+           windDirection: data.windDirection,
+           fuelQuantity: data.fuelQuantity,
+           engineRPM: data.engineRPM
+         }
+       });
+     }
   }
 
   private endFlight(data: FlightData) {
@@ -333,6 +528,23 @@ class MSFSCompanion {
     this.currentFlight.arrivalLatLon = [data.latitude, data.longitude];
     this.currentFlight.duration = this.currentFlight.endTime - this.currentFlight.startTime;
 
+    // Enviar para Flight Tracking WebSocket
+    if (this.isFlightTrackingConnected && this.currentSessionId) {
+      this.sendToFlightTracking({
+        type: 'end_flight',
+        sessionId: this.currentSessionId,
+        data: {
+          aircraft: data.aircraft,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          duration: this.currentFlight.duration,
+          distance: this.currentFlight.distance,
+          maxAltitude: this.currentFlight.maxAltitude,
+          maxSpeed: this.currentFlight.maxSpeed
+        }
+      });
+    }
+    
     // Enviar para o backend
     this.sendFlightToBackend(this.currentFlight);
     
@@ -421,11 +633,128 @@ class MSFSCompanion {
 
   private broadcast(message: any) {
     const messageStr = JSON.stringify(message);
+    
     this.clients.forEach(client => {
-      if (client.readyState === 1) { // WebSocket.OPEN
+      if (client.readyState === client.OPEN) {
         client.send(messageStr);
+      } else {
+        this.clients.delete(client);
       }
     });
+  }
+  
+  // ============================================
+  // FLIGHT TRACKING WEBSOCKET
+  // ============================================
+  
+  private connectToFlightTracking() {
+    if (!CONFIG.DEVICE_TOKEN) {
+      console.log('⚠️  DEVICE_TOKEN não configurado, pulando conexão com Flight Tracking');
+      return;
+    }
+    
+    console.log('🔌 Conectando ao Flight Tracking WebSocket...');
+    
+    try {
+      this.flightTrackingWS = new WebSocket(CONFIG.FLIGHT_TRACKING_WS);
+      
+      this.flightTrackingWS.on('open', () => {
+        console.log('✅ Conectado ao Flight Tracking WebSocket');
+        
+        // Autenticar
+        this.sendToFlightTracking({
+          type: 'auth',
+          deviceToken: CONFIG.DEVICE_TOKEN
+        });
+      });
+      
+      this.flightTrackingWS.on('message', (data) => {
+        try {
+          const message = JSON.parse(data.toString());
+          this.handleFlightTrackingMessage(message);
+        } catch (error) {
+          console.error('Erro ao processar mensagem do Flight Tracking:', error);
+        }
+      });
+      
+      this.flightTrackingWS.on('close', (code, reason) => {
+        console.log(`🔌 Conexão Flight Tracking fechada: ${code} - ${reason}`);
+        this.isFlightTrackingConnected = false;
+        this.currentSessionId = null;
+        
+        // Reconectar após 5 segundos
+        this.reconnectTimeout = setTimeout(() => {
+          this.connectToFlightTracking();
+        }, 5000);
+      });
+      
+      this.flightTrackingWS.on('error', (error) => {
+        console.error('❌ Erro no Flight Tracking WebSocket:', error);
+      });
+      
+    } catch (error) {
+      console.error('❌ Erro ao conectar Flight Tracking WebSocket:', error);
+      
+      // Tentar reconectar após 10 segundos
+      this.reconnectTimeout = setTimeout(() => {
+        this.connectToFlightTracking();
+      }, 10000);
+    }
+  }
+  
+  private handleFlightTrackingMessage(message: any) {
+    switch (message.type) {
+      case 'auth_success':
+        console.log(`✅ Autenticado no Flight Tracking: ${message.deviceName}`);
+        this.isFlightTrackingConnected = true;
+        break;
+        
+      case 'auth_error':
+        console.error(`❌ Erro de autenticação Flight Tracking: ${message.message}`);
+        break;
+        
+      case 'flight_started':
+        console.log(`🛫 Sessão de voo iniciada: ${message.sessionId}`);
+        this.currentSessionId = message.sessionId;
+        break;
+        
+      case 'flight_ended':
+        console.log(`🛬 Sessão de voo finalizada: ${message.sessionId}`);
+        this.currentSessionId = null;
+        break;
+        
+      case 'error':
+        console.error(`❌ Erro Flight Tracking: ${message.message}`);
+        break;
+        
+      case 'pong':
+        // Resposta ao ping
+        break;
+        
+      default:
+        console.log('📨 Mensagem Flight Tracking não reconhecida:', message.type);
+    }
+  }
+  
+  private sendToFlightTracking(message: any) {
+    if (this.flightTrackingWS && this.flightTrackingWS.readyState === WebSocket.OPEN) {
+      this.flightTrackingWS.send(JSON.stringify(message));
+    }
+  }
+  
+  private disconnectFlightTracking() {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
+    if (this.flightTrackingWS) {
+      this.flightTrackingWS.close();
+      this.flightTrackingWS = null;
+    }
+    
+    this.isFlightTrackingConnected = false;
+    this.currentSessionId = null;
   }
 
   // ============================================
@@ -455,9 +784,21 @@ class MSFSCompanion {
   }
 
   private disconnect() {
-    if (this.isConnected && this.simConnect) {
-      this.simConnect.close();
+    if (this.dataInterval) {
+      clearInterval(this.dataInterval);
+      this.dataInterval = null;
     }
+    
+    if (this.simConnect) {
+      this.simConnect.close();
+      this.simConnect = null;
+    }
+    
+    // Desconectar Flight Tracking WebSocket
+    this.disconnectFlightTracking();
+    
+    this.isConnected = false;
+    console.log('🔌 Desconectado do MSFS');
   }
 
   // ============================================
