@@ -121,31 +121,34 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
   return (
     <>
       <Card 
-        className="hud-display flight-item hover:border-primary/50 transition-all duration-300 cursor-pointer"
+        className="hud-display flight-item hover:border-primary/50 transition-all duration-300 cursor-pointer h-full"
         onClick={handleCardClick}
+        tabIndex={0}
       >
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
+        <CardContent className="p-2">
+          <div className="flex items-center justify-between h-full">
             {/* Informações principais */}
-            <div className="flex items-center gap-4 flex-1">
-              <div className="p-2 rounded-lg bg-primary/20">
-                <Plane className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="p-1 rounded-lg bg-primary/20 flex-shrink-0">
+                <Plane className="h-3 w-3 text-primary" />
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-lg font-semibold text-foreground font-mono">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <h3 className="text-xs font-semibold text-foreground font-mono truncate">
                     {flight.callsign}
                   </h3>
-                  {getStatusBadge(flight.status)}
                 </div>
                 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="font-mono font-semibold text-foreground">
+                <div className="flex flex-col text-xs text-muted-foreground gap-0.5">
+                  <span className="font-mono font-semibold text-foreground truncate">
                     {flight.departure} → {flight.arrival}
                   </span>
+                  <span className="text-muted-foreground truncate">
+                    {flight.aircraft}
+                  </span>
                   <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                    <Calendar className="h-2.5 w-2.5" />
                     <span>{formatDate(flight.date)}</span>
                   </div>
                 </div>
@@ -153,44 +156,80 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
             </div>
 
             {/* Ações */}
-            <div className="flex items-center gap-2 ml-4">
+            <div className="flex items-center gap-1 ml-2 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-6 w-6 p-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowDetailModal(true);
                 }}
                 title="Ver detalhes"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-2.5 w-2.5" />
               </Button>
               
-              <QuickStatusEdit flight={flight} />
+              <div 
+                className="inline-block cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Abrir o popover de edição de status
+                  const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                  });
+                  const trigger = document.getElementById(`status-edit-trigger-${flight.id}`);
+                  if (trigger) {
+                    trigger.dispatchEvent(event);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Abrir o popover de edição de status
+                    const event = new MouseEvent('click', {
+                      bubbles: true,
+                      cancelable: true,
+                      view: window
+                    });
+                    const trigger = document.getElementById(`status-edit-trigger-${flight.id}`);
+                    if (trigger) {
+                      trigger.dispatchEvent(event);
+                    }
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Alterar status do voo ${flight.callsign}`}
+              >
+                {getStatusBadge(flight.status)}
+              </div>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 w-8 p-0"
+                    className="h-6 w-6 p-0"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <MoreVertical className="h-2.5 w-2.5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-panel">
                   <DropdownMenuItem onClick={() => editModalRef.current?.openModal()}>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Editar
+                    <Edit className="h-3 w-3 mr-1" />
+                    <span className="text-xs">Editar</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => setShowDeleteDialog(true)}
                     className="text-destructive focus:text-destructive"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Excluir
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    <span className="text-xs">Excluir</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

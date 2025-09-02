@@ -334,19 +334,29 @@ const Flights = () => {
                   <div className="flex-1 h-px bg-border"></div>
                 </div>
               )}
-              {filteredAndSortedFlights.map((flight, index) => (
-                <div 
-                  key={`flight-${flight.id}`} 
-                  className="fade-in" 
-                  style={{ animationDelay: `${0.1 + ((filteredAndSortedSessions.length + index) * 0.05)}s` }}
-                >
-                  {viewMode === 'compact' ? (
-                    <FlightCardCompact flight={flight} />
-                  ) : (
-                    <FlightCard flight={flight} />
-                  )}
+              {viewMode === 'compact' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {filteredAndSortedFlights.map((flight, index) => (
+                    <div 
+                      key={`flight-${flight.id}`} 
+                      className="fade-in" 
+                      style={{ animationDelay: `${0.1 + ((filteredAndSortedSessions.length + index) * 0.05)}s` }}
+                    >
+                      <FlightCardCompact flight={flight} />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                filteredAndSortedFlights.map((flight, index) => (
+                  <div 
+                    key={`flight-${flight.id}`} 
+                    className="fade-in" 
+                    style={{ animationDelay: `${0.1 + ((filteredAndSortedSessions.length + index) * 0.05)}s` }}
+                  >
+                    <FlightCard flight={flight} />
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>

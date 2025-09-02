@@ -251,7 +251,7 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-foreground truncate">
+                          <h4 className="font-semibold text-foreground truncate text-sm" title={expense.description}>
                             {expense.description}
                           </h4>
                           <Badge variant={getStatusColor(expense.amount)} className="text-xs">
@@ -259,9 +259,9 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
                           </Badge>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>📅 {formatDate(expense.date)}</span>
-                          <span className="font-mono font-bold text-foreground">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="truncate" title={`Data: ${formatDate(expense.date)}`}>📅 {formatDate(expense.date)}</span>
+                          <span className="font-mono font-bold text-foreground truncate" title={`Valor: -${formatCR(expense.amount)} CR`}>
                             -{formatCR(expense.amount)} CR
                           </span>
                         </div>

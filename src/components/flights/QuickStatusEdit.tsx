@@ -128,7 +128,18 @@ export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
     <div ref={triggerRef}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <div className="inline-block" onClick={() => setOpen(true)}>
+          <div 
+            id={`status-edit-trigger-${flight.id}`}
+            className="inline-block" 
+            onClick={() => setOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setOpen(true);
+              }
+            }}
+            tabIndex={-1} // Para evitar tab duplo, o foco será no elemento invisível
+          >
             {getStatusBadge(flight.status)}
           </div>
         </PopoverTrigger>
