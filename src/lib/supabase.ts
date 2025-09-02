@@ -397,6 +397,7 @@ export interface Database {
           auto_sync_enabled: boolean;
           offline_mode_enabled: boolean;
           analytics_enabled: boolean;
+          initial_balance: number;
           created_at: string;
           updated_at: string;
         };
@@ -408,6 +409,7 @@ export interface Database {
           auto_sync_enabled?: boolean;
           offline_mode_enabled?: boolean;
           analytics_enabled?: boolean;
+          initial_balance?: number;
         };
         Update: {
           theme?: 'light' | 'dark';
@@ -416,6 +418,7 @@ export interface Database {
           auto_sync_enabled?: boolean;
           offline_mode_enabled?: boolean;
           analytics_enabled?: boolean;
+          initial_balance?: number;
         };
       };
     };

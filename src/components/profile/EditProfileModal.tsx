@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
+import { useProfileFinancialSync } from "@/hooks/useProfileFinancialSync";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -34,7 +35,9 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
   const { toast } = useToast();
   const { getFinancialStats } = useSupabaseFinancial();
   const { updateProfile } = useProfile();
-  const financialStats = getFinancialStats();
+  
+  // Sincronização automática do career_rating com lucro líquido
+  const { currentNetProfit } = useProfileFinancialSync();
 
   const [formData, setFormData] = useState({
     display_name: profileData?.display_name || "Cmdte. Rodrigo",
@@ -47,15 +50,15 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
     description: profileData?.description || ""
   });
 
-  const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(formData.avatar_url);
+  const [financialStats, setFinancialStats] = useState({
+    flightStats: { totalFlights: 0, totalFlightTime: 0 },
+    netProfit: 0
+  });
 
-  // CR dinâmico do lucro líquido financeiro
-  const dynamicCR = Math.max(0, Math.floor(financialStats.netProfit));
-
+  // Atualizar formData quando profileData mudar
   useEffect(() => {
-    if (profileData) {
+    if (profileData && isOpen) {
       setFormData({
         display_name: profileData.display_name || "Cmdte. Rodrigo",
         avatar_url: profileData.avatar_url || "",
@@ -66,19 +69,37 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         perfect_flights: profileData.perfect_flights || 0,
         description: profileData.description || ""
       });
-      setPreviewUrl(profileData.avatar_url || "");
     }
-  }, [profileData]);
+  }, [profileData, isOpen]); // Adicionar isOpen como dependência
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Carregar estatísticas financeiras apenas quando o modal abrir
+  useEffect(() => {
+    if (isOpen && user?.id) {
+      try {
+        const stats = getFinancialStats(); // getFinancialStats não aceita parâmetros
+        setFinancialStats(stats);
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas financeiras:', error);
+      }
+    }
+  }, [isOpen, user?.id, getFinancialStats]); // Manter getFinancialStats nas dependências
+
+  // Calcular CR dinâmico baseado no lucro líquido
+  const dynamicCR = Math.max(0, Math.floor(currentNetProfit / 1000));
+
+  // Função para formatar CR
+  const formatCR = (cr: number) => {
+    return cr.toLocaleString('pt-BR');
+  };
+
+  const handleAvatarUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
-    setIsUploading(true);
     try {
-      // Upload para o Supabase Storage
+      // Upload do arquivo
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -90,35 +111,31 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       }
 
       // Obter URL pública
-      const { data: { publicUrl } } = supabase.storage
+      const { data } = supabase.storage
         .from('profile-images')
         .getPublicUrl(filePath);
 
-      setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
-      setPreviewUrl(publicUrl);
-
+      setFormData(prev => ({ ...prev, avatar_url: data.publicUrl }));
+      
       toast({
-        title: "Foto enviada com sucesso!",
-        description: "Sua foto de perfil foi atualizada.",
+        title: "Sucesso!",
+        description: "Avatar atualizado com sucesso",
       });
     } catch (error) {
-      console.error('Erro ao fazer upload:', error);
+      console.error('Erro ao fazer upload do avatar:', error);
       toast({
-        title: "Erro no upload",
-        description: "Não foi possível enviar a foto. Tente novamente.",
+        title: "Erro",
+        description: "Erro ao fazer upload do avatar",
         variant: "destructive",
       });
-    } finally {
-      setIsUploading(false);
     }
-  };
+  }, [user, toast]);
 
   const handleSave = async () => {
     if (!user) return;
 
     setIsSaving(true);
     try {
-      // Usar updateProfile do hook para atualizar dados
       await updateProfile({
         display_name: formData.display_name,
         avatar_url: formData.avatar_url,
@@ -127,33 +144,26 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         career_started: formData.career_started,
         achievements: formData.achievements,
         perfect_flights: formData.perfect_flights,
-        description: formData.description
+        description: formData.description,
+        career_rating: dynamicCR
       });
 
       toast({
-        title: "Perfil atualizado!",
-        description: "Suas informações foram salvas com sucesso.",
+        title: "Sucesso!",
+        description: "Perfil atualizado com sucesso",
       });
-
-      // Fechar modal sem refresh da página
+      
       onClose();
     } catch (error) {
-      console.error('Erro ao salvar perfil:', error);
+      console.error('Erro ao atualizar perfil:', error);
       toast({
-        title: "Erro ao salvar",
-        description: "Não foi possível salvar as alterações. Tente novamente.",
+        title: "Erro",
+        description: "Erro ao atualizar perfil",
         variant: "destructive",
       });
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const formatCR = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
   };
 
   return (
@@ -162,42 +172,44 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            {t('profile.editProfile')}
+            {t('profile.edit.title', 'Editar Perfil')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Foto de Perfil */}
-          <div className="flex flex-col items-center space-y-4">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={previewUrl} alt="Profile" />
-              <AvatarFallback>
-                <User className="h-12 w-12" />
+          <div className="flex flex-col items-center gap-4">
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={formData.avatar_url} alt={formData.display_name} />
+              <AvatarFallback className="text-2xl">
+                {formData.display_name.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            
             <div className="flex items-center gap-2">
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleFileUpload}
+                onChange={handleAvatarUpload}
                 className="hidden"
                 id="avatar-upload"
-                disabled={isUploading}
               />
-              <Label htmlFor="avatar-upload" className="cursor-pointer">
-                <Button variant="outline" size="sm" disabled={isUploading} asChild>
-                  <span>
-                    <Upload className="h-4 w-4 mr-2" />
-                    {isUploading ? "Enviando..." : "Alterar Foto"}
-                  </span>
-                </Button>
-              </Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('avatar-upload')?.click()}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Alterar Avatar
+              </Button>
             </div>
           </div>
 
-          {/* Informações Básicas */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Informações Básicas
+            </h3>
+
             <div className="space-y-2">
               <Label htmlFor="display_name">Nome de Exibição</Label>
               <Input
@@ -210,29 +222,22 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
 
             <div className="space-y-2">
               <Label htmlFor="description">Descrição</Label>
-              <Input
+              <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Piloto Profissional"
+                placeholder="Conte um pouco sobre sua experiência como piloto..."
+                rows={3}
               />
             </div>
           </div>
 
-          {/* CR Dinâmico */}
-          <div className="p-4 bg-muted/20 rounded-lg border">
-            <div className="flex items-center gap-2 mb-2">
-              <Star className="h-5 w-5 text-accent" />
-              <Label className="font-semibold">CR (Career Rating)</Label>
-            </div>
-            <p className="text-2xl font-bold text-accent font-mono">{formatCR(dynamicCR)} CR</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Calculado automaticamente do lucro líquido financeiro
-            </p>
-          </div>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Star className="h-5 w-5" />
+              Dados Históricos
+            </h3>
 
-          {/* Dados Históricos */}
-          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="initial_flights">Voos Iniciais (Histórico)</Label>
               <Input
@@ -244,7 +249,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                 placeholder="127"
               />
               <p className="text-xs text-muted-foreground">
-                Novos voos serão somados a este valor
+                Novos voos serão somados a este valor automaticamente
               </p>
             </div>
 
@@ -259,12 +264,11 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                 placeholder="348"
               />
               <p className="text-xs text-muted-foreground">
-                Novas horas serão somadas a este valor
+                Novas horas serão somadas a este valor automaticamente
               </p>
             </div>
           </div>
 
-          {/* Estatísticas de Carreira */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Trophy className="h-5 w-5" />
@@ -286,18 +290,15 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="perfect_flights">Voos Perfeitos</Label>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-warning" />
-                  <Input
-                    id="perfect_flights"
-                    type="number"
-                    min="0"
-                    value={formData.perfect_flights}
-                    onChange={(e) => setFormData(prev => ({ ...prev, perfect_flights: parseInt(e.target.value) || 0 }))}
-                    placeholder="23"
-                  />
-                </div>
+                <Label htmlFor="perfect_flights">Pousos Perfeitos</Label>
+                <Input
+                  id="perfect_flights"
+                  type="number"
+                  min="0"
+                  value={formData.perfect_flights}
+                  onChange={(e) => setFormData(prev => ({ ...prev, perfect_flights: parseInt(e.target.value) || 0 }))}
+                  placeholder="42"
+                />
               </div>
             </div>
 
@@ -316,7 +317,6 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
             </div>
           </div>
 
-          {/* Resumo Calculado */}
           <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
@@ -339,7 +339,6 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
           </div>
         </div>
 
-        {/* Botões */}
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={onClose} disabled={isSaving}>
             Cancelar

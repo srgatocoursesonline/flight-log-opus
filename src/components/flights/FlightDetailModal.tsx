@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -123,6 +124,9 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
               {getStatusBadge(flight.status)}
             </div>
           </div>
+          <DialogDescription>
+            Detalhes completos do voo e informações de rota
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 mt-6">

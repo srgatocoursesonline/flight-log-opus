@@ -19,26 +19,26 @@ const DEFAULT_CATEGORIES: ExpenseCategory[] = [
     isActive: true
   },
   {
-    id: 'lavagem',
-    name: 'Lavagem do Avião',
-    icon: '🧽',
-    description: 'Limpeza e manutenção básica',
-    isDefault: true,
-    isActive: true
-  },
-  {
     id: 'manutencao',
     name: 'Manutenção',
     icon: '🔧',
-    description: 'Reparos e inspeções',
+    description: 'Reparos e inspeções de aeronaves',
     isDefault: true,
     isActive: true
   },
   {
-    id: 'translado',
-    name: 'Translado',
-    icon: '🚗',
-    description: 'Transporte e deslocamento',
+    id: 'seguro',
+    name: 'Seguro',
+    icon: '🛡️',
+    description: 'Seguro da aeronave e cobertura de danos',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'hangar',
+    name: 'Hangar',
+    icon: '🏢',
+    description: 'Custos de hangar e estacionamento',
     isDefault: true,
     isActive: true
   },
@@ -51,10 +51,50 @@ const DEFAULT_CATEGORIES: ExpenseCategory[] = [
     isActive: true
   },
   {
+    id: 'certificacoes',
+    name: 'Certificações',
+    icon: '📜',
+    description: 'Custos de licenças e certificações de piloto',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'translado',
+    name: 'Translado de Aeronave',
+    icon: '🚁',
+    description: 'Custos de transferência de aeronave entre aeroportos',
+    isDefault: true,
+    isActive: true
+  },
+  {
     id: 'pintura',
-    name: 'Pintura',
+    name: 'Pintura e Livery',
     icon: '🎨',
-    description: 'Customização e livery',
+    description: 'Customização e repintura de aeronaves',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'reparos-acidente',
+    name: 'Reparos de Acidente',
+    icon: '🔨',
+    description: 'Custos de reparo após acidentes e danos',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'taxas-aeroporto',
+    name: 'Taxas de Aeroporto',
+    icon: '🏛️',
+    description: 'Taxas de pouso, decolagem e serviços aeroportuários',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'contratacao-tripulacao',
+    name: 'Contratação de Tripulação',
+    icon: '👥',
+    description: 'Custos de contratação e salários da tripulação',
     isDefault: true,
     isActive: true
   }

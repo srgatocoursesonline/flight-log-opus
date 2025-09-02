@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -412,8 +412,10 @@ export const useSupabaseCareerManager = () => {
 
   // Inicialização
   useEffect(() => {
-    fetchCareerDataSimple();
-  }, [fetchCareerDataSimple]);
+    if (user) {
+      fetchCareerDataSimple();
+    }
+  }, [user?.id]);
 
   return {
     careerData,

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -28,13 +29,14 @@ interface AddRevenueModalProps {
   revenue?: Transaction;
   initialValues?: Partial<Transaction>;
   onClose?: () => void;
+  onSuccess?: () => void;
 }
 
 export interface AddRevenueModalRef {
   openModal: () => void;
 }
 
-export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalProps>(({ trigger, revenue, initialValues, onClose }, ref) => {
+export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalProps>(({ trigger, revenue, initialValues, onClose, onSuccess }, ref) => {
   const { t } = useTranslation();
   const { addRevenue, updateRevenue } = useSupabaseFinancial();
   const { getActiveCategories, categories } = useSupabaseRevenueCategories();
@@ -111,7 +113,7 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
         }
       }
     }
-  }, [activeCategories, initialValues]);
+  }, [activeCategories, initialValues, categories]);
 
   useEffect(() => {
     if (formData.category && activeCategories.find(c => c.id === formData.category)) {
@@ -119,7 +121,7 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
     }
   }, [formData.category, activeCategories]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.description.trim()) {
@@ -158,13 +160,13 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
 
     try {
       if (revenue) {
-        updateRevenue(revenue.id, revenueData);
+        await updateRevenue(revenue.id, revenueData);
         toast({
           title: "Sucesso!",
           description: "Receita atualizada com sucesso",
         });
       } else {
-        addRevenue(revenueData);
+        await addRevenue(revenueData);
         toast({
           title: "Sucesso!",
           description: "Receita adicionada com sucesso",
@@ -173,6 +175,12 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
 
       setOpen(false);
       if (onClose) onClose();
+      if (onSuccess) onSuccess();
+      
+      // Refresh automático da página
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
       
       // Reset form se não for edição
       if (!revenue) {
@@ -200,12 +208,34 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
     }
   };
 
-  const formatCategoryOption = (category: any) => (
-    <div className="flex items-center gap-2">
-      <span>{category.icon}</span>
-      <span>{category.name}</span>
-    </div>
-  );
+  const formatCategoryOption = (category: any) => {
+    const translationKey = getCategoryTranslationKey(category.id);
+    const translatedName = translationKey ? t(`financial.${translationKey}`) : category.name;
+    return (
+      <div className="flex items-center gap-2">
+        <span>{category.icon}</span>
+        <span>{translatedName}</span>
+      </div>
+    );
+  };
+
+  const getCategoryTranslationKey = (categoryId: string) => {
+    const translationMap: Record<string, string> = {
+      'commercial-flights': 'commercialFlights',
+      'flight-instruction': 'flightInstruction',
+      'air-freight': 'airFreight',
+      'air-taxi': 'airTaxi',
+      'parachuting': 'parachuting',
+      'vip-charter': 'vipCharter',
+      'special-contracts': 'specialContracts',
+      'medical-transport': 'medicalTransport',
+      'search-rescue': 'searchRescue',
+      'fire-support': 'fireSupport',
+      'reputation-bonus': 'reputationBonus',
+      'other-revenues': 'otherRevenues'
+    };
+    return translationMap[categoryId];
+  };
 
   const defaultTrigger = (
     <Button variant="hud" className="icon-hover">
@@ -232,6 +262,9 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
             <TrendingUp className="h-5 w-5 text-success" />
             {revenue ? 'Editar Receita' : 'Nova Receita'}
           </DialogTitle>
+          <DialogDescription>
+            {revenue ? 'Edite os dados da receita selecionada' : 'Registre uma nova receita no sistema financeiro'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

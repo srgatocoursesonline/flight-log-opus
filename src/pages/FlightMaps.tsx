@@ -200,7 +200,7 @@ const FlightMaps: React.FC = () => {
   // Estatísticas
   const stats = {
     total: routes.length,
-    completed: routes.filter(r => r.status === 'completed').length,
+    completed: routes.filter(r => r.status === 'Concluído').length,
     active: routes.filter(r => r.status === 'active').length,
     planned: routes.filter(r => r.status === 'planned').length
   };

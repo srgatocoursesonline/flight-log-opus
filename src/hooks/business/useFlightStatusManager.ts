@@ -34,7 +34,7 @@ const DEFAULT_FLIGHT_STATUS: FlightStatus[] = [
   },
   {
     id: 'completed',
-    name: 'Completado',
+    name: 'Concluído',
     color: '#10B981',
     icon: '✅',
     description: 'Voo concluído com sucesso',

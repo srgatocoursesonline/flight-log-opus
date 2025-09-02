@@ -5,12 +5,15 @@ import { useSupabaseCareerManager } from '@/hooks/supabase/useSupabaseCareerMana
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useProfileFinancialSync } from '@/hooks/useProfileFinancialSync';
 
-export const CareerRatingCard = () => {
+export function CareerRatingCard() {
   const { careerData, isLoading, refresh } = useSupabaseCareerManager();
   const [showReminder, setShowReminder] = useState(true);
   const navigate = useNavigate();
   
+  // Sincronização automática do career_rating com lucro líquido
+  useProfileFinancialSync();
 
   
   // Verificar se o lembrete deve ser exibido (baseado em localStorage)
@@ -145,4 +148,6 @@ export const CareerRatingCard = () => {
       <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary/30 transition-all duration-300" />
     </div>
   );
-};
+}
+
+export default CareerRatingCard;

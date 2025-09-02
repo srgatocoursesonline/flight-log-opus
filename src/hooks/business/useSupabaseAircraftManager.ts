@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -146,7 +146,7 @@ export const useSupabaseAircraftManager = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, createDefaultAircraft]);
 
   // Initial load
   useEffect(() => {
@@ -154,7 +154,7 @@ export const useSupabaseAircraftManager = () => {
   }, [fetchAircraft]);
 
   // Create default aircraft
-  const createDefaultAircraft = async () => {
+  const createDefaultAircraft = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -185,7 +185,7 @@ export const useSupabaseAircraftManager = () => {
     } catch (error) {
       console.error('Error in createDefaultAircraft:', error);
     }
-  };
+  }, [user]);
 
   // Add new aircraft
   const addAircraft = async (aircraftData: Omit<CustomAircraft, 'id' | 'isDefault'>) => {

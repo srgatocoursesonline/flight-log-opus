@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, Wifi, Download } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 
 export function SupabaseSwitcher() {
   const [isChecking, setIsChecking] = useState(false);

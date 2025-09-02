@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home, 
   Plane, 
@@ -9,17 +9,17 @@ import {
   Settings,
   User,
   Activity,
-  Map
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
+import { useState, useEffect } from "react";
 
 const navItems = [
   { to: "/", icon: Home, labelKey: "navigation.dashboard" },
   { to: "/flights", icon: Plane, labelKey: "navigation.flights" },
   { to: "/realtime", icon: Activity, labelKey: "navigation.realtime" },
-  { to: "/maps", icon: Map, labelKey: "navigation.maps" },
   { to: "/ranking", icon: TrendingUp, labelKey: "navigation.ranking" },
   { to: "/history", icon: History, labelKey: "navigation.history" },
   { to: "/goals", icon: Target, labelKey: "navigation.goals" },
@@ -30,6 +30,18 @@ const navItems = [
 
 export const Navigation = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const [loadingPath, setLoadingPath] = useState<string | null>(null);
+
+  // Reset loading state when location changes
+  useEffect(() => {
+    setLoadingPath(null);
+  }, [location.pathname]);
+
+  const handleNavClick = (path: string) => {
+    // Show loading state for navigation
+    setLoadingPath(path);
+  };
   return (
     <>
       {/* Desktop Sidebar */}
@@ -46,16 +58,22 @@ export const Navigation = () => {
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
+                    onClick={() => handleNavClick(item.to)}
                     className={({ isActive }) =>
                       cn(
                         "group flex gap-x-3 rounded-lg p-3 text-sm font-medium transition-all duration-200",
                         isActive
                           ? "bg-primary text-primary-foreground shadow-glow"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                        loadingPath === item.to && "opacity-75"
                       )
                     }
                   >
-                    <item.icon className="h-5 w-5 shrink-0" />
+                    {loadingPath === item.to ? (
+                      <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
+                    ) : (
+                      <item.icon className="h-5 w-5 shrink-0" />
+                    )}
                     {t(item.labelKey)}
                   </NavLink>
                 </li>
@@ -73,16 +91,22 @@ export const Navigation = () => {
               <NavLink
                 key={item.to}
                 to={item.to}
+                onClick={() => handleNavClick(item.to)}
                 className={({ isActive }) =>
                   cn(
                     "flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200",
                     isActive
                       ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                    loadingPath === item.to && "opacity-75"
                   )
                 }
               >
-                <item.icon className="h-5 w-5" />
+                {loadingPath === item.to ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <item.icon className="h-5 w-5" />
+                )}
                 <span className="text-xs font-medium">{t(item.labelKey)}</span>
               </NavLink>
             ))}

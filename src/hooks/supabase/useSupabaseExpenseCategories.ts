@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -37,7 +37,7 @@ export const useSupabaseExpenseCategories = () => {
       const { data, error } = await supabase
         .from('expense_categories')
         .select('*')
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},user_id.is.null`)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -69,8 +69,10 @@ export const useSupabaseExpenseCategories = () => {
 
   // Initial load
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    if (user) {
+      fetchCategories();
+    }
+  }, [user?.id]); // Apenas depende do user.id para evitar loops
 
   // Add new category
   const addCategory = async (category: Omit<ExpenseCategory, 'id' | 'isDefault'>) => {
@@ -117,7 +119,12 @@ export const useSupabaseExpenseCategories = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        name: string;
+        icon: string;
+        description: string;
+        is_active: boolean;
+      }> = {};
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
       if (updates.description !== undefined) dbUpdates.description = updates.description;

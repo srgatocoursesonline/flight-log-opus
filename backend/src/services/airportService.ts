@@ -54,10 +54,10 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
 
 // URLs das APIs
 const OURAIRPORTS_CSV_URL = 'https://davidmegginson.github.io/ourairports-data/airports.csv';
-const BACKUP_API_URLS = [
-  'https://api.aviationapi.com/v1/airports/search',
-  'https://airport-info.p.rapidapi.com/airport',
-];
+// const BACKUP_API_URLS = [
+//   'https://api.aviationapi.com/v1/airports/search',
+//   'https://airport-info.p.rapidapi.com/airport',
+// ];
 
 // ============================================
 // UTILITÁRIOS
@@ -96,12 +96,18 @@ function toRadians(degrees: number): number {
  */
 function parseCSV(csvText: string): Airport[] {
   const lines = csvText.split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+  const firstLine = lines[0];
+  if (!firstLine) {
+    console.warn('CSV vazio ou inválido');
+    return [];
+  }
+  
+  const headers = firstLine.split(',').map(h => h.replace(/"/g, ''));
   const airports: Airport[] = [];
   
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
-    if (!line.trim()) continue;
+    if (!line || !line.trim()) continue;
     
     // Parse CSV considerando aspas
     const values: string[] = [];
@@ -124,15 +130,22 @@ function parseCSV(csvText: string): Airport[] {
     
     // Criar objeto aeroporto
     if (values.length >= headers.length) {
-      const airport: any = {};
+      const airport: Airport = {} as Airport;
       headers.forEach((header, index) => {
-        airport[header] = values[index] || '';
+        const value = values[index];
+        if (value !== undefined) {
+          (airport as any)[header] = value || '';
+        }
       });
       
       // Converter tipos numéricos
-      airport.latitude_deg = parseFloat(airport.latitude_deg) || 0;
-      airport.longitude_deg = parseFloat(airport.longitude_deg) || 0;
-      airport.elevation_ft = parseInt(airport.elevation_ft) || 0;
+      const latStr = String(airport.latitude_deg || '0');
+      const lonStr = String(airport.longitude_deg || '0');
+      const elevStr = String(airport.elevation_ft || '0');
+      
+      airport.latitude_deg = parseFloat(latStr) || 0;
+      airport.longitude_deg = parseFloat(lonStr) || 0;
+      airport.elevation_ft = parseInt(elevStr, 10) || 0;
       
       // Filtrar apenas aeroportos válidos
       if (

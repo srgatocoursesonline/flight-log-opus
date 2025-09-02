@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -40,6 +40,8 @@ export const useSupabaseRevenueCategories = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });
 
+      
+
       if (error) {
         console.error('Error fetching revenue categories:', error);
         setError('Erro ao carregar categorias de receita');
@@ -57,6 +59,8 @@ export const useSupabaseRevenueCategories = () => {
         isActive: item.is_active,
       }));
 
+      
+
       setCategories(categoryData);
     } catch (error) {
       console.error('Error in fetchCategories:', error);
@@ -69,8 +73,10 @@ export const useSupabaseRevenueCategories = () => {
 
   // Initial load
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    if (user) {
+      fetchCategories();
+    }
+  }, [user?.id]); // Apenas depende do user.id para evitar loops
 
   // Add new category
   const addCategory = async (category: Omit<RevenueCategory, 'id' | 'isDefault'>) => {
@@ -117,7 +123,12 @@ export const useSupabaseRevenueCategories = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        name: string;
+        icon: string;
+        description: string;
+        is_active: boolean;
+      }> = {};
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
       if (updates.description !== undefined) dbUpdates.description = updates.description;

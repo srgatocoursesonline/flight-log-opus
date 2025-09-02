@@ -17,7 +17,7 @@ export const RecentFlights = () => {
 
   // Pegar os 3 voos mais recentes
   const recentFlights = flights
-    .filter(flight => flight.status === 'completed')
+    .filter(flight => flight.status === 'Concluído')
     .sort((a, b) => {
       // Create date objects from the date strings (which are in YYYY-MM-DD format)
       // Using Date.UTC to avoid timezone conversion issues
@@ -28,6 +28,9 @@ export const RecentFlights = () => {
       return dateB.getTime() - dateA.getTime();
     })
     .slice(0, 3);
+    
+
+
   
   return (
     <div className="hud-display recent-flights-container fade-in p-6">

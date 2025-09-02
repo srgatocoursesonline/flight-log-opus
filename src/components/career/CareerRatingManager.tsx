@@ -15,7 +15,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useSupabaseCareerManager, type CareerData } from '@/hooks/supabase/useSupabaseCareerManager';
 import { useToast } from '@/hooks/ui/use-toast';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const CareerRatingManager = () => {

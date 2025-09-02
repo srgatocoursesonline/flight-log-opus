@@ -5,10 +5,10 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { WebSocketServer, WebSocket } from 'ws';
-import { createServer } from 'http';
+import { createServer, Server } from 'http';
 import express from 'express';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import crypto from 'crypto';
 
 // ============================================
@@ -63,7 +63,7 @@ interface AuthenticatedDevice {
 
 interface WebSocketMessage {
   type: 'auth' | 'flight_data' | 'start_flight' | 'end_flight' | 'ping';
-  data?: any;
+  data?: Record<string, unknown>;
   deviceToken?: string;
   sessionId?: string;
 }
@@ -73,9 +73,9 @@ interface WebSocketMessage {
 // ============================================
 
 export class FlightTrackingService {
-  private supabase: SupabaseClient;
+  private supabase!: SupabaseClient;
   private wss: WebSocketServer;
-  private server: any;
+  private server: Server;
   private app: express.Application;
   private authenticatedClients: Map<WebSocket, AuthenticatedDevice> = new Map();
   private activeSessions: Map<string, FlightSession> = new Map();
@@ -95,6 +95,7 @@ export class FlightTrackingService {
       path: '/flight-tracking'
     });
     
+    this.initializeSupabase();
     this.setupRoutes();
     this.setupWebSocket();
   }
@@ -112,8 +113,8 @@ export class FlightTrackingService {
   
   private setupRoutes() {
     // Health check
-    this.app.get('/health', (req, res) => {
-      res.json({ 
+    this.app.get('/health', (_req, res) => {
+      return res.json({ 
         status: 'ok', 
         timestamp: new Date().toISOString(),
         activeConnections: this.authenticatedClients.size,
@@ -149,7 +150,7 @@ export class FlightTrackingService {
           return res.status(500).json({ error: 'Failed to register device' });
         }
         
-        res.json({ 
+        return res.json({ 
           deviceId, 
           deviceToken,
           message: 'Device registered successfully' 
@@ -157,7 +158,7 @@ export class FlightTrackingService {
         
       } catch (error) {
         console.error('Erro no registro de dispositivo:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
       }
     });
     
@@ -179,11 +180,11 @@ export class FlightTrackingService {
           return res.status(500).json({ error: 'Failed to fetch flights' });
         }
         
-        res.json({ flights: data || [] });
+        return res.json({ flights: data || [] });
         
       } catch (error) {
         console.error('Erro na consulta de voos:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
       }
     });
     
@@ -216,7 +217,7 @@ export class FlightTrackingService {
           return res.status(500).json({ error: 'Failed to fetch flight points' });
         }
         
-        res.json({ 
+        return res.json({ 
           session,
           points: points || [],
           totalPoints: points?.length || 0
@@ -224,7 +225,7 @@ export class FlightTrackingService {
         
       } catch (error) {
         console.error('Erro na consulta de voo:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
       }
     });
   }
@@ -276,7 +277,7 @@ export class FlightTrackingService {
     ws: WebSocket, 
     message: WebSocketMessage, 
     authTimeout: NodeJS.Timeout
-  ) {
+  ): Promise<void> {
     switch (message.type) {
       case 'auth':
         await this.handleAuthentication(ws, message, authTimeout);
@@ -310,7 +311,7 @@ export class FlightTrackingService {
     ws: WebSocket, 
     message: WebSocketMessage, 
     authTimeout: NodeJS.Timeout
-  ) {
+  ): Promise<void> {
     try {
       const { deviceToken } = message;
       if (!deviceToken) {
@@ -391,7 +392,7 @@ export class FlightTrackingService {
     }
   }
   
-  private async handleStartFlight(ws: WebSocket, message: WebSocketMessage) {
+  private async handleStartFlight(ws: WebSocket, message: WebSocketMessage): Promise<void> {
     const device = this.authenticatedClients.get(ws);
     if (!device) {
       ws.send(JSON.stringify({ 
@@ -402,7 +403,7 @@ export class FlightTrackingService {
     }
     
     try {
-      const { aircraft, latitude, longitude } = message.data;
+      const { aircraft, latitude, longitude } = message.data as { aircraft: string; latitude: number; longitude: number; };
       
       // Chamar função do banco para iniciar sessão
       const { data, error } = await this.supabase
@@ -463,10 +464,10 @@ export class FlightTrackingService {
     }
     
     try {
-      const { sessionId, latitude, longitude } = message.data;
+      const { sessionId, latitude, longitude } = message.data as { sessionId: string; latitude: number; longitude: number; };
       
       // Chamar função do banco para finalizar sessão
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .rpc('end_flight_session', {
           p_session_id: sessionId,
           p_arrival_lat: latitude,
@@ -575,7 +576,7 @@ export class FlightTrackingService {
   
   private verifyDeviceToken(token: string): { deviceId: string; userId: string } | null {
     try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as any;
+      const payload = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as JwtPayload & { deviceId: string; userId: string };
       return { deviceId: payload.deviceId, userId: payload.userId };
     } catch (error) {
       return null;

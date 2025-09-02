@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 // Removed supabaseDiagnostic import as file was deleted
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 
 export const SupabaseConnectionTest = () => {
   const [isLoading, setIsLoading] = useState(false);

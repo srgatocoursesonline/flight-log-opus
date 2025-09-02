@@ -79,7 +79,7 @@ const History = () => {
   const filteredAndSortedFlights = useMemo(() => {
     if (isLoading) return [];
     
-    let filtered = flights.filter(flight => {
+    const filtered = flights.filter(flight => {
       // Text search filter
       const searchLower = searchTerm.toLowerCase();
       const matchesSearch = searchTerm === '' || 

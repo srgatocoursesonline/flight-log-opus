@@ -99,9 +99,15 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
     });
   };
 
-  const handleDelete = () => {
-    deleteFlight(flight.id);
-    setShowDeleteDialog(false);
+  const handleDelete = async () => {
+    try {
+      await deleteFlight(flight.id);
+      setShowDeleteDialog(false);
+      // Force page refresh to ensure UI updates
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting flight:', error);
+    }
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -205,6 +211,10 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
         ref={editModalRef}
         flight={flight}
         trigger={null}
+        onClose={() => {
+          // Recarregar página após editar voo
+          window.location.reload();
+        }}
       />
 
       {/* Dialog de Confirmação de Exclusão */}

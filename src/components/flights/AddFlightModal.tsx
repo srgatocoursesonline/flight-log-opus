@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,7 +23,6 @@ import { Plus, Plane, Briefcase, Building2 } from 'lucide-react';
 import { useSupabaseFlights, type Flight } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseAircraftManager } from '@/hooks/supabase/useSupabaseAircraftManager';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
-import { autoRefresh } from '@/utils/autoRefresh';
 import { useToast } from '@/hooks/ui/use-toast';
 import { useFlightDraft, type FlightFormData } from '@/hooks/business/useFlightDraft';
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';
@@ -228,7 +228,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
   };
 
   // Verificar se campos são obrigatórios baseado no status
-  const isCompleted = formData.status === 'completed';
+  const isCompleted = formData.status === 'Concluído';
   const isPlanned = formData.status === 'planned';
   const isActive = formData.status === 'active';
 
@@ -239,7 +239,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
     const [depHours, depMinutes] = departureTime.split(':').map(Number);
     const [arrHours, arrMinutes] = arrivalTime.split(':').map(Number);
     
-    let depTotalMinutes = depHours * 60 + depMinutes;
+    const depTotalMinutes = depHours * 60 + depMinutes;
     let arrTotalMinutes = arrHours * 60 + arrMinutes;
     
     // Se horário de chegada for menor que partida, assumir que é no dia seguinte
@@ -304,7 +304,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       // Se o status tiver um nome correspondente aos tipos padrão, use o tipo em vez do ID
       if (status.name === 'Planejado') statusValue = 'planned';
       if (status.name === 'Em Voo') statusValue = 'active';
-      if (status.name === 'Completado') statusValue = 'completed';
+      if (status.name === 'Concluído') statusValue = 'Concluído';
       if (status.name === 'Cancelado') statusValue = 'cancelled';
       
       return {
@@ -332,7 +332,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
       const requiredFields = ['callsign', 'aircraft', 'departure', 'arrival', 'date'];
       
       // Campos adicionais obrigatórios para voos completados
-      if (formData.status === 'completed') {
+        if (formData.status === 'Concluído') {
         requiredFields.push('departureTime', 'arrivalTime', 'flightTime', 'distance', 'fuelUsed', 'landingRate', 'experiencePoints', 'careerRating');
       }
       
@@ -398,9 +398,6 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
           title: "Sucesso!",
           description: "Voo salvo com sucesso",
         });
-        // Trigger automatic refresh after adding new flight
-        autoRefresh();
-        
         // Limpar dados de rascunho após salvar com sucesso
         clearDraftData();
       }
@@ -413,6 +410,11 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         const defaultData = getDefaultFormData();
         setFormData(defaultData);
       }
+
+      // Refresh automático da página após salvar
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
     } catch (error) {
       console.error('Erro ao salvar voo:', error);
       toast({
@@ -473,6 +475,9 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
               </Button>
             )}
           </DialogTitle>
+          <DialogDescription>
+            {flight ? 'Edite os dados do voo selecionado' : 'Registre um novo voo no sistema de log'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

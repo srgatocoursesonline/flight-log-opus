@@ -65,7 +65,7 @@ const Flights = () => {
 
   // Filtrar e ordenar voos manuais
   const filteredAndSortedFlights = useMemo(() => {
-    let filtered = flights.filter(flight => {
+    const filtered = flights.filter(flight => {
       const matchesSearch = 
         flight.callsign.toLowerCase().includes(searchTerm.toLowerCase()) ||
         flight.aircraft.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -118,7 +118,7 @@ const Flights = () => {
   const filteredAndSortedSessions = useMemo(() => {
     if (!showSessions) return [];
     
-    let filtered = sessions.filter(session => {
+    const filtered = sessions.filter(session => {
       const matchesSearch = 
         session.aircraftTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
         session.deviceId.toLowerCase().includes(searchTerm.toLowerCase());
@@ -179,7 +179,13 @@ const Flights = () => {
             {t('flights.subtitle')}
           </p>
         </div>
-        <AddFlightModal ref={addFlightModalRef} />
+        <AddFlightModal 
+          ref={addFlightModalRef} 
+          onClose={() => {
+            // Recarregar página após adicionar/editar voo
+            window.location.reload();
+          }}
+        />
       </div>
 
       {/* Estatísticas */}

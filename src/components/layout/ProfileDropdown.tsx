@@ -66,7 +66,7 @@ export const ProfileDropdown = () => {
               {initials}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium hidden sm:inline-block max-w-20 truncate">
+          <span className="text-sm font-medium inline-block max-w-32 sm:max-w-40 md:max-w-48 lg:max-w-none truncate">
             {displayName}
           </span>
           <ChevronDown className="h-3 w-3 opacity-50" />

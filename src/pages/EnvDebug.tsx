@@ -66,7 +66,7 @@ export const EnvDebug = () => {
   
       
       // Importar o cliente Supabase
-      const { supabase } = await import('@/lib/config/supabase');
+      const { supabase } = await import('@/lib/supabase');
       
       console.log('Cliente Supabase importado:', supabase);
       

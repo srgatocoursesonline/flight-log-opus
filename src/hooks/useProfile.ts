@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useSupabaseFinancial } from '@/hooks/supabase/useSupabaseFinancial';
 
 export interface ProfileData {
   id: string;
@@ -25,13 +24,12 @@ export interface ProfileData {
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const { getFinancialStats } = useSupabaseFinancial();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Buscar dados do perfil
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
       return;
@@ -57,6 +55,38 @@ export const useProfile = () => {
       setError('Erro ao carregar dados do perfil');
     } finally {
       setIsLoading(false);
+    }
+  }, [user]);
+
+  // Sincronizar career_rating do perfil com lucro líquido financeiro
+  const syncCareerRatingWithNetProfit = async (netProfit: number) => {
+    if (!user || !profile) {
+      return;
+    }
+
+    try {
+      // CR deve ser sempre igual ao lucro líquido (sem arredondamento)
+      const newCareerRating = netProfit;
+      
+      // Só atualizar se o valor for diferente do atual
+      if (profile.career_rating !== newCareerRating) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            career_rating: newCareerRating,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Erro ao sincronizar career_rating:', error);
+        } else {
+          // Atualizar estado local
+          setProfile(prev => prev ? { ...prev, career_rating: newCareerRating } : null);
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao sincronizar career_rating com lucro líquido:', err);
     }
   };
 
@@ -90,20 +120,16 @@ export const useProfile = () => {
     }
   };
 
-  // Obter estatísticas calculadas
-  const getProfileStats = () => {
+  // Obter estatísticas calculadas (sem dependências financeiras para evitar loops)
+  const getProfileStats = useCallback(() => {
     if (!profile) return null;
-
-    const financialStats = getFinancialStats();
     
-    // CR dinâmico baseado no lucro líquido
-    const dynamicCR = Math.max(0, Math.floor(financialStats.netProfit));
+    // CR dinâmico baseado no career_rating do perfil
+    const dynamicCR = profile.career_rating || 0;
     
-    // Total de voos = voos iniciais + voos registrados
-    const totalFlights = profile.total_flights + financialStats.flightStats.totalFlights;
-    
-    // Total de horas = horas iniciais + horas dos voos registrados
-    const totalHours = profile.total_hours + (financialStats.flightStats.totalFlightTime || 0);
+    // Total de voos e horas do perfil
+    const totalFlights = profile.total_flights || 0;
+    const totalHours = profile.total_hours || 0;
     
     // Calcular tempo desde o início da carreira
     let careerDuration = '';
@@ -128,10 +154,9 @@ export const useProfile = () => {
       careerDuration,
       perfectFlightRate,
       perfectFlights: profile.perfect_flights || 0,
-      achievements: profile.achievements || '',
-      financialStats
+      achievements: profile.achievements || ''
     };
-  };
+  }, [profile]);
 
   // Criar perfil se não existir
   const createProfile = async (profileData: Partial<ProfileData>) => {
@@ -207,8 +232,10 @@ export const useProfile = () => {
 
   // Carregar perfil quando o usuário mudar
   useEffect(() => {
-    fetchProfile();
-  }, [user]);
+    if (user) {
+      fetchProfile();
+    }
+  }, [user?.id]);
 
   return {
     profile,
@@ -218,6 +245,7 @@ export const useProfile = () => {
     updateProfile,
     createProfile,
     uploadAvatar,
-    getProfileStats
+    getProfileStats,
+    syncCareerRatingWithNetProfit
   };
 };

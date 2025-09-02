@@ -38,26 +38,7 @@ export const unregisterServiceWorker = async () => {
 
 // Install PWA prompt
 export const installPWA = () => {
-  // This will be called by the beforeinstallprompt event
-  let deferredPrompt: any;
-  
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Show install button or prompt
-    const installBtn = document.getElementById('install-pwa-btn');
-    if (installBtn) {
-      installBtn.style.display = 'block';
-      installBtn.addEventListener('click', () => {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult: any) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the PWA install prompt');
-          }
-          deferredPrompt = null;
-        });
-      });
-    }
-  });
+  // PWA install functionality disabled to avoid console warnings
+  // Can be re-enabled when proper install UI is implemented
+  console.log('PWA install functionality available but not configured');
 };

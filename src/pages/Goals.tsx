@@ -8,8 +8,7 @@ const Goals = () => {
   
   const handleSetNewGoal = () => {
     // TODO: Implementar nova meta
-
-    autoRefresh();
+    console.log('Set new goal - TODO');
   };
   
   return (

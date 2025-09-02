@@ -16,10 +16,12 @@ interface QuickStatusEditProps {
 
 export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
   const { t } = useTranslation();
-  const { updateFlight } = useSupabaseFlights();
+  const { updateFlight, refresh } = useSupabaseFlights();
   const statusManager = useSupabaseFlightStatusManager();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
+  
+
 
   // Fecha o popover quando clicar fora dele
   useEffect(() => {
@@ -37,8 +39,8 @@ export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
 
   // Renderiza o badge do status atual
   const getStatusBadge = (status: Flight['status']) => {
-    // Tentar encontrar status customizado primeiro
-    const customStatus = statusManager.getStatusByName(status);
+    // Tentar encontrar status customizado primeiro usando o valor correto
+    const customStatus = statusManager.getStatusByValue(status);
     
     if (customStatus) {
       return (
@@ -79,8 +81,18 @@ export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
 
   // Atualiza o status do voo
   const handleStatusChange = async (newStatus: string) => {
-    await updateFlight(flight.id, { status: newStatus as Flight['status'] });
-    setOpen(false);
+    try {
+      await updateFlight(flight.id, { status: newStatus as Flight['status'] });
+      setOpen(false);
+      
+      // Auto-refresh para atualizar o dashboard e outros componentes
+      setTimeout(() => {
+        console.log('🔄 QuickStatusEdit - Forcing page reload after status change');
+        window.location.reload();
+      }, 300);
+    } catch (error) {
+      console.error('❌ QuickStatusEdit - Erro ao atualizar status do voo:', error);
+    }
   };
 
   // Prepara as opções de status disponíveis
@@ -91,7 +103,7 @@ export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
     // Se o status tiver um nome correspondente aos tipos padrão, use o tipo em vez do ID
     if (status.name === 'Planejado') statusValue = 'planned';
     if (status.name === 'Em Voo') statusValue = 'active';
-    if (status.name === 'Completado') statusValue = 'completed';
+    if (status.name === 'Concluído') statusValue = 'Concluído';
     if (status.name === 'Cancelado') statusValue = 'cancelled';
     
     return {

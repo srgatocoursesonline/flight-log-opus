@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFlights } from './useFlights';
-import { autoRefresh } from '@/utils/autoRefresh';
+import { useFinancialSettings } from './useFinancialSettings';
 
 export interface Transaction {
   id: string;
@@ -67,9 +67,6 @@ export const useFinancial = () => {
     };
     const updatedRevenues = [newRevenue, ...revenues];
     saveRevenues(updatedRevenues);
-    
-    // Refresh automático após adicionar receita
-    autoRefresh();
   };
 
   const updateRevenue = (id: string, updates: Partial<Transaction>) => {
@@ -77,17 +74,11 @@ export const useFinancial = () => {
       revenue.id === id ? { ...revenue, ...updates } : revenue
     );
     saveRevenues(updatedRevenues);
-    
-    // Refresh automático após atualizar receita
-    autoRefresh();
   };
 
   const deleteRevenue = (id: string) => {
     const updatedRevenues = revenues.filter(revenue => revenue.id !== id);
     saveRevenues(updatedRevenues);
-    
-    // Refresh automático após excluir receita
-    autoRefresh();
   };
 
   const addExpense = (expense: Omit<Transaction, 'id' | 'type'>) => {
@@ -98,9 +89,6 @@ export const useFinancial = () => {
     };
     const updatedExpenses = [newExpense, ...expenses];
     saveExpenses(updatedExpenses);
-    
-    // Refresh automático após adicionar despesa
-    autoRefresh();
   };
 
   const updateExpense = (id: string, updates: Partial<Transaction>) => {
@@ -108,24 +96,19 @@ export const useFinancial = () => {
       expense.id === id ? { ...expense, ...updates } : expense
     );
     saveExpenses(updatedExpenses);
-    
-    // Refresh automático após atualizar despesa
-    autoRefresh();
   };
 
   const deleteExpense = (id: string) => {
     const updatedExpenses = expenses.filter(expense => expense.id !== id);
     saveExpenses(updatedExpenses);
-    
-    // Refresh automático após excluir despesa
-    autoRefresh();
   };
 
   const getFinancialStats = () => {
     const flightStats = getFlightStats();
+    const { getInitialBalance } = useFinancialSettings();
     
-    // Receita = Base mínima (5.922.235 CR) + CR dos voos reais + receitas lançadas
-    const baseRevenue = 5922235;
+    // Receita = Valor inicial configurável + CR dos voos reais + receitas lançadas
+    const baseRevenue = getInitialBalance();
     const realFlightsCR = flightStats.totalCR || 0;
     const additionalRevenues = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
     const totalRevenue = baseRevenue + realFlightsCR + additionalRevenues;

@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { LoginPage } from "./pages/Login";
 import { SignupPage } from "./pages/Signup";
+import EmailConfirmationPage from "./pages/EmailConfirmation";
 import SuperDiagnostic from "./pages/super-diagnostic";
 import Diagnostic from "./pages/Diagnostic";
 import RealTimeTracking from "./pages/RealTimeTracking";
@@ -52,11 +53,15 @@ const AppContent = () => {
   useTheme();
   
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true
+    }}>
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/confirm-email" element={<EmailConfirmationPage />} />
         <Route path="/diagnostic" element={<Diagnostic />} />
         <Route path="/super-diagnostic" element={<SuperDiagnostic />} />
 

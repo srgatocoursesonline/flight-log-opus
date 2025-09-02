@@ -8,9 +8,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 
 // Importar rotas
 import msfsRoutes from './routes/msfs.js';
@@ -46,8 +46,8 @@ const CONFIG = {
 class FlightLogServer {
   private app: express.Application;
   private wsServer: WebSocketServer;
-  private supabase: any;
-  private clients: Set<any> = new Set();
+  private supabase: SupabaseClient;
+  private clients: Set<WebSocket> = new Set();
 
   constructor() {
     this.app = express();
@@ -178,7 +178,7 @@ class FlightLogServer {
 
   private setupErrorHandling() {
     // Error handler
-    this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    this.app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
       console.error('❌ Erro no servidor:', error);
       
       res.status(error.status || 500).json({
@@ -207,7 +207,7 @@ class FlightLogServer {
   // BROADCAST WEBSOCKET
   // ============================================
 
-  public broadcast(message: any) {
+  public broadcast(message: Record<string, unknown>) {
     const messageStr = JSON.stringify(message);
     this.clients.forEach(client => {
       if (client.readyState === 1) { // WebSocket.OPEN

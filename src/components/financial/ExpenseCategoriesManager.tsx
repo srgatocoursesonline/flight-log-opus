@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -213,6 +214,9 @@ export const ExpenseCategoriesManager = () => {
               <DialogContent className="glass-panel">
                 <DialogHeader>
                   <DialogTitle>Adicionar Nova Categoria</DialogTitle>
+                  <DialogDescription>
+                    Crie uma nova categoria para organizar suas despesas
+                  </DialogDescription>
                 </DialogHeader>
                 
                 <div className="space-y-4">
@@ -356,6 +360,9 @@ export const ExpenseCategoriesManager = () => {
           <DialogContent className="glass-panel">
             <DialogHeader>
               <DialogTitle>Editar Categoria</DialogTitle>
+              <DialogDescription>
+                Edite os dados da categoria selecionada
+              </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">

@@ -11,42 +11,90 @@ export interface RevenueCategory {
 
 const DEFAULT_REVENUE_CATEGORIES: RevenueCategory[] = [
   {
-    id: 'renda-passiva',
-    name: 'Renda Passiva',
-    icon: '💰',
-    description: 'Investimentos e rendimentos passivos',
+    id: 'vip-charter',
+    name: 'Voos VIP Charter',
+    icon: '✈️',
+    description: 'Voos charter VIP com Vision Jet e aeronaves de luxo',
     isDefault: true,
     isActive: true
   },
   {
-    id: 'contratos-especiais',
-    name: 'Contratos Especiais',
-    icon: '📋',
-    description: 'Contratos de voo especiais e exclusivos',
+    id: 'cargo-missions',
+    name: 'Missões de Carga',
+    icon: '📦',
+    description: 'Transporte de carga e mercadorias',
     isDefault: true,
     isActive: true
   },
   {
-    id: 'bonus-desempenho',
-    name: 'Bônus de Desempenho',
-    icon: '🏆',
-    description: 'Prêmios por excelência operacional',
+    id: 'sightseeing',
+    name: 'Voos Turísticos',
+    icon: '🌄',
+    description: 'Voos panorâmicos e turismo aéreo',
     isDefault: true,
     isActive: true
   },
   {
-    id: 'patrocinio',
-    name: 'Patrocínio',
-    icon: '🤝',
-    description: 'Acordos de patrocínio e parcerias',
+    id: 'search-rescue',
+    name: 'Busca e Salvamento',
+    icon: '🚁',
+    description: 'Operações de busca e salvamento',
     isDefault: true,
     isActive: true
   },
   {
-    id: 'treinamento',
+    id: 'medevac',
+    name: 'Transporte Médico',
+    icon: '🏥',
+    description: 'Evacuação médica e transporte de emergência',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'firefighting',
+    name: 'Combate a Incêndios',
+    icon: '🔥',
+    description: 'Operações de combate a incêndios florestais',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'skydiving',
+    name: 'Paraquedismo',
+    icon: '🪂',
+    description: 'Voos para atividades de paraquedismo',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'flight-training',
     name: 'Instrução de Voo',
     icon: '👨‍🏫',
-    description: 'Receitas por instrução e treinamento',
+    description: 'Receitas por instrução e treinamento de pilotos',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'passive-income',
+    name: 'Renda Passiva',
+    icon: '💰',
+    description: 'Receitas passivas de certificações e contratos',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'bonus-reputation',
+    name: 'Bônus de Reputação',
+    icon: '⭐',
+    description: 'Bônus por alta reputação e excelência operacional',
+    isDefault: true,
+    isActive: true
+  },
+  {
+    id: 'special-contracts',
+    name: 'Contratos Especiais',
+    icon: '📋',
+    description: 'Contratos exclusivos e missões especializadas',
     isDefault: true,
     isActive: true
   },

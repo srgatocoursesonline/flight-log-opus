@@ -4,11 +4,12 @@
  * NOTA: Removido window.location.reload() para evitar loops infinitos
  */
 export const autoRefresh = (callback?: () => void, delay: number = 300) => {
-  if (callback) {
+  if (callback && typeof callback === 'function') {
     const timeoutId = setTimeout(callback, delay);
     return () => clearTimeout(timeoutId);
   }
-  // Se não há callback, não faz nada (evita reload da página)
+  // Se não há callback válido, não faz nada (evita reload da página)
+  console.warn('autoRefresh called without valid callback - this may indicate unnecessary refresh calls');
   return () => {};
 };
 

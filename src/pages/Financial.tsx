@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSupabaseFinancial } from '@/hooks/supabase/useSupabaseFinancial';
 import { AddExpenseModal } from '@/components/financial/AddExpenseModal';
 import { ExpensesList } from '@/components/financial/ExpensesList';
@@ -7,9 +7,15 @@ import { RevenuesList } from '@/components/financial/RevenuesList';
 import { Button } from '@/components/ui/button';
 import { Plus, Receipt, TrendingUp, DollarSign } from 'lucide-react';
 
+
 const Financial = () => {
-  const { getFinancialStats } = useSupabaseFinancial();
-  const financialStats = getFinancialStats();
+  const { financialStats, expenses, revenues } = useSupabaseFinancial();
+  
+  // Função para atualizar dados após transação
+  const handleTransactionSuccess = useCallback(() => {
+    // Força reload da página para garantir dados atualizados
+    window.location.reload();
+  }, []);
   
   // Receita baseada APENAS no CR dos voos reais que você lançar
   const currentRevenue = financialStats.totalRevenue;
@@ -35,11 +41,13 @@ const Financial = () => {
         </p>
       </div>
       
+
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="hud-display stats-card fade-in p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground">Receita Total (CR)</h3>
-            <span className="text-success">↗</span>
+            <span className="text-success text-3xl">↗</span>
           </div>
           <p className="text-2xl font-bold text-success">{formatCR(currentRevenue)} CR</p>
           <p className="text-xs text-muted-foreground">
@@ -50,9 +58,9 @@ const Financial = () => {
         <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground">Custos Totais (CR)</h3>
-            <span className="text-destructive">↘</span>
+            <span className="text-destructive text-3xl">↘</span>
           </div>
-          <p className="text-2xl font-bold text-muted-foreground">{formatCR(currentExpenses)} CR</p>
+          <p className="text-2xl font-bold text-destructive">{formatCR(currentExpenses)} CR</p>
           <p className="text-xs text-muted-foreground">
             {currentExpenses > 0 ? `${financialStats.totalTransactions} despesas registradas` : 'Nenhuma despesa registrada ainda'}
           </p>
@@ -61,16 +69,18 @@ const Financial = () => {
         <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground">Lucro Líquido (CR)</h3>
-            <span className="text-success">💰</span>
+            <span className={`text-3xl ${currentProfit >= 0 ? 'text-success' : 'text-destructive'}`}>
+              {currentProfit >= 0 ? '↗' : '↘'}
+            </span>
           </div>
-          <p className="text-2xl font-bold text-success">{formatCR(currentProfit)} CR</p>
+          <p className={`text-2xl font-bold ${currentProfit >= 0 ? 'text-success' : 'text-destructive'}`}>{formatCR(currentProfit)} CR</p>
           <p className="text-xs text-muted-foreground">Receita - Despesas = Lucro</p>
         </div>
         
         <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.3s' }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground">Margem de Lucro</h3>
-            <span className="text-accent">📊</span>
+            <span className="text-accent text-3xl">📊</span>
           </div>
           <p className="text-2xl font-bold text-success">{profitMargin.toFixed(1)}%</p>
           <p className="text-xs text-muted-foreground">
@@ -94,10 +104,11 @@ const Financial = () => {
                   Nova Receita
                 </Button>
               }
+              onSuccess={handleTransactionSuccess}
             />
           </div>
           
-          <RevenuesList />
+          <RevenuesList onTransactionSuccess={handleTransactionSuccess} />
         </div>
         
         {/* Sistema de Lançamento de Despesas */}
@@ -114,10 +125,11 @@ const Financial = () => {
                   Nova Despesa
                 </Button>
               }
+              onSuccess={handleTransactionSuccess}
             />
           </div>
           
-          <ExpensesList />
+          <ExpensesList onTransactionSuccess={handleTransactionSuccess} />
         </div>
         
         {/* Resumo por Categoria */}
@@ -185,17 +197,30 @@ const Financial = () => {
         </div>
         
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="text-center p-4 bg-success/10 rounded-lg border border-success/20">
-            <p className="text-2xl mb-2">🟢</p>
-            <p className="font-bold text-success">Situação Positiva</p>
-            <p className="text-sm text-muted-foreground">Sem despesas registradas</p>
+          <div className={`text-center p-4 rounded-lg border ${
+            currentProfit >= 0 
+              ? 'bg-success/10 border-success/20' 
+              : 'bg-destructive/10 border-destructive/20'
+          }`}>
+            <p className="text-2xl mb-2">{currentProfit >= 0 ? '🟢' : '🔴'}</p>
+            <p className={`font-bold ${
+              currentProfit >= 0 ? 'text-success' : 'text-destructive'
+            }`}>
+              {currentProfit >= 0 ? 'Situação Positiva' : 'Situação Negativa'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {currentProfit >= 0 
+                ? (currentExpenses > 0 ? 'Lucro líquido positivo' : 'Sem despesas registradas')
+                : 'Despesas superam receitas'
+              }
+            </p>
           </div>
           
           <div className="text-center p-4 bg-info/10 rounded-lg border border-info/20">
             <p className="text-2xl mb-2">📊</p>
-            <p className="font-bold text-info">CR: {formatCR(currentRevenue)}</p>
+            <p className="font-bold text-info">CR: {formatCR(financialStats.realFlightsCR)}</p>
             <p className="text-sm text-muted-foreground">
-              {currentRevenue > 0 ? 'Career Rating dos seus voos' : 'Registre voos para acumular CR'}
+              {financialStats.realFlightsCR > 0 ? 'Career Rating dos seus voos' : 'Registre voos para acumular CR'}
             </p>
           </div>
           

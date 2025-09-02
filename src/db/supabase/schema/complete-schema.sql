@@ -158,7 +158,7 @@ CREATE OR REPLACE VIEW flight_statistics AS
 SELECT 
   user_id,
   COUNT(*) as total_flights,
-  COUNT(*) FILTER (WHERE status = 'Completado') as completed_flights,
+  COUNT(*) FILTER (WHERE status = 'Concluído') as completed_flights,
   SUM(career_rating) as total_career_rating,
   SUM(distance) as total_distance,
   CASE 

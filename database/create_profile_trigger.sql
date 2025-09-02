@@ -69,18 +69,32 @@ BEGIN
   -- Criar categorias padrão de despesas
   INSERT INTO public.expense_categories (user_id, name, icon, description, is_default, is_active)
   VALUES 
-    (NEW.id, 'Combustível', 'fuel', 'Gastos com combustível de aeronaves', true, true),
-    (NEW.id, 'Manutenção', 'wrench', 'Custos de manutenção de aeronaves', true, true),
-    (NEW.id, 'Hangar', 'warehouse', 'Custos de hangar e estacionamento', true, true),
-    (NEW.id, 'Seguro', 'shield', 'Seguro da aeronave', true, true);
+    (NEW.id, 'Combustível', '⛽', 'Gastos com combustível de aeronaves', true, true),
+    (NEW.id, 'Manutenção', '🔧', 'Manutenção preventiva e corretiva de aeronaves', true, true),
+    (NEW.id, 'Seguro', '🛡️', 'Seguro obrigatório e opcional da aeronave', true, true),
+    (NEW.id, 'Hangar', '🏢', 'Custos de hangar e estacionamento de aeronaves', true, true),
+    (NEW.id, 'Certificações', '📜', 'Custos para obter certificações e licenças', true, true),
+    (NEW.id, 'Translado de Aeronave', '✈️', 'Custos para mover aeronave entre aeroportos', true, true),
+    (NEW.id, 'Reparos de Acidente', '🚨', 'Reparos emergenciais após acidentes', true, true),
+    (NEW.id, 'Taxas de Aeroporto', '🏛️', 'Taxas de pouso, decolagem e serviços aeroportuários', true, true),
+    (NEW.id, 'Contratação de Tripulação', '👥', 'Custos com contratação de pilotos e tripulação', true, true),
+    (NEW.id, 'Pintura e Livery', '🎨', 'Personalização visual da aeronave', true, true);
   
   -- Criar categorias padrão de receitas
   INSERT INTO public.revenue_categories (user_id, name, icon, description, is_default, is_active)
   VALUES 
-    (NEW.id, 'Voos Comerciais', 'plane', 'Receita de voos comerciais', true, true),
-    (NEW.id, 'Instrução de Voo', 'graduation-cap', 'Receita de aulas de pilotagem', true, true),
-    (NEW.id, 'Frete Aéreo', 'package', 'Receita de transporte de cargas', true, true),
-    (NEW.id, 'Táxi Aéreo', 'car', 'Receita de voos de táxi aéreo', true, true);
+    (NEW.id, 'Voos VIP Charter', '🛩️', 'Transporte executivo e voos charter de luxo', true, true),
+    (NEW.id, 'Missões de Carga', '📦', 'Transporte de mercadorias e cargas especiais', true, true),
+    (NEW.id, 'Voos Turísticos', '🌅', 'Passeios panorâmicos e turismo aéreo', true, true),
+    (NEW.id, 'Busca e Salvamento', '🚁', 'Operações de resgate e emergência', true, true),
+    (NEW.id, 'Transporte Médico', '🏥', 'Evacuação médica e transporte de emergência', true, true),
+    (NEW.id, 'Combate a Incêndios', '🔥', 'Operações de combate a incêndios florestais', true, true),
+    (NEW.id, 'Paraquedismo', '🪂', 'Voos para saltos de paraquedas', true, true),
+    (NEW.id, 'Instrução de Voo', '🎓', 'Aulas de pilotagem e treinamento', true, true),
+    (NEW.id, 'Renda Passiva', '💰', 'Receita automática de certificações e contratos', true, true),
+    (NEW.id, 'Bônus de Reputação', '⭐', 'Bônus por alta reputação e performance', true, true),
+    (NEW.id, 'Contratos Especiais', '📋', 'Missões especiais e contratos únicos', true, true),
+    (NEW.id, 'Outras Receitas', '💼', 'Outras fontes de receita não categorizadas', true, true);
   
   -- Criar status padrão de voos
   INSERT INTO public.flight_statuses (user_id, name, color, icon, description, hourly_multiplier, is_default, is_active)

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { autoRefresh } from "@/utils/autoRefresh";
 import { ExpenseCategoriesManager } from "@/components/financial/ExpenseCategoriesManager";
 import { RevenueCategoriesManager } from "@/components/financial/RevenueCategoriesManager";
+import { FinancialSettingsManager } from "@/components/financial/FinancialSettingsManager";
 import { FlightConfigManager } from "@/components/flight/FlightConfigManager";
 import { CareerRatingManager } from "@/components/career/CareerRatingManager";
 
@@ -49,25 +50,25 @@ const Settings = () => {
   
   const handleExportData = () => {
     // TODO: Implementar export de dados
-    autoRefresh();
+    console.log('Export data - TODO');
   };
   
   const handleBackup = () => {
     // TODO: Implementar backup
-    autoRefresh();
+    console.log('Backup - TODO');
   };
   
   const handleResetData = () => {
     // TODO: Implementar reset de dados
     if (confirm('Tem certeza que deseja resetar todos os dados?')) {
       // Aqui seria implementado o reset real
-      autoRefresh();
+      console.log('Reset data - TODO');
     }
   };
   
   const handleConnectSupabase = () => {
     // TODO: Implementar conexão Supabase
-    autoRefresh();
+    console.log('Connect Supabase - TODO');
   };
   
   return (
@@ -152,6 +153,7 @@ const Settings = () => {
             
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-6 border-t border-border/50">
+                <FinancialSettingsManager />
                 <ExpenseCategoriesManager />
                 <RevenueCategoriesManager />
               </div>

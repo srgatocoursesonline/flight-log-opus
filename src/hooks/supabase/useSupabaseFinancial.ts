@@ -2,12 +2,12 @@
 // SUPABASE FINANCIAL MANAGER HOOK
 // ============================================
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { autoRefresh } from '@/utils/autoRefresh';
 import { useSupabaseFlights } from './useSupabaseFlights';
+import { useFinancialSettings } from '@/hooks/business/useFinancialSettings';
 
 export interface Transaction {
   id: string;
@@ -25,6 +25,7 @@ export const useSupabaseFinancial = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getFlightStats } = useSupabaseFlights();
+  const { getInitialBalance } = useFinancialSettings();
 
   // Fetch financial transactions from database
   const fetchTransactions = useCallback(async () => {
@@ -45,6 +46,8 @@ export const useSupabaseFinancial = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+
+
       if (error) {
         console.error('Error fetching transactions:', error);
         setError('Erro ao carregar transações financeiras');
@@ -56,6 +59,8 @@ export const useSupabaseFinancial = () => {
       const expenseTransactions: Transaction[] = [];
       const revenueTransactions: Transaction[] = [];
 
+
+      
       data.forEach(item => {
         const transaction: Transaction = {
           id: item.id,
@@ -86,11 +91,13 @@ export const useSupabaseFinancial = () => {
 
   // Initial load
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    if (user) {
+      fetchTransactions();
+    }
+  }, [user?.id]); // Apenas depende do user.id para evitar loops
 
   // Add new revenue
-  const addRevenue = async (revenue: Omit<Transaction, 'id' | 'type'>) => {
+  const addRevenue = useCallback(async (revenue: Omit<Transaction, 'id' | 'type'>) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -119,17 +126,14 @@ export const useSupabaseFinancial = () => {
       // Refresh data
       await fetchTransactions();
       toast.success(`Receita "${revenue.description}" adicionada com sucesso!`);
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in addRevenue:', error);
       toast.error('Erro ao adicionar receita');
     }
-  };
+  }, [user, fetchTransactions]);
 
   // Update revenue
-  const updateRevenue = async (id: string, updates: Partial<Transaction>) => {
+  const updateRevenue = useCallback(async (id: string, updates: Partial<Transaction>) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -137,7 +141,12 @@ export const useSupabaseFinancial = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        description: string;
+        amount: number;
+        transaction_date: string;
+        category_id: string;
+      }> = {};
       if (updates.description !== undefined) dbUpdates.description = updates.description;
       if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
       if (updates.date !== undefined) dbUpdates.transaction_date = updates.date;
@@ -156,27 +165,17 @@ export const useSupabaseFinancial = () => {
         return;
       }
 
-      // Update local state
-      setRevenues(prev => 
-        prev.map(revenue => 
-          revenue.id === id 
-            ? { ...revenue, ...updates }
-            : revenue
-        )
-      );
-
+      // Refresh data from database
+      await fetchTransactions();
       toast.success('Receita atualizada com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in updateRevenue:', error);
       toast.error('Erro ao atualizar receita');
     }
-  };
+  }, [user, fetchTransactions]);
 
   // Delete revenue
-  const deleteRevenue = async (id: string) => {
+  const deleteRevenue = useCallback(async (id: string) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -196,20 +195,17 @@ export const useSupabaseFinancial = () => {
         return;
       }
 
-      // Update local state
-      setRevenues(prev => prev.filter(revenue => revenue.id !== id));
+      // Refresh data from database
+      await fetchTransactions();
       toast.success('Receita deletada com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in deleteRevenue:', error);
       toast.error('Erro ao deletar receita');
     }
-  };
+  }, [user, fetchTransactions]);
 
   // Add new expense
-  const addExpense = async (expense: Omit<Transaction, 'id' | 'type'>) => {
+  const addExpense = useCallback(async (expense: Omit<Transaction, 'id' | 'type'>) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -238,17 +234,14 @@ export const useSupabaseFinancial = () => {
       // Refresh data
       await fetchTransactions();
       toast.success(`Despesa "${expense.description}" adicionada com sucesso!`);
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in addExpense:', error);
       toast.error('Erro ao adicionar despesa');
     }
-  };
+  }, [user, fetchTransactions]);
 
   // Update expense
-  const updateExpense = async (id: string, updates: Partial<Transaction>) => {
+  const updateExpense = useCallback(async (id: string, updates: Partial<Transaction>) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -256,7 +249,12 @@ export const useSupabaseFinancial = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        description: string;
+        amount: number;
+        transaction_date: string;
+        category_id: string;
+      }> = {};
       if (updates.description !== undefined) dbUpdates.description = updates.description;
       if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
       if (updates.date !== undefined) dbUpdates.transaction_date = updates.date;
@@ -275,27 +273,17 @@ export const useSupabaseFinancial = () => {
         return;
       }
 
-      // Update local state
-      setExpenses(prev => 
-        prev.map(expense => 
-          expense.id === id 
-            ? { ...expense, ...updates }
-            : expense
-        )
-      );
-
+      // Refresh data from database
+      await fetchTransactions();
       toast.success('Despesa atualizada com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in updateExpense:', error);
       toast.error('Erro ao atualizar despesa');
     }
-  };
+  }, [user, fetchTransactions]);
 
   // Delete expense
-  const deleteExpense = async (id: string) => {
+  const deleteExpense = useCallback(async (id: string) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -315,24 +303,21 @@ export const useSupabaseFinancial = () => {
         return;
       }
 
-      // Update local state
-      setExpenses(prev => prev.filter(expense => expense.id !== id));
+      // Refresh data from database
+      await fetchTransactions();
       toast.success('Despesa deletada com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in deleteExpense:', error);
       toast.error('Erro ao deletar despesa');
     }
-  };
+  }, [user, fetchTransactions]);
 
-  // Get financial statistics
-  const getFinancialStats = () => {
+  // Memoized financial statistics to prevent unnecessary re-renders
+  const financialStats = useMemo(() => {
     const flightStats = getFlightStats();
     
-    // Revenue = Base minimum (5.922.235 CR) + CR from real flights + additional revenues
-    const baseRevenue = 5922235;
+    // Revenue = User configured initial balance + CR from real flights + additional revenues
+    const baseRevenue = getInitialBalance();
     const realFlightsCR = flightStats.totalCR || 0;
     const additionalRevenues = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
     const totalRevenue = baseRevenue + realFlightsCR + additionalRevenues;
@@ -376,7 +361,12 @@ export const useSupabaseFinancial = () => {
       realFlightsCR,
       additionalRevenues
     };
-  };
+  }, [expenses, revenues, getFlightStats, getInitialBalance]);
+
+  // Get financial statistics (backward compatibility)
+  const getFinancialStats = useCallback(() => {
+    return financialStats;
+  }, [financialStats]);
 
   return {
     expenses,
@@ -394,6 +384,7 @@ export const useSupabaseFinancial = () => {
     deleteRevenue,
     deleteTransaction: deleteExpense, // For compatibility
     getFinancialStats,
+    financialStats, // Direct access to memoized stats
     refresh: fetchTransactions,
   };
 };

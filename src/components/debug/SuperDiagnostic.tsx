@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckCircle, XCircle, RefreshCw, Database, FileCode, Code } from 'lucide-react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const SuperDiagnostic = () => {
@@ -18,7 +18,7 @@ export const SuperDiagnostic = () => {
   useEffect(() => {
     loadEnvironmentVariables();
     runTests();
-  }, []);
+  }, [runTests]);
 
   const loadEnvironmentVariables = () => {
     // Collect all VITE_ environment variables
@@ -270,7 +270,7 @@ export const SuperDiagnostic = () => {
 import { supabase } from '@/lib/config/supabase';
 
 // Por isso:
-import { supabase } from '@/lib/config/supabase';`}
+import { supabase } from '@/lib/supabase';`}
                     </pre>
                     
                     <p className="mt-2">Este cliente usa credenciais hardcoded e não depende de variáveis de ambiente.</p>

@@ -122,9 +122,15 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
     });
   };
 
-  const handleDelete = () => {
-    deleteFlight(flight.id);
-    setShowDeleteDialog(false);
+  const handleDelete = async () => {
+    try {
+      await deleteFlight(flight.id);
+      setShowDeleteDialog(false);
+      // Force page refresh to ensure UI updates
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting flight:', error);
+    }
   };
 
   return (
@@ -262,6 +268,10 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         ref={editModalRef}
         flight={flight}
         trigger={null}
+        onClose={() => {
+          // Recarregar página após editar voo
+          window.location.reload();
+        }}
       />
 
       {/* Dialog de Confirmação de Exclusão */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -79,7 +79,7 @@ export default function RealTimeTracker() {
   // WEBSOCKET CONNECTION
   // ============================================
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     try {
       const ws = new WebSocket('ws://localhost:3002');
       wsRef.current = ws;
@@ -123,7 +123,7 @@ export default function RealTimeTracker() {
       console.error('Erro ao conectar WebSocket:', error);
       toast.error('Falha ao conectar com MSFS Companion');
     }
-  };
+  }, [connectionAttempts, handleWebSocketMessage]);
 
   const disconnectWebSocket = () => {
     if (reconnectTimeoutRef.current) {
@@ -140,7 +140,7 @@ export default function RealTimeTracker() {
   // MESSAGE HANDLING
   // ============================================
 
-  const handleWebSocketMessage = (message: WSMessage) => {
+  const handleWebSocketMessage = useCallback((message: WSMessage) => {
     switch (message.type) {
       case 'status':
         setStatus(message.data);
@@ -159,9 +159,9 @@ export default function RealTimeTracker() {
         handleFlightEvent(message.event!, message.data);
         break;
     }
-  };
+  }, [handleFlightEvent]);
 
-  const handleFlightEvent = (event: string, data: any) => {
+  const handleFlightEvent = useCallback((event: string, data: any) => {
     switch (event) {
       case 'flightStart':
         toast.success('🛫 Voo iniciado!');
@@ -180,7 +180,7 @@ export default function RealTimeTracker() {
         toast.error('❌ Erro ao salvar voo: ' + data.error);
         break;
     }
-  };
+  }, []);
 
   // ============================================
   // LIFECYCLE
@@ -192,7 +192,7 @@ export default function RealTimeTracker() {
     return () => {
       disconnectWebSocket();
     };
-  }, []);
+  }, [connectWebSocket]);
 
   // ============================================
   // UTILITY FUNCTIONS

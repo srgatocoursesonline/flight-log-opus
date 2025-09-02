@@ -4,7 +4,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -59,46 +59,11 @@ export const useFlightSessions = () => {
       setIsLoading(true);
       setError(null);
 
-      // Usar a view flight_session_stats que já calcula as métricas
-      const { data, error } = await supabase
-        .from('flight_session_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('started_at', { ascending: false });
-
-      if (error) {
-        console.error('Erro ao buscar sessões de voo:', error);
-        setError('Erro ao carregar sessões de voo');
-        toast.error('Erro ao carregar sessões de voo');
-        return;
-      }
-
-      // Transformar dados para o formato da interface
-      const sessionData: FlightSession[] = (data || []).map(item => ({
-        id: item.id,
-        userId: item.user_id,
-        deviceId: item.device_id,
-        aircraftTitle: item.aircraft_title,
-        startedAt: item.started_at,
-        endedAt: item.ended_at,
-        status: item.status,
-        departureLat: item.departure_lat,
-        departureLon: item.departure_lon,
-        arrivalLat: item.arrival_lat,
-        arrivalLon: item.arrival_lon,
-        flightTime: item.flight_time,
-        totalPoints: item.total_points,
-        maxAltitude: item.max_altitude,
-        maxSpeed: item.max_speed,
-        totalDistance: item.total_distance,
-        averageSpeed: item.average_speed,
-        currentLat: item.current_lat,
-        currentLon: item.current_lon,
-        currentAltitude: item.current_altitude,
-        currentSpeed: item.current_speed
-      }));
-
-      setSessions(sessionData);
+      // TEMPORÁRIO: Tabela flight_sessions ainda não existe no banco
+      // Retornando array vazio para evitar erro 404
+      console.log('Flight sessions feature temporarily disabled - table not found');
+      setSessions([]);
+      
     } catch (error) {
       console.error('Erro em fetchSessions:', error);
       setError('Erro ao conectar com o banco de dados');
@@ -110,12 +75,14 @@ export const useFlightSessions = () => {
 
   // Carregar dados inicialmente
   useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+    if (user) {
+      fetchSessions();
+    }
+  }, [user?.id]);
 
   // Calcular estatísticas das sessões
   const getSessionStats = useCallback((): FlightSessionStats => {
-    const completedSessions = sessions.filter(s => s.status === 'completed');
+    const completedSessions = sessions.filter(s => s.status === 'Concluído');
     const activeSessions = sessions.filter(s => s.status === 'active');
     
     const totalFlightTime = completedSessions.reduce((sum, session) => {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -28,13 +29,14 @@ interface AddExpenseModalProps {
   expense?: Transaction;
   initialValues?: Partial<Transaction>;
   onClose?: () => void;
+  onSuccess?: () => void;
 }
 
 export interface AddExpenseModalRef {
   openModal: () => void;
 }
 
-export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalProps>(({ trigger, expense, initialValues, onClose }, ref) => {
+export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalProps>(({ trigger, expense, initialValues, onClose, onSuccess }, ref) => {
   const { t } = useTranslation();
   const { addExpense, updateExpense } = useSupabaseFinancial();
   const { getActiveCategories, categories } = useSupabaseExpenseCategories();
@@ -110,7 +112,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
         }
       }
     }
-  }, [activeCategories, initialValues]);
+  }, [activeCategories, initialValues, categories]);
 
   // Clear the prefill label if user selects an active category
   useEffect(() => {
@@ -119,7 +121,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
     }
   }, [formData.category, activeCategories]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.description.trim()) {
@@ -158,13 +160,13 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
 
     try {
       if (expense) {
-        updateExpense(expense.id, expenseData);
+        await updateExpense(expense.id, expenseData);
         toast({
           title: "Sucesso!",
           description: "Despesa atualizada com sucesso",
         });
       } else {
-        addExpense(expenseData);
+        await addExpense(expenseData);
         toast({
           title: "Sucesso!",
           description: "Despesa adicionada com sucesso",
@@ -173,6 +175,12 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
 
       setOpen(false);
       if (onClose) onClose();
+      if (onSuccess) onSuccess();
+      
+      // Refresh automático da página
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
       
       // Reset form se não for edição
       if (!expense) {
@@ -200,12 +208,32 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
     }
   };
 
-  const formatCategoryOption = (category: any) => (
-    <div className="flex items-center gap-2">
-      <span>{category.icon}</span>
-      <span>{category.name}</span>
-    </div>
-  );
+  const formatCategoryOption = (category: any) => {
+    const translationKey = getCategoryTranslationKey(category.id);
+    const translatedName = translationKey ? t(`financial.${translationKey}`) : category.name;
+    return (
+      <div className="flex items-center gap-2">
+        <span>{category.icon}</span>
+        <span>{translatedName}</span>
+      </div>
+    );
+  };
+
+  const getCategoryTranslationKey = (categoryId: string) => {
+    const translationMap: Record<string, string> = {
+      'aircraft-fuel': 'aircraftFuel',
+      'aircraft-maintenance': 'aircraftMaintenance',
+      'aircraft-insurance': 'aircraftInsurance',
+      'hangar-rent': 'hangarRent',
+      'pilot-training': 'pilotTraining',
+      'flight-equipment': 'flightEquipment',
+      'airport-fees': 'airportFees',
+      'navigation-fees': 'navigationFees',
+      'weather-services': 'weatherServices',
+      'other-expenses': 'otherExpenses'
+    };
+    return translationMap[categoryId];
+  };
 
   const defaultTrigger = (
     <Button variant="hud" className="icon-hover">
@@ -232,6 +260,9 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
             <Receipt className="h-5 w-5 text-primary" />
             {expense ? 'Editar Despesa' : 'Nova Despesa'}
           </DialogTitle>
+          <DialogDescription>
+            {expense ? 'Edite os dados da despesa selecionada' : 'Registre uma nova despesa no sistema financeiro'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { autoRefresh } from '@/utils/autoRefresh';
@@ -84,12 +84,14 @@ export const useSupabaseGoals = () => {
 
   // Initial load
   useEffect(() => {
-    fetchGoals();
-  }, [fetchGoals]);
+    if (user) {
+      fetchGoals();
+    }
+  }, [user?.id]); // Apenas depende do user.id para evitar loops
 
   // Update goal progress based on flight statistics
   const updateGoalProgress = useCallback(async () => {
-    if (!user || goals.length === 0) return;
+    if (!user) return;
 
     try {
       const flightStats = getFlightStats();
@@ -135,7 +137,7 @@ export const useSupabaseGoals = () => {
     } catch (error) {
       console.error('Error updating goal progress:', error);
     }
-  }, [user, goals, getFlightStats]);
+  }, [user, getFlightStats, updateGoal]);
 
   // Update goal progress when flight stats change
   useEffect(() => {
@@ -175,9 +177,6 @@ export const useSupabaseGoals = () => {
       // Refresh data
       await fetchGoals();
       toast.success(`Meta "${goal.title}" adicionada com sucesso!`);
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in addGoal:', error);
       toast.error('Erro ao adicionar meta');
@@ -185,7 +184,7 @@ export const useSupabaseGoals = () => {
   };
 
   // Update goal
-  const updateGoal = async (id: string, updates: Partial<Goal>) => {
+  const updateGoal = useCallback(async (id: string, updates: Partial<Goal>) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return;
@@ -193,7 +192,15 @@ export const useSupabaseGoals = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        title: string;
+        description: string;
+        goal_type: string;
+        target_value: number;
+        current_value: number;
+        target_date: string;
+        is_completed: boolean;
+      }> = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
       if (updates.description !== undefined) dbUpdates.description = updates.description;
       if (updates.goalType !== undefined) dbUpdates.goal_type = updates.goalType;
@@ -228,14 +235,11 @@ export const useSupabaseGoals = () => {
       if (updates.title || updates.description || updates.targetValue) {
         toast.success('Meta atualizada com sucesso!');
       }
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in updateGoal:', error);
       toast.error('Erro ao atualizar meta');
     }
-  };
+  }, [user]);
 
   // Delete goal
   const deleteGoal = async (id: string) => {
@@ -260,9 +264,6 @@ export const useSupabaseGoals = () => {
       // Update local state
       setGoals(prev => prev.filter(goal => goal.id !== id));
       toast.success('Meta deletada com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in deleteGoal:', error);
       toast.error('Erro ao deletar meta');

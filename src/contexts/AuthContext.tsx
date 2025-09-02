@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [hasShownLoginToast]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -134,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           data: {
             display_name: displayName || 'Cmdte. Rodrigo',
           },
+          emailRedirectTo: `${window.location.origin}/confirm-email`,
         },
       });
       

@@ -61,6 +61,10 @@ export const MSFSFlights = ({
     setIsDeleting(flightId);
     try {
       await deleteFlight(flightId);
+      // Force page refresh to ensure UI updates
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting flight:', error);
     } finally {
       setIsDeleting(null);
     }

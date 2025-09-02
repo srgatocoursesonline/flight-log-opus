@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { autoRefresh } from '@/utils/autoRefresh';
@@ -116,8 +116,10 @@ export const useSupabaseFlights = () => {
 
   // Initial load
   useEffect(() => {
-    fetchFlights();
-  }, [fetchFlights]);
+    if (user) {
+      fetchFlights();
+    }
+  }, [user?.id]); // Apenas depende do user.id para evitar loops
 
   // Add new flight
   const addFlight = async (flight: Omit<Flight, 'id'>) => {
@@ -180,9 +182,6 @@ export const useSupabaseFlights = () => {
       
       toast.success(`Voo "${flight.callsign}" adicionado com sucesso!`);
       
-      // Auto refresh for real-time updates
-      autoRefresh();
-      
       return data;
     } catch (error) {
       console.error('Erro geral em addFlight:', error);
@@ -200,7 +199,26 @@ export const useSupabaseFlights = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: any = {};
+      const dbUpdates: Partial<{
+        callsign: string;
+        aircraft: string;
+        departure: string;
+        arrival: string;
+        departure_time: string;
+        arrival_time: string;
+        flight_time: string;
+        distance: number;
+        fuel_used: number;
+        landing_rate: number;
+        experience_points: number;
+        career_rating: number;
+        status: string;
+        route: string;
+        notes: string;
+        service_type: string;
+        origin_country: string;
+        destination_country: string;
+      }> = {};
       if (updates.callsign !== undefined) dbUpdates.callsign = updates.callsign;
       if (updates.aircraft !== undefined) dbUpdates.aircraft = updates.aircraft;
       if (updates.departure !== undefined) dbUpdates.departure = updates.departure;
@@ -236,19 +254,10 @@ export const useSupabaseFlights = () => {
         return;
       }
 
-      // Update local state
-      setFlights(prev => 
-        prev.map(flight => 
-          flight.id === id 
-            ? { ...flight, ...updates }
-            : flight
-        )
-      );
+      // Refresh data to ensure consistency
+      await fetchFlights();
 
       toast.success('Voo atualizado com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in updateFlight:', error);
       toast.error('Erro ao atualizar voo');
@@ -278,9 +287,6 @@ export const useSupabaseFlights = () => {
       // Update local state
       setFlights(prev => prev.filter(flight => flight.id !== id));
       toast.success('Voo deletado com sucesso!');
-      
-      // Auto refresh for real-time updates
-      autoRefresh();
     } catch (error) {
       console.error('Error in deleteFlight:', error);
       toast.error('Erro ao deletar voo');
@@ -292,6 +298,9 @@ export const useSupabaseFlights = () => {
     // Use only real flights (excluding mock data)
     const realFlights = flights.filter(flight => !flight.isExample);
     
+    // Filter only completed flights for CR calculation
+    const completedFlights = realFlights.filter(flight => flight.status === 'Concluído');
+    
     // Statistics based only on real flights
     const totalRealFlights = realFlights.length;
     const totalRealDistance = realFlights.reduce((sum, flight) => sum + flight.distance, 0);
@@ -301,7 +310,8 @@ export const useSupabaseFlights = () => {
     const averageRating = totalRealFlights > 0 
       ? realFlights.reduce((sum, flight) => sum + flight.careerRating, 0) / totalRealFlights 
       : 0;
-    const totalCR = realFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
+    // Only count CR from completed flights
+    const totalCR = completedFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
 
     return {
       // Only real data for all calculations and displays

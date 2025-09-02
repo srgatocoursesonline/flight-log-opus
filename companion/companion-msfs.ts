@@ -83,6 +83,7 @@ interface FlightLog {
   maxSpeed: number;
   distance: number;
   duration?: number;
+  [key: string]: unknown;
 }
 
 // ============================================
@@ -91,14 +92,14 @@ interface FlightLog {
 
 class MSFSCompanion {
   private simConnect: ConnectionHandle | null = null;
-  private expressApp: express.Application;
-  private wsServer: WebSocketServer;
+  private expressApp!: express.Application;
+  private wsServer!: WebSocketServer;
   private isConnected = false;
   private isFlying = false;
   private currentFlight: FlightLog | null = null;
   private lastData: FlightData | null = null;
   private dataInterval: NodeJS.Timeout | null = null;
-  private clients: Set<any> = new Set();
+  private clients: Set<WebSocket> = new Set();
   
   // Flight Tracking WebSocket
   private flightTrackingWS: WebSocket | null = null;
@@ -199,13 +200,15 @@ class MSFSCompanion {
     });
 
     // Evento de erro
-    this.simConnect.on('error', (error: any) => {
+    this.simConnect.on('error', (error: Error) => {
       console.error('❌ Erro SimConnect:', error);
     });
 
     // Dados recebidos
-    this.simConnect.on('simObjectData', (data: any) => {
-      this.processFlightData(data);
+    this.simConnect.on('simObjectData', (recvSimObjectData: any) => {
+        if (recvSimObjectData && recvSimObjectData.data) {
+          this.processFlightData(recvSimObjectData.data);
+        }
     });
   }
 
@@ -214,111 +217,111 @@ class MSFSCompanion {
 
     // Definir estrutura de dados que queremos receber
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'PLANE LATITUDE',
       'degrees',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'PLANE LONGITUDE', 
       'degrees',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'PLANE ALTITUDE',
       'feet',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'GROUND VELOCITY',
       'knots',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'AIRSPEED INDICATED',
       'knots', 
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'VERTICAL SPEED',
       'feet per minute',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'PLANE HEADING DEGREES MAGNETIC',
       'degrees',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'SIM ON GROUND',
       'bool',
-      Protocol.SIMCONNECT_DATATYPE_INT32
+      2 // SIMCONNECT_DATATYPE_INT32
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'TITLE',
       null,
-      Protocol.SIMCONNECT_DATATYPE_STRING256
+      0 // SIMCONNECT_DATATYPE_STRING256
     );
     
     // Dados adicionais para análise
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'AIRSPEED TRUE',
       'knots',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'AMBIENT WIND VELOCITY',
       'knots',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'AMBIENT WIND DIRECTION',
       'degrees',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'FUEL TOTAL QUANTITY',
       'gallons',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
     
     this.simConnect.addToDataDefinition(
-      'FlightData',
+      0,
       'GENERAL ENG RPM:1',
       'rpm',
-      Protocol.SIMCONNECT_DATATYPE_FLOAT64
+      8 // SIMCONNECT_DATATYPE_FLOAT64
     );
 
     // Solicitar dados a cada frame do simulador
     this.simConnect.requestDataOnSimObject(
-      'FlightData',
-      'FlightData',
+      0,
+      0,
       0, // User aircraft
-      Protocol.SIMCONNECT_PERIOD_SIM_FRAME,
-      Protocol.SIMCONNECT_DATA_REQUEST_FLAG_CHANGED
+      1, // SIMCONNECT_PERIOD_SIM_FRAME
+      0 // SIMCONNECT_DATA_REQUEST_FLAG_CHANGED
     );
   }
 
@@ -341,7 +344,7 @@ class MSFSCompanion {
     }
   }
 
-  private processFlightData(rawData: any) {
+  private processFlightData(rawData: [number, number, number, number, number, number, number, number, string, number, number, number, number, number]) {
     try {
       // Mapear dados do SimConnect para nossa estrutura
       const data: FlightData = {
@@ -577,7 +580,8 @@ class MSFSCompanion {
       
     } catch (error) {
       console.error('❌ Erro ao enviar voo para o backend:', error);
-      this.broadcastEvent('flightSaveError', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      this.broadcastEvent('flightSaveError', { error: errorMessage });
     }
   }
 
@@ -623,7 +627,7 @@ class MSFSCompanion {
     });
   }
 
-  private broadcastEvent(event: string, data: any) {
+  private broadcastEvent(event: string, data: Record<string, unknown>) {
     this.broadcast({
       type: 'event',
       event: event,
@@ -631,7 +635,7 @@ class MSFSCompanion {
     });
   }
 
-  private broadcast(message: any) {
+  private broadcast(message: Record<string, unknown>) {
     const messageStr = JSON.stringify(message);
     
     this.clients.forEach(client => {
@@ -702,7 +706,7 @@ class MSFSCompanion {
     }
   }
   
-  private handleFlightTrackingMessage(message: any) {
+  private handleFlightTrackingMessage(message: { type?: string; sessionId?: string; [key: string]: unknown }) {
     switch (message.type) {
       case 'auth_success':
         console.log(`✅ Autenticado no Flight Tracking: ${message.deviceName}`);
@@ -715,7 +719,7 @@ class MSFSCompanion {
         
       case 'flight_started':
         console.log(`🛫 Sessão de voo iniciada: ${message.sessionId}`);
-        this.currentSessionId = message.sessionId;
+        this.currentSessionId = message.sessionId ?? null;
         break;
         
       case 'flight_ended':
@@ -736,7 +740,7 @@ class MSFSCompanion {
     }
   }
   
-  private sendToFlightTracking(message: any) {
+  private sendToFlightTracking(message: Record<string, unknown>) {
     if (this.flightTrackingWS && this.flightTrackingWS.readyState === WebSocket.OPEN) {
       this.flightTrackingWS.send(JSON.stringify(message));
     }

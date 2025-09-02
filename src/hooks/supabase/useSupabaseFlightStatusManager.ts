@@ -3,7 +3,7 @@
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -38,7 +38,7 @@ const defaultStatuses: Omit<FlightStatus, 'id'>[] = [
     hourlyMultiplier: 1.0,
   },
   {
-    name: 'Completado',
+    name: 'Concluído',
     color: '#10B981',
     icon: '✅',
     description: 'Voo concluído com sucesso',
@@ -81,10 +81,46 @@ export const useSupabaseFlightStatusManager = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Create default statuses
+  const createDefaultStatuses = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const defaultStatusData = defaultStatuses.map(status => ({
+        user_id: user.id,
+        name: status.name,
+        color: status.color,
+        icon: status.icon,
+        description: status.description,
+        hourly_multiplier: status.hourlyMultiplier,
+        is_active: status.isActive,
+        is_default: status.isDefault,
+      }));
+
+      const { error } = await supabase
+        .from('flight_statuses')
+        .insert(defaultStatusData);
+
+      if (error) {
+        console.error('Error creating default statuses:', error);
+        return;
+      }
+
+      toast.success('Status de voo padrão criados com sucesso!');
+    } catch (error) {
+      console.error('Error in createDefaultStatuses:', error);
+    }
+  }, [user]);
+
   // Fetch statuses from database
   const fetchStatuses = useCallback(async () => {
     if (!user) {
-      setFlightStatuses(defaultStatuses.map(status => ({ ...status, id: status.name })));
+      // Use proper IDs for default statuses when not authenticated
+      const statusesWithIds = defaultStatuses.map((status, index) => ({ 
+        ...status, 
+        id: `default-${index}` 
+      }));
+      setFlightStatuses(statusesWithIds);
       setLoading(false);
       return;
     }
@@ -96,7 +132,7 @@ export const useSupabaseFlightStatusManager = () => {
       const { data, error } = await supabase
         .from('flight_statuses')
         .select('*')
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},user_id.is.null`)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -120,7 +156,6 @@ export const useSupabaseFlightStatusManager = () => {
 
       // If no status data exists, create default statuses
       if (statuses.length === 0) {
-  
         await createDefaultStatuses();
         // Fetch again after creating defaults
         setTimeout(() => fetchStatuses(), 1000);
@@ -135,46 +170,12 @@ export const useSupabaseFlightStatusManager = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, createDefaultStatuses]);
 
   // Initial load
   useEffect(() => {
     fetchStatuses();
   }, [fetchStatuses]);
-
-  // Create default statuses
-  const createDefaultStatuses = async () => {
-    if (!user) return;
-
-    try {
-
-      
-      const defaultStatusData = defaultStatuses.map(status => ({
-        user_id: user.id,
-        name: status.name,
-        color: status.color,
-        icon: status.icon,
-        description: status.description,
-        hourly_multiplier: status.hourlyMultiplier,
-        is_active: status.isActive,
-        is_default: status.isDefault,
-      }));
-
-      const { error } = await supabase
-        .from('flight_statuses')
-        .insert(defaultStatusData);
-
-      if (error) {
-        console.error('Error creating default statuses:', error);
-        return;
-      }
-
-
-      toast.success('Status de voo padrão criados com sucesso!');
-    } catch (error) {
-      console.error('Error in createDefaultStatuses:', error);
-    }
-  };
 
   // Add new status
   const addStatus = async (statusData: Omit<FlightStatus, 'id' | 'isDefault'>) => {
@@ -224,7 +225,19 @@ export const useSupabaseFlightStatusManager = () => {
     try {
       const status = flightStatuses.find(s => s.id === statusId);
       if (status?.isDefault) {
-        toast.error('Não é possível deletar status padrão');
+        toast.error('Não é possível deletar status padrão do sistema');
+        return;
+      }
+
+      // Verificar se o status pertence ao usuário (não é padrão do sistema)
+      const { data: statusData } = await supabase
+        .from('flight_statuses')
+        .select('user_id')
+        .eq('id', statusId)
+        .single();
+
+      if (!statusData || statusData.user_id === null) {
+        toast.error('Não é possível deletar status padrão do sistema');
         return;
       }
 
@@ -259,6 +272,18 @@ export const useSupabaseFlightStatusManager = () => {
     try {
       const status = flightStatuses.find(s => s.id === statusId);
       if (!status) return;
+
+      // Verificar se o status pertence ao usuário (não é padrão do sistema)
+      const { data: statusData } = await supabase
+        .from('flight_statuses')
+        .select('user_id')
+        .eq('id', statusId)
+        .single();
+
+      if (!statusData || statusData.user_id === null) {
+        toast.error('Não é possível modificar status padrão do sistema');
+        return;
+      }
 
       const { error } = await supabase
         .from('flight_statuses')
@@ -327,6 +352,38 @@ export const useSupabaseFlightStatusManager = () => {
     return flightStatuses.find(status => status.name === name);
   };
 
+  // Get status by value (for compatibility with Flight status values)
+  const getStatusByValue = (value: string) => {
+    // First, try to find by ID (UUID)
+    let foundStatus = flightStatuses.find(status => status.id === value);
+    
+    if (foundStatus) {
+      return foundStatus;
+    }
+    
+    // Map standard status values to status names
+    const statusMapping: Record<string, string> = {
+      'planned': 'Planejado',
+      'active': 'Em Voo', 
+      'completed': 'Concluído',
+      'cancelled': 'Cancelado'
+    };
+    
+    const statusName = statusMapping[value] || value;
+     
+     // Try exact match by name
+     foundStatus = flightStatuses.find(status => status.name === statusName);
+     
+     // If not found, try case-insensitive match
+     if (!foundStatus) {
+       foundStatus = flightStatuses.find(status => 
+         status.name.toLowerCase() === statusName.toLowerCase()
+       );
+     }
+     
+     return foundStatus;
+  };
+
   return {
     flightStatuses,
     loading,
@@ -337,6 +394,7 @@ export const useSupabaseFlightStatusManager = () => {
     resetToDefaults,
     getActiveStatuses,
     getStatusByName,
+    getStatusByValue,
     refresh: fetchStatuses,
   };
 };

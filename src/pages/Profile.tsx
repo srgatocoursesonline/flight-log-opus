@@ -2,15 +2,21 @@ import { User, Edit, Star, Calendar, Clock, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { autoRefresh } from "@/utils/autoRefresh";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { useProfile } from "@/hooks/useProfile";
+import { useProfileFinancialSync } from "@/hooks/useProfileFinancialSync";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 
 const Profile = () => {
   const { t } = useTranslation();
-  const { profile, isLoading, getProfileStats, fetchProfile } = useProfile();
+  const { profile, isLoading, fetchProfile, getProfileStats } = useProfile();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  
+  // Sincronização automática do career_rating com lucro líquido
+  useProfileFinancialSync();
   
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -22,7 +28,13 @@ const Profile = () => {
     fetchProfile();
   };
 
-  const stats = getProfileStats();
+  // Calcular estatísticas quando o perfil mudar
+  useEffect(() => {
+    if (profile) {
+      const profileStats = getProfileStats();
+      setStats(profileStats);
+    }
+  }, [profile, getProfileStats]);
 
   if (isLoading) {
     return (
@@ -172,6 +184,8 @@ const Profile = () => {
           description: profile.description
         } : undefined}
       />
+      
+
     </div>
   );
 };

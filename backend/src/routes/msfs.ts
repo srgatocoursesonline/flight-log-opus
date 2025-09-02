@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { z } from 'zod';
+import { WebSocket } from 'ws';
 import { findNearestAirport } from '../services/airportService.js';
 import { calculateFlightDistance, calculateFlightDuration } from '../utils/flightCalculations.js';
 
@@ -125,15 +126,15 @@ router.post('/logbook', async (req, res) => {
         timestamp: new Date().toISOString(),
       };
       
-      wsClients.forEach((client: any) => {
-        if (client.readyState === 1) {
+      wsClients.forEach((client: WebSocket) => {
+        if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(message));
         }
       });
     }
     
     // Resposta
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Voo registrado com sucesso',
       data: {
@@ -163,10 +164,10 @@ router.post('/logbook', async (req, res) => {
       });
     }
     
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro interno do servidor',
-      message: error.message,
+      message: error instanceof Error ? error.message : 'Erro desconhecido',
     });
   }
 });
@@ -188,14 +189,14 @@ router.post('/telemetry', async (req, res) => {
         timestamp: new Date().toISOString(),
       };
       
-      wsClients.forEach((client: any) => {
-        if (client.readyState === 1) {
+      wsClients.forEach((client: WebSocket) => {
+        if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(message));
         }
       });
     }
     
-    res.json({ success: true, message: 'Telemetria recebida' });
+    return res.json({ success: true, message: 'Telemetria recebida' });
     
   } catch (error) {
     console.error('❌ Erro ao processar telemetria:', error);
@@ -208,7 +209,7 @@ router.post('/telemetry', async (req, res) => {
       });
     }
     
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro interno do servidor',
     });
@@ -237,7 +238,7 @@ router.get('/flights', async (req, res) => {
       throw error;
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: flights,
       pagination: {
@@ -250,7 +251,7 @@ router.get('/flights', async (req, res) => {
     
   } catch (error) {
     console.error('❌ Erro ao buscar voos:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao buscar voos',
     });
@@ -282,14 +283,14 @@ router.get('/flights/:id', async (req, res) => {
       throw error;
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: flight,
     });
     
   } catch (error) {
     console.error('❌ Erro ao buscar voo:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao buscar voo',
     });
@@ -312,7 +313,7 @@ router.get('/stats', async (req, res) => {
       throw error;
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: stats || {
         total_flights: 0,
@@ -325,7 +326,7 @@ router.get('/stats', async (req, res) => {
     
   } catch (error) {
     console.error('❌ Erro ao buscar estatísticas:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao buscar estatísticas',
     });

@@ -66,7 +66,7 @@ export default function MSFSFlights() {
 
   // Filter and sort flights
   const filteredAndSortedFlights = useMemo(() => {
-    let filtered = flights.filter(flight => {
+    const filtered = flights.filter(flight => {
       const matchesSearch = 
         flight.aircraft_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
         flight.departure_icao.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -114,6 +114,10 @@ export default function MSFSFlights() {
     setIsDeleting(flightId);
     try {
       await deleteFlight(flightId);
+      // Force page refresh to ensure UI updates
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting flight:', error);
     } finally {
       setIsDeleting(null);
     }

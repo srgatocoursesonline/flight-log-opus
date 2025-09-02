@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -124,7 +124,7 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
   // WEBSOCKET CONNECTION
   // ============================================
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     try {
       const ws = new WebSocket('ws://localhost:3001/flight-tracking');
       wsRef.current = ws;
@@ -159,8 +159,8 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
         setCurrentPosition(null);
         setCurrentSession(null);
         
-        // Tentar reconectar após 3 segundos
-        if (connectionAttempts < 10) {
+        // Tentar reconectar após 3 segundos apenas se não foi desconectado intencionalmente
+        if (connectionAttempts < 5 && wsRef.current) {
           setTimeout(() => {
             setConnectionAttempts(prev => prev + 1);
             connectWebSocket();
@@ -170,14 +170,14 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
 
       ws.onerror = (error) => {
         console.error('Erro WebSocket:', error);
-        toast.error('Erro de conexão com Flight Tracking Service');
+        // Remover toast de erro para evitar spam
       };
 
     } catch (error) {
       console.error('Erro ao conectar WebSocket:', error);
-      toast.error('Falha ao conectar com Flight Tracking Service');
+      // Remover toast de erro para evitar spam
     }
-  };
+  }, [connectionAttempts, handleWebSocketMessage]);
 
   const disconnectWebSocket = () => {
     if (wsRef.current) {
@@ -216,7 +216,7 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
         toast.info('Voo finalizado');
         break;
         
-      case 'flight_data':
+      case 'flight_data': {
         const flightData = message.data as FlightPoint;
         setCurrentPosition(flightData);
         
@@ -232,6 +232,7 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
           mapRef.current.setView([flightData.latitude, flightData.longitude], mapRef.current.getZoom());
         }
         break;
+      }
         
       case 'error':
         console.error('❌ Erro do servidor:', message.message);
@@ -304,7 +305,7 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
     return () => {
       disconnectWebSocket();
     };
-  }, []);
+  }, []); // Remover dependência para evitar reconexões infinitas
 
   // Componente para acessar a instância do mapa
   const MapInstance = () => {

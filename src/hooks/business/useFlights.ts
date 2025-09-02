@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { autoRefresh } from '@/utils/autoRefresh';
 
 export interface Flight {
   id: string;
@@ -191,22 +190,19 @@ export const useFlights = () => {
       flight.id === id ? { ...flight, ...updates } : flight
     );
     saveFlights(updatedFlights);
-    
-    // Refresh automático após atualizar voo
-    autoRefresh();
   };
 
   const deleteFlight = (id: string) => {
     const updatedFlights = flights.filter(flight => flight.id !== id);
     saveFlights(updatedFlights);
-    
-    // Refresh automático após excluir voo
-    autoRefresh();
   };
 
   const getFlightStats = () => {
     // Usar apenas voos reais (excluindo dados mockados)
     const realFlights = flights.filter(flight => !flight.isExample);
+    
+    // Filtrar apenas voos completados para cálculo de CR
+    const completedFlights = realFlights.filter(flight => flight.status === 'Concluído');
     
     // Estatísticas baseadas apenas em voos reais
     const totalRealFlights = realFlights.length;
@@ -217,7 +213,8 @@ export const useFlights = () => {
     const averageRating = totalRealFlights > 0 
       ? realFlights.reduce((sum, flight) => sum + flight.careerRating, 0) / totalRealFlights 
       : 0;
-    const totalCR = realFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
+    // Apenas voos completados contribuem para o CR total
+    const totalCR = completedFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
 
     return {
       // Apenas dados reais para todos os cálculos e exibições

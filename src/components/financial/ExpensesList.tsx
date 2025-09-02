@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,13 +19,24 @@ import { useSupabaseFinancial, type Transaction } from '@/hooks/supabase/useSupa
 import { useSupabaseExpenseCategories } from '@/hooks/supabase/useSupabaseExpenseCategories';
 import { useToast } from '@/hooks/ui/use-toast';
 import { AddExpenseModal } from './AddExpenseModal';
+import { FilterControls } from './FilterControls';
 
-export const ExpensesList = () => {
+interface ExpensesListProps {
+  onTransactionSuccess?: () => void;
+}
+
+export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
+  const { t } = useTranslation();
   const { expenses, deleteExpense } = useSupabaseFinancial();
   const { categories } = useSupabaseExpenseCategories();
   const { toast } = useToast();
   const [editingExpense, setEditingExpense] = useState<Transaction | null>(null);
   const [prefillExpense, setPrefillExpense] = useState<Partial<Transaction> | null>(null);
+  
+  // Estados dos filtros
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
   const formatCR = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -50,20 +62,43 @@ export const ExpensesList = () => {
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
-    return category || { 
+    if (category) {
+      // Try to get translation for the category name
+      const translationKey = getCategoryTranslationKey(categoryId);
+      const translatedName = translationKey ? t(`financial.${translationKey}`) : category.name;
+      return {
+        ...category,
+        name: translatedName
+      };
+    }
+    return { 
       name: 'Categoria Desconhecida', 
       icon: '❓', 
       description: '' 
     };
   };
 
-  const handleDelete = (id: string) => {
+  const getCategoryTranslationKey = (categoryId: string) => {
+    const translationMap: Record<string, string> = {
+      'aircraft-fuel': 'aircraftFuel',
+      'aircraft-maintenance': 'aircraftMaintenance',
+      'aircraft-insurance': 'aircraftInsurance',
+      'hangar-rent': 'hangarRent',
+      'pilot-training': 'pilotTraining',
+      'flight-equipment': 'flightEquipment',
+      'airport-fees': 'airportFees',
+      'navigation-fees': 'navigationFees',
+      'weather-services': 'weatherServices',
+      'other-expenses': 'otherExpenses'
+    };
+    return translationMap[categoryId];
+  };
+
+  const handleDelete = async (id: string) => {
     try {
-      deleteExpense(id);
-      toast({
-        title: "Sucesso!",
-        description: "Despesa excluída com sucesso",
-      });
+      await deleteExpense(id);
+      // Force page refresh to ensure UI updates
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Erro",
@@ -79,34 +114,129 @@ export const ExpensesList = () => {
     return 'default';
   };
 
+  // Filtrar despesas
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter(expense => {
+      // Filtro por categoria
+      if (selectedCategory !== 'all' && expense.category !== selectedCategory) {
+        return false;
+      }
+
+      // Filtro por data inicial
+      if (startDate && expense.date < startDate) {
+        return false;
+      }
+
+      // Filtro por data final
+      if (endDate && expense.date > endDate) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [expenses, selectedCategory, startDate, endDate]);
+
+  // Verificar se há filtros ativos
+  const hasActiveFilters = selectedCategory !== 'all' || startDate !== '' || endDate !== '';
+
+  // Limpar filtros
+  const clearFilters = () => {
+    setSelectedCategory('all');
+    setStartDate('');
+    setEndDate('');
+  };
+
+  // Preparar categorias para o filtro
+  const categoriesForFilter = categories.map(category => ({
+    id: category.id,
+    name: getCategoryInfo(category.id).name,
+    icon: category.icon
+  }));
+
   if (expenses.length === 0) {
     return (
-      <Card className="hud-display">
-        <CardContent className="p-8 text-center">
-          <Receipt className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            Nenhuma despesa registrada
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            Comece adicionando suas primeiras despesas operacionais
-          </p>
-        </CardContent>
-      </Card>
+      <>
+        <FilterControls
+          categories={categoriesForFilter}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+        
+        <Card className="hud-display">
+          <CardContent className="p-8 text-center">
+            <Receipt className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Nenhuma despesa registrada
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Comece adicionando suas primeiras despesas operacionais
+            </p>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
+
+  if (filteredExpenses.length === 0 && hasActiveFilters) {
+    return (
+      <>
+        <FilterControls
+          categories={categoriesForFilter}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+        
+        <Card className="hud-display">
+          <CardContent className="p-8 text-center">
+            <Receipt className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Nenhuma despesa encontrada
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Tente ajustar os filtros para encontrar as despesas desejadas
+            </p>
+          </CardContent>
+        </Card>
+      </>
     );
   }
 
   return (
     <>
+      <FilterControls
+        categories={categoriesForFilter}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        startDate={startDate}
+        onStartDateChange={setStartDate}
+        endDate={endDate}
+        onEndDateChange={setEndDate}
+        onClearFilters={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+      
       <Card className="hud-display">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Receipt className="h-5 w-5 text-primary" />
-            Despesas Registradas ({expenses.length})
+            Despesas Registradas ({filteredExpenses.length}{expenses.length !== filteredExpenses.length ? ` de ${expenses.length}` : ''})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="max-h-96 overflow-y-auto">
-            {expenses.map((expense, index) => {
+            {filteredExpenses.map((expense, index) => {
               const categoryInfo = getCategoryInfo(expense.category);
               
               return (
@@ -131,7 +261,7 @@ export const ExpensesList = () => {
                         
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>📅 {formatDate(expense.date)}</span>
-                          <span className="font-mono font-bold text-destructive">
+                          <span className="font-mono font-bold text-foreground">
                             -{formatCR(expense.amount)} CR
                           </span>
                         </div>
@@ -217,6 +347,7 @@ export const ExpensesList = () => {
           setEditingExpense(null);
           setPrefillExpense(null);
         }}
+        onSuccess={onTransactionSuccess}
       />
     </>
   );
