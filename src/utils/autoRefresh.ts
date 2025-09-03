@@ -9,7 +9,7 @@ export const autoRefresh = (callback?: () => void, delay: number = 300) => {
     return () => clearTimeout(timeoutId);
   }
   // Se não há callback válido, não faz nada (evita reload da página)
-  console.warn('autoRefresh called without valid callback - this may indicate unnecessary refresh calls');
+  // Removido o console.warn para reduzir logs
   return () => {};
 };
 

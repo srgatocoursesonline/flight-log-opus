@@ -229,10 +229,10 @@ export const RevenuesList = ({ onTransactionSuccess }: RevenuesListProps) => {
         hasActiveFilters={hasActiveFilters}
       />
       
-      <Card className="hud-display">
+      <Card className="hud-display stats-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <TrendingUp className="h-5 w-5 text-success" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-xs font-medium">
+            <TrendingUp className="h-4 w-4 text-success icon-hover" />
             Receitas Registradas ({filteredRevenues.length}{revenues.length !== filteredRevenues.length ? ` de ${revenues.length}` : ''})
           </CardTitle>
         </CardHeader>
@@ -244,26 +244,26 @@ export const RevenuesList = ({ onTransactionSuccess }: RevenuesListProps) => {
               return (
                 <div 
                   key={revenue.id} 
-                  className="flight-item p-4 border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                  className="flight-item p-2 border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">{categoryInfo.icon}</div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="text-sm">{categoryInfo.icon}</div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-foreground truncate text-sm" title={revenue.description}>
+                          <h4 className="font-medium text-foreground truncate text-xs" title={revenue.description}>
                             {revenue.description}
                           </h4>
-                          <Badge variant={getStatusColor(revenue.amount)} className="text-xs">
+                          <Badge variant={getStatusColor(revenue.amount)} className="text-xs px-1 py-0 text-[10px]">
                             {categoryInfo.name}
                           </Badge>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="truncate" title={`Data: ${formatDate(revenue.date)}`}>📅 {formatDate(revenue.date)}</span>
-                          <span className="font-mono font-bold text-success truncate" title={`Valor: +${formatCR(revenue.amount)} CR`}>
+                          <span className="revenue-amount truncate" title={`Valor: +${formatCR(revenue.amount)} CR`}>
                             +{formatCR(revenue.amount)} CR
                           </span>
                         </div>

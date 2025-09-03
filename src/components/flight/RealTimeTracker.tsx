@@ -224,7 +224,7 @@ export default function RealTimeTracker() {
   return (
     <div className="space-y-6">
       {/* Status de Conexão */}
-      <Card>
+      <Card className="chart-container">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {isConnected ? (
@@ -269,7 +269,7 @@ export default function RealTimeTracker() {
       {currentData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Informações da Aeronave */}
-          <Card>
+          <Card className="stats-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plane className="h-5 w-5" />
@@ -289,7 +289,7 @@ export default function RealTimeTracker() {
           </Card>
 
           {/* Posição */}
-          <Card>
+          <Card className="stats-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
@@ -305,7 +305,7 @@ export default function RealTimeTracker() {
           </Card>
 
           {/* Altitude */}
-          <Card>
+          <Card className="stats-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mountain className="h-5 w-5" />
@@ -333,7 +333,7 @@ export default function RealTimeTracker() {
           </Card>
 
           {/* Velocidade */}
-          <Card>
+          <Card className="stats-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Gauge className="h-5 w-5" />
@@ -351,7 +351,7 @@ export default function RealTimeTracker() {
           </Card>
 
           {/* Proa */}
-          <Card>
+          <Card className="stats-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Navigation className="h-5 w-5" />
@@ -378,7 +378,7 @@ export default function RealTimeTracker() {
 
           {/* Voo Atual */}
           {status.currentFlight && (
-            <Card>
+            <Card className="stats-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5" />
@@ -412,7 +412,7 @@ export default function RealTimeTracker() {
 
       {/* Mensagem quando não há dados */}
       {!currentData && isConnected && status.connected && (
-        <Card>
+        <Card className="chart-container">
           <CardContent className="text-center py-8">
             <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground">
@@ -427,7 +427,7 @@ export default function RealTimeTracker() {
 
       {/* Mensagem quando não conectado */}
       {!isConnected && (
-        <Card>
+        <Card className="chart-container">
           <CardContent className="text-center py-8">
             <WifiOff className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground">

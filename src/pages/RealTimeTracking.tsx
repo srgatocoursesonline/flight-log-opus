@@ -17,12 +17,12 @@ export default function RealTimeTracking() {
   const { t } = useTranslation();
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-6 pt-8 pb-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="mobile-title gradient-title flex items-center gap-2">
               <Activity className="h-8 w-8" />
               Tracking em Tempo Real
             </h1>
@@ -40,7 +40,7 @@ export default function RealTimeTracking() {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
+          <Card className="stats-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
@@ -56,7 +56,7 @@ export default function RealTimeTracking() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="stats-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
@@ -91,7 +91,7 @@ export default function RealTimeTracking() {
       </div>
 
       {/* Instruções de Setup */}
-      <Card>
+      <Card className="chart-container">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5" />
@@ -135,7 +135,7 @@ export default function RealTimeTracking() {
       <LiveTrackingMap />
 
       {/* Links Úteis */}
-      <Card>
+      <Card className="chart-container">
         <CardHeader>
           <CardTitle>Links Úteis</CardTitle>
         </CardHeader>

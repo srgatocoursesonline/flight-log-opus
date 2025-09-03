@@ -129,8 +129,8 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
           <div className="flex items-center justify-between h-full">
             {/* Informações principais */}
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="p-1 rounded-lg bg-primary/20 flex-shrink-0">
-                <Plane className="h-3 w-3 text-primary" />
+              <div className="p-1 rounded-lg bg-blue-600/20 flex-shrink-0">
+                <Plane className="h-3 w-3 text-blue-600" />
               </div>
               
               <div className="flex-1 min-w-0">
@@ -140,15 +140,15 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
                   </h3>
                 </div>
                 
-                <div className="flex flex-col text-xs text-muted-foreground gap-0.5">
+                <div className="flex flex-col text-xs text-readable-muted gap-0.5">
                   <span className="font-mono font-semibold text-foreground truncate">
                     {flight.departure} → {flight.arrival}
                   </span>
-                  <span className="text-muted-foreground truncate">
+                  <span className="text-readable-muted truncate">
                     {flight.aircraft}
                   </span>
                   <div className="flex items-center gap-1">
-                    <Calendar className="h-2.5 w-2.5" />
+                    <Calendar className="h-2.5 w-2.5 text-blue-600" />
                     <span>{formatDate(flight.date)}</span>
                   </div>
                 </div>

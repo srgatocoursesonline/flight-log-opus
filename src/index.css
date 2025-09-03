@@ -2,507 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Flight Simulator 2024 Career Manager - Cockpit Theme Design System
-All colors MUST be HSL - Inspired by modern avionic displays
-*/
-
 @layer base {
   :root {
-    /* Tema Claro - Microsoft Flight Simulator 2024 */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
-    /* Aviation primary - azul MSFS */
-    --primary: 207 89% 42%;
+    --primary: 207 89% 55%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
-
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    /* Accent - amarelo aviação */
-    --accent: 45 93% 58%;
+    --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 207 89% 42%;
-
-    /* Cores de status modo claro */
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
-    
-    --warning: 32.4 95.4% 43.7%;
-    --warning-foreground: 210 40% 98%;
-    
-    --info: 213 94% 68%;
-    --info-foreground: 210 40% 98%;
-
-    /* Gradientes modo claro */
-    --gradient-primary: linear-gradient(135deg, hsl(207 89% 42%) 0%, hsl(207 89% 52%) 100%);
-    --gradient-surface: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
-    --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.9) 0%, hsl(210 40% 98% / 0.8) 100%);
-
-    /* Sombras modo claro */
-    --shadow-cockpit: 0 8px 32px hsl(222.2 84% 4.9% / 0.15);
-    --shadow-panel: 0 4px 16px hsl(222.2 84% 4.9% / 0.1);
-    --shadow-glow: 0 0 20px hsl(207 89% 42% / 0.3);
-
-    /* Glass morphism modo claro */
-    --glass-bg: hsl(0 0% 100% / 0.95);
-    --glass-border: hsl(214.3 31.8% 91.4% / 0.5);
-
-    --radius: 0.75rem;
+    --ring: 207 89% 55%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
   }
 
   .dark {
-    /* Tema Escuro - Cockpit Theme Microsoft Flight Simulator 2024 */
-    --background: 217 33% 6%;
-    --foreground: 210 20% 98%;
-
-    --card: 217 28% 8%;
-    --card-foreground: 210 15% 95%;
-
-    --popover: 217 35% 7%;
-    --popover-foreground: 210 20% 98%;
-
-    /* Aviation primary - radar/HUD blue */
-    --primary: 207 89% 42%;
-    --primary-foreground: 210 40% 98%;
-
-    /* Secondary - metallic gray panels */
-    --secondary: 215 15% 15%;
-    --secondary-foreground: 210 10% 85%;
-
-    /* Muted elements - subdued cockpit lighting */
-    --muted: 215 20% 12%;
-    --muted-foreground: 215 10% 70%;
-
-    /* Accent - radar yellow for alerts/highlights */
-    --accent: 45 93% 58%;
-    --accent-foreground: 217 33% 6%;
-
-    /* Navigation warning red */
-    --destructive: 0 75% 55%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 207 89% 55%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
-    /* Cockpit panel borders - subtle glow */
-    --border: 215 25% 18%;
-    --input: 215 25% 16%;
-    --ring: 207 89% 42%;
-
-    /* Cores de status modo escuro */
-    --success: 120 60% 50%;
-    --success-foreground: 210 40% 98%;
-
-    --warning: 38 92% 55%;
-    --warning-foreground: 217 33% 6%;
-    
-    --info: 213 94% 68%;
-    --info-foreground: 217 33% 6%;
-
-    /* Gradientes modo escuro */
-    --gradient-primary: linear-gradient(135deg, hsl(207 89% 42%) 0%, hsl(207 89% 32%) 100%);
-    --gradient-surface: linear-gradient(145deg, hsl(217 28% 8%) 0%, hsl(217 35% 10%) 100%);
-    --gradient-glass: linear-gradient(145deg, hsl(217 28% 8% / 0.8) 0%, hsl(217 35% 12% / 0.6) 100%);
-
-    /* Sombras modo escuro */
-    --shadow-cockpit: 0 8px 32px hsl(217 50% 3% / 0.8);
-    --shadow-panel: 0 4px 16px hsl(217 40% 4% / 0.6);
-    --shadow-glow: 0 0 20px hsl(207 89% 42% / 0.3);
-
-    /* Glass morphism modo escuro */
-    --glass-bg: hsl(217 28% 8% / 0.8);
-    --glass-border: hsl(215 25% 18% / 0.3);
-    
-    --radius: 0.75rem;
-  }
-
-  /* SOLUÇÃO DEFINITIVA PARA ÍCONES - VERSÃO ROBUSTA */
-  
-  /* Modo escuro - força branco em TODOS os SVGs */
-  html.dark svg,
-  .dark svg,
-  html.dark [data-lucide],
-  .dark [data-lucide],
-  html.dark .lucide,
-  .dark .lucide {
-    color: white !important;
-    fill: none !important;
-    stroke: currentColor !important;
-  }
-  
-  /* Modo claro - força preto em TODOS os SVGs */
-  html.light svg,
-  .light svg,
-  html.light [data-lucide],
-  .light [data-lucide],
-  html.light .lucide,
-  .light .lucide {
-    color: black !important;
-    fill: none !important;
-    stroke: currentColor !important;
-  }
-  
-  /* Fallback ultra-específico para Clock */
-  html.dark [data-lucide="clock"],
-  .dark [data-lucide="clock"],
-  html.dark svg[class*="Clock"],
-  .dark svg[class*="Clock"],
-  html.dark .lucide-clock,
-  .dark .lucide-clock {
-    color: #ffffff !important;
-    stroke: #ffffff !important;
-    fill: none !important;
-  }
-  
-  /* Fallback para SVGs sem classe de tema */
-  html:not(.light) svg {
-    color: white !important;
-  }
-  
-  /* Força todos os ícones lucide independente do contexto */
-  svg[class*="lucide"] {
-    color: inherit !important;
-    stroke: currentColor !important;
-  }
-  
-  /* Regras específicas para elementos com text-foreground */
-  .text-foreground svg {
-    color: inherit !important;
-  }
-
-  /* CORREÇÃO PARA INPUTS DE DATA E HORA - ÍCONES NATIVOS DO NAVEGADOR */
-  
-  /* Chrome/Edge/Safari - Webkit inputs - VERSÃO ULTRA AGRESSIVA */
-  html.dark input[type="time"]::-webkit-calendar-picker-indicator,
-  .dark input[type="time"]::-webkit-calendar-picker-indicator,
-  html.dark input[type="date"]::-webkit-calendar-picker-indicator,
-  .dark input[type="date"]::-webkit-calendar-picker-indicator,
-  html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(2) !important;
-    -webkit-filter: invert(1) brightness(2) !important;
-    background: none !important;
-    color: white !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
-    cursor: pointer !important;
-  }
-  
-  /* Firefox e outros navegadores */
-  html.dark input[type="time"],
-  .dark input[type="time"],
-  html.dark input[type="date"],
-  .dark input[type="date"],
-  html.dark input[type="datetime-local"],
-  .dark input[type="datetime-local"] {
-    color-scheme: dark !important;
-    accent-color: hsl(var(--primary)) !important;
-  }
-  
-  /* Força cor do texto nos inputs de data/hora */
-  html.dark input[type="time"],
-  .dark input[type="time"],
-  html.dark input[type="date"],
-  .dark input[type="date"],
-  html.dark input[type="datetime-local"],
-  .dark input[type="datetime-local"] {
-    color: white !important;
-    background: hsl(var(--input)) !important;
-    border-color: hsl(var(--border)) !important;
-  }
-  
-  /* CSS personalizado para ícones específicos */
-  html.dark input[type="time"]::-webkit-calendar-picker-indicator {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3ccircle cx='12' cy='12' r='10'/%3e%3cpolyline points='12,6 12,12 16,14'/%3e%3c/svg%3e") !important;
-    background-size: 16px 16px !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    width: 20px !important;
-    height: 20px !important;
-  }
-  
-  html.dark input[type="date"]::-webkit-calendar-picker-indicator {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3e%3cline x1='16' y1='2' x2='16' y2='6'/%3e%3cline x1='8' y1='2' x2='8' y2='6'/%3e%3cline x1='3' y1='10' x2='21' y2='10'/%3e%3c/svg%3e") !important;
-    background-size: 16px 16px !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    width: 20px !important;
-    height: 20px !important;
-  }
-  
-  /* Para modo claro - garante que os ícones sejam escuros */
-  html.light input[type="time"]::-webkit-calendar-picker-indicator,
-  .light input[type="time"]::-webkit-calendar-picker-indicator,
-  html.light input[type="date"]::-webkit-calendar-picker-indicator,
-  .light input[type="date"]::-webkit-calendar-picker-indicator,
-  html.light input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-  .light input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: none !important;
-    -webkit-filter: none !important;
-    color: black !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-  
-  html.light input[type="time"],
-  .light input[type="time"],
-  html.light input[type="date"],
-  .light input[type="date"],
-  html.light input[type="datetime-local"],
-  .light input[type="datetime-local"] {
-    color-scheme: light !important;
-    color: black !important;
-  }
-  
-  /* Fallback para todos os inputs em containers dark */
-  .dark input::-webkit-calendar-picker-indicator {
-    filter: invert(1) !important;
-  }
-  
-  /* Force para inputs dentro de dialogs/modals */
-  .dark [role="dialog"] input[type="time"]::-webkit-calendar-picker-indicator,
-  .dark [role="dialog"] input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1.5) !important;
-  }
-
-  /* Estilos para seções colapsáveis das configurações */
-  [data-state="open"] [data-chevron] {
-    transform: rotate(0deg);
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  [data-state="closed"] [data-chevron] {
-    transform: rotate(-90deg);
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .settings-section {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .settings-section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
-  }
-  
-  .settings-trigger {
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .settings-trigger:hover {
-    background: hsl(var(--muted) / 0.3);
-  }
-  
-  .settings-content {
-    animation: slideDown 0.2s ease-out;
-  }
-  
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Cockpit-specific utility classes */
-  .glass-panel {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-panel);
-  }
-
-  .cockpit-glow {
-    box-shadow: var(--shadow-glow);
-  }
-
-  .hud-display {
-    background: var(--gradient-glass);
-    border: 1px solid hsl(var(--primary) / 0.3);
-    box-shadow: inset 0 1px 0 hsl(var(--primary) / 0.1);
-  }
-
-  .gradient-title {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-
-  /* Animações para cards e componentes */
-  .stats-card {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform-origin: center;
-  }
-
-  .stats-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px hsl(var(--primary) / 0.3), 0 0 20px hsl(var(--primary) / 0.2);
-    border-color: hsl(var(--primary) / 0.6);
-  }
-
-  .chart-container {
-    transition: all 0.3s ease-in-out;
-  }
-
-  .chart-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 32px hsl(var(--primary) / 0.2), 0 0 16px hsl(var(--accent) / 0.1);
-    border-color: hsl(var(--primary) / 0.4);
-  }
-
-  .recent-flights-container {
-    transition: all 0.3s ease-in-out;
-  }
-
-  .recent-flights-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 32px hsl(var(--primary) / 0.2);
-    border-color: hsl(var(--primary) / 0.4);
-  }
-
-  .flight-item {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .flight-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
-    transition: left 0.6s ease-in-out;
-  }
-
-  .flight-item:hover::before {
-    left: 100%;
-  }
-
-  .flight-item:hover {
-    transform: translateX(8px);
-    background: hsl(var(--muted) / 0.6);
-    border-color: hsl(var(--primary) / 0.3);
-    box-shadow: 4px 0 12px hsl(var(--primary) / 0.2);
-  }
-
-  .quick-action-card {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .quick-action-card::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, hsl(var(--primary) / 0.1) 0%, transparent 70%);
-    transform: translate(-50%, -50%);
-    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border-radius: 50%;
-  }
-
-  .quick-action-card:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-
-  .quick-action-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 24px hsl(var(--primary) / 0.3);
-    border-color: hsl(var(--primary) / 0.5);
-  }
-
-  .quick-action-icon {
-    transition: all 0.3s ease-in-out;
-  }
-
-  .quick-action-card:hover .quick-action-icon {
-    transform: scale(1.1) rotate(5deg);
-  }
-
-  /* Animação de pulso suave para elementos importantes */
-  .pulse-glow {
-    animation: pulseGlow 3s ease-in-out infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% {
-      box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
-    }
-    50% {
-      box-shadow: 0 0 16px hsl(var(--primary) / 0.5), 0 0 24px hsl(var(--primary) / 0.3);
-    }
-  }
-
-  /* Animação de shimmer para loading states */
-  .shimmer {
-    background: linear-gradient(90deg, 
-      hsl(var(--muted)) 25%, 
-      hsl(var(--primary) / 0.1) 50%, 
-      hsl(var(--muted)) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  /* Efeito de fade-in para componentes */
-  .fade-in {
-    animation: fadeIn 0.6s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Efeito de escala suave para ícones */
-  .icon-hover {
-    transition: all 0.2s ease-in-out;
-  }
-
-  .icon-hover:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(0 4px 8px hsl(var(--primary) / 0.3));
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 207 89% 55%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -510,27 +63,391 @@ All colors MUST be HSL - Inspired by modern avionic displays
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground;
   }
+}
 
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 8px;
+/* Mobile optimizations */
+.mobile-section {
+  @apply px-3 py-4 space-y-4;
+}
+
+.mobile-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3;
+}
+
+.mobile-grid-1 {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.mobile-grid-2 {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
+}
+
+.mobile-grid-3 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3;
+}
+
+.mobile-grid-4 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3;
+}
+
+.mobile-card {
+  @apply bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.mobile-title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.mobile-value {
+  @apply text-lg font-bold;
+}
+
+.mobile-card-title {
+  @apply text-xs font-medium;
+}
+
+.mobile-card-subtitle {
+  @apply text-xs;
+}
+
+.mobile-trend {
+  @apply text-xs font-medium;
+}
+
+/* Financial Status Animations */
+.financial-status-container {
+  @apply relative overflow-hidden;
+}
+
+.financial-status-glow {
+  @apply relative;
+}
+
+.financial-status-glow::before {
+  content: '';
+  @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300;
+  background: linear-gradient(45deg, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.2));
+  z-index: -1;
+}
+
+.financial-status-glow:hover::before {
+  @apply opacity-100;
+}
+
+.financial-status-card {
+  @apply transition-all duration-300 ease-out;
+}
+
+.financial-status-card:hover {
+  @apply transform -translate-y-2 scale-105;
+  box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
+}
+
+.financial-status-pulse {
+  animation: financialPulse 2s ease-in-out infinite;
+}
+
+@keyframes financialPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
   }
-
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--muted));
+  50% {
+    box-shadow: 0 0 16px hsl(var(--primary) / 0.5), 0 0 24px hsl(var(--primary) / 0.3);
   }
+}
 
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary) / 0.6);
-    border-radius: 4px;
+.financial-emoji-bounce {
+  @apply inline-block;
+  animation: emojiFloat 3s ease-in-out infinite;
+}
+
+@keyframes emojiFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
   }
+  25% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+  75% {
+    transform: translateY(-1px) rotate(-1deg);
+  }
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.8);
+/* Stats Cards Animations */
+.stats-card {
+  @apply transition-all duration-300 ease-out;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-card:hover {
+  @apply transform -translate-y-2;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px hsl(var(--primary) / 0.3);
+  border-color: hsl(var(--primary) / 0.6);
+}
+
+.pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px hsl(var(--primary) / 0.5), 0 0 24px hsl(var(--primary) / 0.2);
+  }
+}
+
+/* Flight Components Animations */
+.flight-item {
+  @apply transition-all duration-300 ease-out relative overflow-hidden;
+}
+
+.flight-item:hover {
+  @apply transform translate-x-2;
+  background: hsl(var(--muted) / 0.6);
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 4px 0 12px hsl(var(--primary) / 0.2);
+}
+
+.flight-item:hover::before {
+  content: '';
+  @apply absolute top-0 left-0 w-full h-full pointer-events-none;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+  animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.recent-flights-container {
+  @apply transition-all duration-300 ease-out;
+}
+
+.recent-flights-container:hover {
+  @apply transform -translate-y-2;
+  box-shadow: 0 16px 32px hsl(var(--primary) / 0.2);
+  border-color: hsl(var(--primary) / 0.4);
+}
+
+/* Quick Actions Animations */
+.quick-action-card {
+  @apply transition-all duration-300 ease-out relative overflow-hidden;
+}
+
+.quick-action-card:hover {
+  @apply transform -translate-y-2 scale-105;
+  box-shadow: 0 12px 24px hsl(var(--primary) / 0.3);
+}
+
+.quick-action-card:hover::before {
+  content: '';
+  @apply absolute inset-0 pointer-events-none;
+  background: radial-gradient(circle at center, hsl(var(--primary) / 0.1), transparent 70%);
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.quick-action-icon {
+  @apply transition-all duration-300 ease-out;
+}
+
+.quick-action-card:hover .quick-action-icon {
+  @apply transform rotate-6 scale-110;
+  filter: drop-shadow(0 4px 8px hsl(var(--primary) / 0.3));
+}
+
+/* Chart Container Animations */
+.chart-container {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.chart-container:hover {
+  @apply transform -translate-y-2;
+  box-shadow: 0 16px 32px hsl(var(--primary) / 0.2);
+  border-color: hsl(var(--primary) / 0.4);
+}
+
+/* Global Animations */
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-fade-in {
+  animation: mobileFadeIn 0.4s ease-out;
+}
+
+@keyframes mobileFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Icon Hover Effects */
+.icon-hover {
+  @apply transition-all duration-200 ease-out;
+}
+
+.icon-hover:hover {
+  @apply transform scale-105;
+  filter: drop-shadow(0 2px 4px hsl(var(--primary) / 0.2));
+}
+
+/* HUD Display Effects */
+.hud-display {
+  @apply relative;
+  background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.95));
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+.hud-display::before {
+  content: '';
+  @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500;
+  background: linear-gradient(45deg, transparent, hsl(var(--primary) / 0.05), transparent);
+  z-index: -1;
+}
+
+.hud-display:hover::before {
+  @apply opacity-100;
+}
+
+/* Financial Colors - Revenue and Expense */
+.revenue-amount {
+  @apply font-mono font-semibold text-xs;
+  color: hsl(142 76% 36%); /* Green for light mode */
+}
+
+.dark .revenue-amount {
+  color: hsl(142 69% 58%); /* Lighter green for dark mode */
+}
+
+.expense-amount {
+  @apply font-mono font-semibold text-xs;
+  color: hsl(0 84% 60%); /* Red for light mode */
+}
+
+.dark .expense-amount {
+  color: hsl(0 91% 71%); /* Lighter red for dark mode */
+}
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  background: hsl(var(--primary));
+}
+
+/* Classes para melhor legibilidade no modo escuro */
+.text-readable {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.text-readable-muted {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+.text-readable-subtle {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+.button-text {
+  @apply text-gray-900 dark:text-white;
+}
+
+.label-text {
+  @apply text-gray-800 dark:text-gray-200;
+}
+
+.description-text {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+.modal-title {
+  @apply text-gray-900 dark:text-white;
+}
+
+.card-title {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.card-subtitle {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .mobile-section {
+    @apply px-2 py-3;
+  }
+  
+  .mobile-card {
+    @apply p-3;
+  }
+  
+  .mobile-title {
+    @apply text-sm;
+  }
+  
+  .mobile-value {
+    @apply text-base;
+  }
+  
+  /* Reduce animations on mobile for performance */
+  .stats-card:hover,
+  .flight-item:hover,
+  .quick-action-card:hover {
+    transform: none;
+  }
+  
+  .financial-status-card:hover {
+    @apply transform scale-105;
   }
 }

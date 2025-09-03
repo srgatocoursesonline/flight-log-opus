@@ -4,8 +4,8 @@ import { SupabaseSwitcher } from "@/components/debug/SupabaseSwitcher";
 
 export default function Diagnostic() {
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-2xl font-bold mb-4">Diagnóstico do Sistema</h1>
+    <div className="container mx-auto px-6 pt-8 pb-6 space-y-6">
+      <h1 className="mobile-title gradient-title">Diagnóstico do Sistema</h1>
       <div className="grid gap-6 md:grid-cols-2">
         <SupabaseConnectionTest />
         <SupabaseSwitcher />

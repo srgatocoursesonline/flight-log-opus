@@ -1,37 +1,25 @@
-/**
- * Serviço para buscar informações de aeroportos pelo código ICAO
- * Utiliza múltiplas APIs com sistema de fallback para garantir cobertura completa
- * APIs suportadas: API Ninjas, AeroDataBox, ICAO Official, AviationStack
- */
+// ============================================
+// AIRPORT DATA SERVICE
+// Service for fetching airport information from multiple sources
+// ============================================
 
-// Chaves de API - adicione suas chaves aqui
+import { AirportInfo } from '@/types/airport';
+
+// API keys (should be in environment variables in production)
 const API_KEYS = {
-  ninjas: '', // https://api.api-ninjas.com/
-  aeroDataBox: '', // https://aerodatabox.com/
-  aviationStack: '', // https://aviationstack.com/
-  icaoOfficial: '' // https://applications.icao.int/dataservices/
+  ninjas: import.meta.env.VITE_API_NINJAS_KEY || '',
+  aeroDataBox: import.meta.env.VITE_AERODATABOX_KEY || '',
+  aviationStack: import.meta.env.VITE_AVIATIONSTACK_KEY || '',
+  icaoOfficial: import.meta.env.VITE_ICAO_OFFICIAL_KEY || ''
 };
 
-interface AirportInfo {
-  name: string;
-  iata_code: string;
-  icao_code: string;
-  city?: string;
-  state?: string;
-  country_code?: string;
-  lat?: number;
-  lng?: number;
-  error?: string;
-}
-
 /**
- * Busca informações de um aeroporto pelo código ICAO usando múltiplas APIs
- * @param icaoCode Código ICAO do aeroporto (ex: SBGR)
- * @returns Informações do aeroporto ou null se não encontrado
+ * Fetch airport information by ICAO code
+ * @param icaoCode ICAO code of the airport (ex: SBGR)
+ * @returns Airport information or null if not found
  */
 export async function fetchAirportByIcao(icaoCode: string): Promise<AirportInfo | null> {
   if (!icaoCode || icaoCode.length !== 4) {
-    console.warn('Código ICAO inválido:', icaoCode);
     return null;
   }
 
@@ -43,12 +31,9 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportInfo 
     const parsed = JSON.parse(cachedData);
     // Verificar se o cache não é muito antigo (7 dias)
     if (parsed.cached_at && Date.now() - parsed.cached_at < 7 * 24 * 60 * 60 * 1000) {
-      console.log(`Dados do aeroporto ${upperIcaoCode} obtidos do cache`);
       return parsed.data;
     }
   }
-
-  console.log(`Buscando informações do aeroporto ${upperIcaoCode} via APIs...`);
 
   // Tentar buscar via APIs em ordem de prioridade
   const apis = [
@@ -61,10 +46,8 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportInfo 
 
   for (const api of apis) {
     try {
-      console.log(`Tentando buscar via ${api.name}...`);
       const result = await api.fetch();
       if (result) {
-        console.log(`✅ Aeroporto ${upperIcaoCode} encontrado via ${api.name}`);
         // Salvar no cache com timestamp
         const cacheData = {
           data: result,
@@ -74,35 +57,29 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportInfo 
         return result;
       }
     } catch (error) {
-      console.warn(`❌ ${api.name} falhou para ${upperIcaoCode}:`, error);
       continue;
     }
   }
 
   // Fallback para dados mockados
-  console.log(`⚠️ Todas as APIs falharam. Usando dados mockados para ${upperIcaoCode}`);
   const mockData = getMockAirportData(upperIcaoCode);
   
   if (mockData) {
-    console.log(`✅ Dados mockados encontrados para ${upperIcaoCode}`);
     // Salvar dados mockados no cache também
     const cacheData = {
       data: mockData,
       cached_at: Date.now()
     };
     localStorage.setItem(`airport_${upperIcaoCode}`, JSON.stringify(cacheData));
-  } else {
-    console.warn(`❌ Nenhum dado encontrado para ${upperIcaoCode}`);
   }
   
   return mockData;
 }
 
-/**
- * Busca informações do aeroporto via API Ninjas
- * @param icaoCode Código ICAO do aeroporto
- * @returns Informações do aeroporto ou null
- */
+// ============================================
+// API FETCHING FUNCTIONS
+// ============================================
+
 async function fetchFromApiNinjas(icaoCode: string): Promise<AirportInfo | null> {
   if (!API_KEYS.ninjas) return null;
   
@@ -130,16 +107,10 @@ async function fetchFromApiNinjas(icaoCode: string): Promise<AirportInfo | null>
       };
     }
   } catch (error) {
-    console.warn('API Ninjas falhou:', error);
   }
   return null;
 }
 
-/**
- * Busca informações do aeroporto via AeroDataBox
- * @param icaoCode Código ICAO do aeroporto
- * @returns Informações do aeroporto ou null
- */
 async function fetchFromAeroDataBox(icaoCode: string): Promise<AirportInfo | null> {
   if (!API_KEYS.aeroDataBox) return null;
   
@@ -165,16 +136,10 @@ async function fetchFromAeroDataBox(icaoCode: string): Promise<AirportInfo | nul
       lng: airport.location?.lon
     };
   } catch (error) {
-    console.warn('AeroDataBox falhou:', error);
   }
   return null;
 }
 
-/**
- * Busca informações do aeroporto via AviationStack
- * @param icaoCode Código ICAO do aeroporto
- * @returns Informações do aeroporto ou null
- */
 async function fetchFromAviationStack(icaoCode: string): Promise<AirportInfo | null> {
   if (!API_KEYS.aviationStack) return null;
   
@@ -198,16 +163,10 @@ async function fetchFromAviationStack(icaoCode: string): Promise<AirportInfo | n
       };
     }
   } catch (error) {
-    console.warn('AviationStack falhou:', error);
   }
   return null;
 }
 
-/**
- * Busca informações do aeroporto via ICAO Official API
- * @param icaoCode Código ICAO do aeroporto
- * @returns Informações do aeroporto ou null
- */
 async function fetchFromIcaoOfficial(icaoCode: string): Promise<AirportInfo | null> {
   if (!API_KEYS.icaoOfficial) return null;
   
@@ -231,24 +190,15 @@ async function fetchFromIcaoOfficial(icaoCode: string): Promise<AirportInfo | nu
       };
     }
   } catch (error) {
-    console.warn('ICAO Official falhou:', error);
   }
   return null;
 }
 
-/**
- * Busca informações do aeroporto no arquivo CSV local
- * @param icaoCode Código ICAO do aeroporto
- * @returns Informações do aeroporto ou null
- */
 async function fetchFromCsvFile(icaoCode: string): Promise<AirportInfo | null> {
   try {
-    console.log(`Buscando ${icaoCode} no arquivo CSV local...`);
-    
     // Buscar o arquivo CSV no diretório público
     const response = await fetch('/airports.csv');
     if (!response.ok) {
-      console.warn('Arquivo airports.csv não encontrado');
       return null;
     }
     
@@ -284,21 +234,18 @@ async function fetchFromCsvFile(icaoCode: string): Promise<AirportInfo | null> {
       }
     }
     
-    console.log(`Aeroporto ${icaoCode} não encontrado no arquivo CSV`);
     return null;
   } catch (error) {
-    console.warn('Erro ao buscar no arquivo CSV:', error);
     return null;
   }
 }
 
-/**
- * Dados mockados de aeroportos para uso como fallback final
- * @param icaoCode Código ICAO do aeroporto
- * @returns Dados mockados do aeroporto
- */
-function getMockAirportData(icaoCode: string): AirportInfo | null {
-  const mockData: Record<string, AirportInfo> = {
+// ============================================
+// MOCK DATA
+// ============================================
+
+const getMockAirportData = (icaoCode: string): AirportInfo | null => {
+  const mockAirports: Record<string, AirportInfo> = {
     'SBGR': {
       name: 'Aeroporto Internacional de São Paulo/Guarulhos',
       iata_code: 'GRU',
@@ -306,8 +253,18 @@ function getMockAirportData(icaoCode: string): AirportInfo | null {
       city: 'Guarulhos',
       state: 'SP',
       country_code: 'BR',
-      lat: -23.435556,
-      lng: -46.473056
+      lat: -23.4322,
+      lng: -46.4692
+    },
+    'SBGL': {
+      name: 'Aeroporto Internacional do Galeão',
+      iata_code: 'GIG',
+      icao_code: 'SBGL',
+      city: 'Rio de Janeiro',
+      state: 'RJ',
+      country_code: 'BR',
+      lat: -22.8089,
+      lng: -43.2436
     },
     'SBRJ': {
       name: 'Aeroporto Santos Dumont',
@@ -316,8 +273,8 @@ function getMockAirportData(icaoCode: string): AirportInfo | null {
       city: 'Rio de Janeiro',
       state: 'RJ',
       country_code: 'BR',
-      lat: -22.910556,
-      lng: -43.163333
+      lat: -22.9105,
+      lng: -43.1631
     },
     'SBSP': {
       name: 'Aeroporto de Congonhas',
@@ -326,66 +283,10 @@ function getMockAirportData(icaoCode: string): AirportInfo | null {
       city: 'São Paulo',
       state: 'SP',
       country_code: 'BR',
-      lat: -23.626111,
-      lng: -46.656389
-    },
-    'SBCF': {
-      name: 'Aeroporto Internacional de Belo Horizonte/Confins',
-      iata_code: 'CNF',
-      icao_code: 'SBCF',
-      city: 'Confins',
-      state: 'MG',
-      country_code: 'BR',
-      lat: -19.624444,
-      lng: -43.971944
-    },
-    'SBBR': {
-      name: 'Aeroporto Internacional de Brasília',
-      iata_code: 'BSB',
-      icao_code: 'SBBR',
-      city: 'Brasília',
-      state: 'DF',
-      country_code: 'BR',
-      lat: -15.871111,
-      lng: -47.918889
-    },
-    'SBKP': {
-      name: 'Aeroporto Internacional de Campinas/Viracopos',
-      iata_code: 'VCP',
-      icao_code: 'SBKP',
-      city: 'Campinas',
-      state: 'SP',
-      country_code: 'BR',
-      lat: -23.007222,
-      lng: -47.134444
-    },
-    'SBPA': {
-      name: 'Aeroporto Internacional de Porto Alegre',
-      iata_code: 'POA',
-      icao_code: 'SBPA',
-      city: 'Porto Alegre',
-      state: 'RS',
-      country_code: 'BR',
-      lat: -29.994444,
-      lng: -51.171111
+      lat: -23.6261,
+      lng: -46.6564
     }
   };
-  
-  // Retornar dados mockados se existir, ou null
-  return mockData[icaoCode.toUpperCase()] || null;
-}
 
-/**
- * Busca o país de um aeroporto pelo código ICAO
- * @param icaoCode Código ICAO do aeroporto
- * @returns Código do país do aeroporto, ou string vazia se não encontrado
- */
-export async function getCountryCodeByIcao(icaoCode: string): Promise<string> {
-  const airportInfo = await fetchAirportByIcao(icaoCode);
-  return airportInfo?.country_code || '';
-}
-
-export default {
-  fetchAirportByIcao,
-  getCountryCodeByIcao
+  return mockAirports[icaoCode.toUpperCase()] || null;
 };

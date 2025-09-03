@@ -17,7 +17,7 @@ export const FlightChart = () => {
     <div className="hud-display chart-container fade-in p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-foreground mb-1">{t('flightChart.title')}</h3>
-        <p className="text-sm text-muted-foreground">{t('flightChart.subtitle')}</p>
+        <p className="text-sm text-readable-muted">{t('flightChart.subtitle')}</p>
       </div>
       
       <div className="h-80 relative">
@@ -26,13 +26,13 @@ export const FlightChart = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="date" 
-              stroke="hsl(var(--muted-foreground))"
+              stroke="hsl(var(--readable-muted))"
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis 
-              stroke="hsl(var(--muted-foreground))"
+              stroke="hsl(var(--readable-muted))"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -73,11 +73,11 @@ export const FlightChart = () => {
       <div className="flex justify-center gap-6 mt-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary" />
-          <span className="text-sm text-muted-foreground">{t('flightChart.flights')}</span>
+          <span className="text-sm text-readable-muted">{t('flightChart.flights')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-accent" />
-          <span className="text-sm text-muted-foreground">{t('flightChart.careerRating')}</span>
+          <span className="text-sm text-readable-muted">{t('flightChart.careerRating')}</span>
         </div>
       </div>
     </div>

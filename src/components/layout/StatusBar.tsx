@@ -36,7 +36,7 @@ export const StatusBar = () => {
             <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
             <span className="text-xs font-mono text-success">{t('statusBar.online')}</span>
           </div>
-          <div className="text-xs text-muted-foreground font-mono hidden sm:block">
+          <div className="text-xs text-readable-muted font-mono hidden sm:block">
             {t('statusBar.appName')}
           </div>
         </div>

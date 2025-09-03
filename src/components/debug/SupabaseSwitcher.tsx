@@ -18,7 +18,7 @@ export function SupabaseSwitcher() {
       setConnectionOk(!error);
     } catch (error) {
       setConnectionOk(false);
-      console.error('Connection test error:', error);
+      // Removido o console.error para reduzir logs
     } finally {
       setIsChecking(false);
     }

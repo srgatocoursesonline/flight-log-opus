@@ -72,9 +72,9 @@ const Settings = () => {
   };
   
   return (
-    <div className="space-y-6 pb-20 lg:pb-6">
-      <div className="flex flex-col gap-2 fade-in">
-        <h1 className="text-3xl font-bold tracking-tight gradient-title">
+    <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
+      <div className="flex flex-col gap-1 fade-in">
+        <h1 className="mobile-title gradient-title">
           {t('settings.title')}
         </h1>
         <p className="text-muted-foreground">
@@ -90,7 +90,7 @@ const Settings = () => {
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
                   <Bell className="h-6 w-6 text-primary icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">{t('settings.notifications')}</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.notifications.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.notifications ? (
@@ -106,27 +106,21 @@ const Settings = () => {
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.flightReminders')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.flightRemindersDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.notifications.email')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.notifications.emailDesc')}</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.goalProgress')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.goalProgressDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.notifications.push')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.notifications.pushDesc')}</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-foreground">{t('settings.achievementUnlocked')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.achievementUnlockedDesc')}</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
+
               </div>
             </CollapsibleContent>
           </div>
@@ -138,8 +132,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <Database className="h-6 w-6 text-success icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">Configurações Financeiras</h3>
+                  <Database className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.financial.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.financial ? (
@@ -167,8 +161,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <SettingsIcon className="h-6 w-6 text-accent icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">Configurações de Voo</h3>
+                  <SettingsIcon className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.flights.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.flight ? (
@@ -194,8 +188,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <Trophy className="h-6 w-6 text-accent icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">Configurações de Carreira</h3>
+                  <Trophy className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.career.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.career ? (
@@ -221,8 +215,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <Smartphone className="h-6 w-6 text-accent icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">{t('settings.appPreferences')}</h3>
+                  <Smartphone className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.app.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.app ? (
@@ -238,27 +232,21 @@ const Settings = () => {
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.offlineMode')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.offlineModeDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.flights.offlineMode')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.flights.offlineModeDesc')}</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.autoSync')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.autoSyncDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.flights.autoSync')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.flights.autoSyncDesc')}</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-foreground">{t('settings.analytics')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.analyticsDesc')}</p>
-                  </div>
-                  <Switch />
-                </div>
+
               </div>
             </CollapsibleContent>
           </div>
@@ -270,8 +258,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <Database className="h-6 w-6 text-info icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">{t('settings.dataManagement')}</h3>
+                  <Database className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.data.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.data ? (
@@ -287,26 +275,26 @@ const Settings = () => {
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.exportData')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.exportDataDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.data.export')}</h4>
+                    <p className="text-sm text-muted-foreground">Baixe seus dados de voo</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleExportData}>{t('settings.export')}</Button>
+                  <Button variant="outline" size="sm" onClick={handleExportData}>{t('settings.data.export')}</Button>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground">{t('settings.backup')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.backupDesc')}</p>
+                    <h4 className="font-medium text-foreground">{t('settings.data.backup')}</h4>
+                    <p className="text-sm text-muted-foreground">Crie um backup dos seus dados</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleBackup}>{t('settings.backup')}</Button>
+                  <Button variant="outline" size="sm" onClick={handleBackup}>{t('settings.data.backup')}</Button>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-foreground text-destructive">{t('settings.resetData')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('settings.resetDataDesc')}</p>
+                    <h4 className="font-medium text-foreground text-destructive">{t('settings.data.reset')}</h4>
+                    <p className="text-sm text-muted-foreground">Apagar permanentemente todos os dados de voo</p>
                   </div>
-                  <Button variant="destructive" size="sm" onClick={handleResetData}>{t('settings.reset')}</Button>
+                  <Button variant="destructive" size="sm" onClick={handleResetData}>{t('settings.data.reset')}</Button>
                 </div>
               </div>
             </CollapsibleContent>
@@ -319,8 +307,8 @@ const Settings = () => {
             <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
-                  <Shield className="h-6 w-6 text-warning icon-hover" />
-                  <h3 className="text-lg font-semibold text-foreground">{t('settings.privacySecurity')}</h3>
+                  <Shield className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.security.title')}</h3>
                 </div>
                 <div data-chevron>
                   {openSections.security ? (
@@ -336,10 +324,10 @@ const Settings = () => {
               <div className="px-6 pb-6 border-t border-border/50">
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
-                    {t('settings.securityFeatures')}
+                    Recursos de segurança e privacidade para proteger seus dados
                   </p>
                   <Button variant="hud" onClick={handleConnectSupabase}>
-                    {t('settings.connectSupabase')}
+                    {t('settings.security.connectAccount')}
                   </Button>
                 </div>
               </div>

@@ -206,11 +206,11 @@ const FlightMaps: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-6 pt-8 pb-6 space-y-6">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center">
+          <h1 className="mobile-title gradient-title flex items-center">
             <Map className="h-8 w-8 mr-3 text-primary" />
             {t('maps.title', 'Mapas de Voo')}
           </h1>
@@ -250,7 +250,7 @@ const FlightMaps: React.FC = () => {
                 <p className="text-sm font-medium text-muted-foreground">Total</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
-              <Map className="h-8 w-8 text-muted-foreground" />
+              <Map className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>

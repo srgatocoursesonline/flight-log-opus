@@ -1,0 +1,467 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Bell, 
+  CreditCard, 
+  Globe, 
+  Shield, 
+  Database, 
+  Download, 
+  Upload, 
+  Trash2, 
+  Key,
+  Plane,
+  Trophy,
+  User
+} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+
+const Settings = () => {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  
+  // Estados para controlar seções abertas/fechadas - TODAS RECOLHIDAS POR PADRÃO
+  const [openSections, setOpenSections] = useState({
+    notifications: false,
+    financial: false,
+    flight: false,
+    career: false,
+    app: false,
+    data: false,
+    security: false
+  });
+  
+  // Estados para configurações persistentes
+  const [settings, setSettings] = useState({
+    notifications: {
+      email: localStorage.getItem('settings.notifications.email') === 'true',
+      push: localStorage.getItem('settings.notifications.push') !== 'false' // padrão true
+    },
+    financial: {
+      currency: localStorage.getItem('settings.financial.currency') || 'brl',
+      initialBalance: localStorage.getItem('settings.financial.initialBalance') || '10000'
+    },
+    flights: {
+      autoSync: localStorage.getItem('settings.flights.autoSync') !== 'false', // padrão true
+      offlineMode: localStorage.getItem('settings.flights.offlineMode') === 'true'
+    },
+    career: {
+      level: localStorage.getItem('settings.career.level') || '1',
+      class: localStorage.getItem('settings.career.class') || 'D'
+    },
+    app: {
+      language: localStorage.getItem('settings.app.language') || 'pt-BR',
+      theme: localStorage.getItem('settings.app.theme') || 'dark'
+    }
+  });
+  
+  // Função para salvar configurações
+  const saveSettings = (section: string, key: string, value: string | boolean) => {
+    const settingsKey = `settings.${section}.${key}`;
+    localStorage.setItem(settingsKey, value.toString());
+    
+    setSettings(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section as keyof typeof prev],
+        [key]: value
+      }
+    }));
+  };
+  
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+  
+  // Ouvir o evento para abrir a seção de carreira
+  useEffect(() => {
+    const handleOpenCareerSection = () => {
+      setOpenSections(prev => ({
+        ...prev,
+        career: true
+      }));
+    };
+
+    window.addEventListener('openCareerSection', handleOpenCareerSection);
+    
+    return () => {
+      window.removeEventListener('openCareerSection', handleOpenCareerSection);
+    };
+  }, []);
+  
+  const handleExportData = () => {
+    // TODO: Implementar export de dados
+    // Functionality placeholder without console output
+  };
+  
+  const handleBackup = () => {
+    // TODO: Implementar backup
+    // Functionality placeholder without console output
+  };
+  
+  const handleResetData = () => {
+    // TODO: Implementar reset de dados
+    if (confirm('Tem certeza que deseja resetar todos os dados?')) {
+      // Aqui seria implementado o reset real
+      // Functionality placeholder without console output
+    }
+  };
+  
+  const handleConnectSupabase = () => {
+    // TODO: Implementar conexão Supabase
+    // Functionality placeholder without console output
+  };
+  
+  return (
+    <div className="space-y-6 pb-20 lg:pb-6">
+      <div className="flex flex-col gap-2 fade-in">
+        <h1 className="text-3xl font-bold tracking-tight gradient-title">
+          {t('settings.title')}
+        </h1>
+        <p className="text-muted-foreground">
+          {t('settings.subtitle')}
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {/* Notificações */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('notifications')}
+          >
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.notifications.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.notifications ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.notifications && (
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="email-notifications">{t('settings.notifications.email')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('settings.notifications.emailDesc')}</p>
+                </div>
+                <Switch 
+                  id="email-notifications" 
+                  checked={settings.notifications.email}
+                  onCheckedChange={(checked) => saveSettings('notifications', 'email', checked)}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="push-notifications">{t('settings.notifications.push')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('settings.notifications.pushDesc')}</p>
+                </div>
+                <Switch 
+                  id="push-notifications" 
+                  checked={settings.notifications.push}
+                  onCheckedChange={(checked) => saveSettings('notifications', 'push', checked)}
+                />
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Financeiro */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('financial')}
+          >
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.financial.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.financial ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.financial && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currency">{t('settings.financial.currency')}</Label>
+                <Select 
+                  value={settings.financial.currency}
+                  onValueChange={(value) => saveSettings('financial', 'currency', value)}
+                >
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder={t('settings.financial.selectCurrency')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="brl">BRL (R$)</SelectItem>
+                    <SelectItem value="usd">USD ($)</SelectItem>
+                    <SelectItem value="eur">EUR (€)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="initial-balance">{t('settings.financial.initialBalance')}</Label>
+                <Input 
+                  id="initial-balance" 
+                  type="number" 
+                  placeholder="0.00" 
+                  value={settings.financial.initialBalance}
+                  onChange={(e) => saveSettings('financial', 'initialBalance', e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">{t('settings.financial.initialBalanceDesc')}</p>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Voos */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('flight')}
+          >
+            <div className="flex items-center gap-2">
+              <Plane className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.flights.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.flight ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.flight && (
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="auto-sync">{t('settings.flights.autoSync')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('settings.flights.autoSyncDesc')}</p>
+                </div>
+                <Switch 
+                  id="auto-sync" 
+                  checked={settings.flights.autoSync}
+                  onCheckedChange={(checked) => saveSettings('flights', 'autoSync', checked)}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="offline-mode">{t('settings.flights.offlineMode')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('settings.flights.offlineModeDesc')}</p>
+                </div>
+                <Switch 
+                  id="offline-mode" 
+                  checked={settings.flights.offlineMode}
+                  onCheckedChange={(checked) => saveSettings('flights', 'offlineMode', checked)}
+                />
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Carreira */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('career')}
+          >
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.career.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.career ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.career && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="career-level">{t('settings.career.level')}</Label>
+                <Select defaultValue="1">
+                  <SelectTrigger id="career-level">
+                    <SelectValue placeholder={t('settings.career.selectLevel')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 - Estagiário</SelectItem>
+                    <SelectItem value="2">2 - Piloto de Linha</SelectItem>
+                    <SelectItem value="3">3 - Capitão</SelectItem>
+                    <SelectItem value="4">4 - Comandante</SelectItem>
+                    <SelectItem value="5">5 - Diretor de Voo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="career-class">{t('settings.career.class')}</Label>
+                <Select defaultValue="D">
+                  <SelectTrigger id="career-class">
+                    <SelectValue placeholder={t('settings.career.selectClass')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="S">S - Superior</SelectItem>
+                    <SelectItem value="A">A - Excelente</SelectItem>
+                    <SelectItem value="B">B - Bom</SelectItem>
+                    <SelectItem value="C">C - Regular</SelectItem>
+                    <SelectItem value="D">D - Iniciante</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Aplicativo */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('app')}
+          >
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.app.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.app ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.app && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="language">{t('settings.app.language')}</Label>
+                <Select defaultValue="pt-BR">
+                  <SelectTrigger id="language">
+                    <SelectValue placeholder={t('settings.app.selectLanguage')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
+                    <SelectItem value="en-US">English (United States)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="theme">{t('settings.app.theme')}</Label>
+                <Select defaultValue="dark">
+                  <SelectTrigger id="theme">
+                    <SelectValue placeholder={t('settings.app.selectTheme')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">{t('settings.app.light')}</SelectItem>
+                    <SelectItem value="dark">{t('settings.app.dark')}</SelectItem>
+                    <SelectItem value="system">{t('settings.app.system')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Dados e Backup */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('data')}
+          >
+            <div className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.data.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.data ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.data && (
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button variant="outline" className="flex items-center gap-2" onClick={handleExportData}>
+                  <Download className="h-4 w-4" />
+                  {t('settings.data.export')}
+                </Button>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  {t('settings.data.import')}
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full flex items-center gap-2" onClick={handleBackup}>
+                  <Database className="h-4 w-4" />
+                  {t('settings.data.backup')}
+                </Button>
+                <Button variant="destructive" className="w-full flex items-center gap-2" onClick={handleResetData}>
+                  <Trash2 className="h-4 w-4" />
+                  {t('settings.data.reset')}
+                </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Segurança */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('security')}
+          >
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('settings.security.title')}</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              {openSections.security ? '−' : '+'}
+            </Button>
+          </CardHeader>
+          {openSections.security && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="current-password">{t('settings.security.currentPassword')}</Label>
+                <Input id="current-password" type="password" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="new-password">{t('settings.security.newPassword')}</Label>
+                <Input id="new-password" type="password" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">{t('settings.security.confirmPassword')}</Label>
+                <Input id="confirm-password" type="password" />
+              </div>
+              
+              <Button className="w-full">
+                <Key className="h-4 w-4 mr-2" />
+                {t('settings.security.changePassword')}
+              </Button>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full flex items-center gap-2" onClick={handleConnectSupabase}>
+                  <User className="h-4 w-4" />
+                  {t('settings.security.connectAccount')}
+                </Button>
+                <Button variant="destructive" className="w-full">
+                  {t('settings.security.deleteAccount')}
+                </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Settings;

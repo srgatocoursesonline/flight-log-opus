@@ -48,6 +48,11 @@ const History = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+
+  // Função para pluralização de voos
+  const pluralizeFlights = (count: number) => {
+    return count === 1 ? 'voo' : 'voos';
+  };
   const [showFilters, setShowFilters] = useState(false);
 
   // Calculate stats based on real flights
@@ -235,8 +240,8 @@ const History = () => {
     return (
       <div className="space-y-6 pb-20 lg:pb-6">
         <div className="text-center py-12">
-          <Plane className="h-12 w-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
-          <p className="text-muted-foreground">{t('common.loading')}</p>
+          <Plane className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-readable-muted">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -246,10 +251,10 @@ const History = () => {
     <div className="space-y-6 pb-20 lg:pb-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight gradient-title">
+          <h1 className="mobile-title gradient-title">
             {t('history.title')}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-readable-muted">
             {t('history.subtitle')}
           </p>
         </div>
@@ -257,7 +262,7 @@ const History = () => {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="icon-hover">
-                <Filter className="h-4 w-4 mr-2" />
+                <Filter className="h-4 w-4 mr-2 text-blue-600" />
                 {t('common.filter')}
               </Button>
             </AlertDialogTrigger>
@@ -298,7 +303,7 @@ const History = () => {
                   <p className="text-sm font-medium">Período</p>
                   <div className="flex gap-2">
                     <div className="grid gap-2 flex-1">
-                      <p className="text-xs text-muted-foreground">De</p>
+                      <p className="text-xs text-readable-muted">De</p>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -324,7 +329,7 @@ const History = () => {
                       </Popover>
                     </div>
                     <div className="grid gap-2 flex-1">
-                      <p className="text-xs text-muted-foreground">Até</p>
+                      <p className="text-xs text-readable-muted">Até</p>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -360,7 +365,7 @@ const History = () => {
           </AlertDialog>
 
           <Button variant="outline" className="icon-hover" onClick={exportToExcel}>
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 mr-2 text-blue-600" />
             Export
           </Button>
         </div>
@@ -369,28 +374,28 @@ const History = () => {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="hud-display stats-card fade-in p-4" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-primary icon-hover" />
+            <Calendar className="h-5 w-5 text-blue-600 icon-hover" />
             <div>
-              <p className="text-sm text-muted-foreground">{t('history.thisWeek')}</p>
-              <p className="font-semibold text-foreground">{stats.week} {t('history.flights')}</p>
+              <p className="text-sm text-readable-muted">{t('history.thisWeek')}</p>
+              <p className="font-semibold text-green-500">{stats.week} {pluralizeFlights(stats.week)}</p>
             </div>
           </div>
         </div>
         <div className="hud-display stats-card fade-in p-4" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-accent icon-hover" />
+            <Calendar className="h-5 w-5 text-blue-600 icon-hover" />
             <div>
-              <p className="text-sm text-muted-foreground">{t('history.thisMonth')}</p>
-              <p className="font-semibold text-foreground">{stats.month} {t('history.flights')}</p>
+              <p className="text-sm text-readable-muted">{t('history.thisMonth')}</p>
+              <p className="font-semibold text-green-500">{stats.month} {pluralizeFlights(stats.month)}</p>
             </div>
           </div>
         </div>
         <div className="hud-display stats-card fade-in p-4" style={{ animationDelay: '0.3s' }}>
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-success icon-hover" />
+            <Calendar className="h-5 w-5 text-blue-600 icon-hover" />
             <div>
-              <p className="text-sm text-muted-foreground">{t('history.totalFlights')}</p>
-              <p className="font-semibold text-foreground">{stats.total} {t('history.flights')}</p>
+              <p className="text-sm text-readable-muted">{t('history.totalFlights')}</p>
+              <p className="font-semibold text-green-500">{stats.total} {pluralizeFlights(stats.total)}</p>
             </div>
           </div>
         </div>
@@ -399,7 +404,7 @@ const History = () => {
       {/* Search and Sort Controls */}
       <div className="flex flex-col lg:flex-row gap-4 fade-in" style={{ animationDelay: '0.4s' }}>
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-readable-muted" />
           <input
             type="text"
             placeholder={t('history.searchFlights')}
@@ -435,7 +440,7 @@ const History = () => {
               <span>Status: {statusFilter}</span>
               <button 
                 onClick={() => setStatusFilter('all')} 
-                className="ml-1 text-muted-foreground hover:text-foreground"
+                className="ml-1 text-readable-muted hover:text-foreground"
               >
                 ×
               </button>
@@ -446,7 +451,7 @@ const History = () => {
               <span>De: {format(dateFrom, 'dd/MM/yyyy')}</span>
               <button 
                 onClick={() => setDateFrom(undefined)} 
-                className="ml-1 text-muted-foreground hover:text-foreground"
+                className="ml-1 text-readable-muted hover:text-foreground"
               >
                 ×
               </button>
@@ -457,7 +462,7 @@ const History = () => {
               <span>Até: {format(dateTo, 'dd/MM/yyyy')}</span>
               <button 
                 onClick={() => setDateTo(undefined)} 
-                className="ml-1 text-muted-foreground hover:text-foreground"
+                className="ml-1 text-readable-muted hover:text-foreground"
               >
                 ×
               </button>
@@ -478,11 +483,11 @@ const History = () => {
       {filteredAndSortedFlights.length === 0 ? (
         <div className="hud-display stats-card p-6 fade-in" style={{ animationDelay: '0.5s' }}>
           <div className="text-center py-12">
-            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4 icon-hover" />
+            <Calendar className="h-12 w-12 text-blue-600 mx-auto mb-4 icon-hover" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {flights.length === 0 ? t('history.noHistory') : 'Nenhum voo encontrado'}
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-readable-muted">
               {flights.length === 0 
                 ? t('history.noHistoryDesc')
                 : 'Tente ajustar os filtros de busca.'
@@ -526,8 +531,8 @@ const History = () => {
           </Table>
           
           {/* Display total count */}
-          <div className="text-center text-sm text-muted-foreground p-4 border-t">
-            {t('common.showing')} {filteredAndSortedFlights.length} {t('common.of')} {flights.length} {t('common.flights')}
+          <div className="text-center text-sm text-readable-muted p-4 border-t">
+            {t('common.showing')} {filteredAndSortedFlights.length} {t('common.of')} {flights.length} {pluralizeFlights(flights.length)}
           </div>
         </div>
       )}

@@ -4,12 +4,12 @@ import { StatusBar } from "./StatusBar";
 
 export const AppLayout = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mobile-scroll-smooth">
       <StatusBar />
       <div className="flex">
         <Navigation />
-        <main className="flex-1 lg:ml-64 pt-16 lg:pt-12">
-          <div className="p-4 lg:p-6">
+        <main className="flex-1 lg:ml-64 pt-16 lg:pt-12 mobile-bottom-nav-padding mobile-safe-area">
+          <div className="mobile-container">
             <Outlet />
           </div>
         </main>

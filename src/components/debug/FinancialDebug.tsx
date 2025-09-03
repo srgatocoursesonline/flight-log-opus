@@ -14,23 +14,11 @@ export const FinancialDebug = () => {
   } = useSupabaseFinancial();
 
   const handleRefresh = () => {
-    console.log('=== FINANCIAL DEBUG - ANTES DO REFRESH ===');
-    console.log('Expenses:', expenses);
-    console.log('Revenues:', revenues);
-    console.log('Financial Stats:', financialStats);
-    console.log('Is Loading:', isLoading);
-    console.log('Error:', error);
+    // Removido o console.log para reduzir logs
     
     refresh();
     
-    setTimeout(() => {
-      console.log('=== FINANCIAL DEBUG - APÓS O REFRESH ===');
-      console.log('Expenses:', expenses);
-      console.log('Revenues:', revenues);
-      console.log('Financial Stats:', financialStats);
-      console.log('Is Loading:', isLoading);
-      console.log('Error:', error);
-    }, 1000);
+    // Removido o console.log para reduzir logs
   };
 
   return (
@@ -67,7 +55,7 @@ export const FinancialDebug = () => {
             }`}>
               {financialStats.netProfit.toFixed(2)} CR
             </p>
-            <p className="text-sm text-green-600">
+            <p className={`text-sm ${financialStats.profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               Margem: {financialStats.profitMargin.toFixed(1)}%
             </p>
           </div>

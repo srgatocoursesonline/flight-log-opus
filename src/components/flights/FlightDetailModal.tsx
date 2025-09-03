@@ -111,13 +111,13 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-panel">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/20">
-                <Plane className="h-5 w-5 text-primary" />
+            <DialogTitle className="flex items-center gap-3 modal-title">
+              <div className="p-2 rounded-lg bg-blue-600/20">
+                <Plane className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <span className="text-xl font-bold font-mono">{flight.callsign}</span>
-                <p className="text-sm text-muted-foreground font-normal">{flight.aircraft}</p>
+                <p className="text-sm description-text font-normal">{flight.aircraft}</p>
               </div>
             </DialogTitle>
             <div className="flex items-center gap-2">
@@ -133,28 +133,28 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
           {/* Informações Básicas da Rota */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <MapPin className="h-5 w-5 text-primary" />
+              <MapPin className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Rota</p>
-                <p className="text-lg font-semibold font-mono">
+                <p className="text-sm description-text">Rota</p>
+                <p className="text-lg font-semibold font-mono text-readable">
                   {flight.departure} → {flight.arrival}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <Clock className="h-5 w-5 text-foreground" />
+              <Clock className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Horários</p>
-                <p className="text-lg font-semibold">
+                <p className="text-sm description-text">Horários</p>
+                <p className="text-lg font-semibold text-readable">
                   {flight.departureTime || 'N/A'} - {flight.arrivalTime || 'N/A'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <Calendar className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Data</p>
-                <p className="text-lg font-semibold">
+                <p className="text-sm description-text">Data</p>
+                <p className="text-lg font-semibold text-readable">
                   {formatDate(flight.date)}
                 </p>
               </div>
@@ -164,42 +164,42 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
           {/* Métricas de Performance Detalhadas */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary" />
+              <Star className="h-5 w-5 text-blue-600" />
               Métricas de Performance
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Clock className="h-6 w-6 text-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-1">Duração</p>
-                <p className="text-lg font-bold text-foreground font-mono">
+                <Clock className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm description-text mb-1">Duração</p>
+                <p className="text-lg font-bold text-readable font-mono">
                   {flight.flightTime || 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Route className="h-6 w-6 text-accent mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-1">Distância</p>
-                <p className="text-lg font-bold text-foreground font-mono">
+                <Route className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm description-text mb-1">Distância</p>
+                <p className="text-lg font-bold text-readable font-mono">
                   {flight.distance ? `${flight.distance} nm` : 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <TrendingDown className={cn('h-6 w-6 mx-auto mb-2', flight.landingRate ? getLandingRateColor(flight.landingRate) : 'text-muted-foreground')} />
-                <p className="text-sm text-muted-foreground mb-1">Landing Rate</p>
-                <p className={cn('text-lg font-bold font-mono', flight.landingRate ? getLandingRateColor(flight.landingRate) : 'text-muted-foreground')}>
+                <TrendingDown className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+                <p className="text-sm description-text mb-1">Landing Rate</p>
+                <p className={cn('text-lg font-bold font-mono', flight.landingRate ? getLandingRateColor(flight.landingRate) : 'description-text')}>
                   {flight.landingRate ? `${flight.landingRate} fpm` : 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Star className={cn('h-6 w-6 mx-auto mb-2', flight.experiencePoints ? 'text-info' : 'text-muted-foreground')} />
-                <p className="text-sm text-muted-foreground mb-1">Experience Points</p>
-                <p className={cn('text-lg font-bold font-mono', flight.experiencePoints ? 'text-info' : 'text-muted-foreground')}>
+                <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+                <p className="text-sm description-text mb-1">Experience Points</p>
+                <p className={cn('text-lg font-bold font-mono', flight.experiencePoints ? 'text-readable' : 'description-text')}>
                   {flight.experiencePoints || 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Star className={cn('h-6 w-6 mx-auto mb-2', flight.careerRating ? getRatingColor(flight.careerRating) : 'text-muted-foreground')} />
-                <p className="text-sm text-muted-foreground mb-1">Career Rating</p>
-                <p className={cn('text-lg font-bold font-mono', flight.careerRating ? getRatingColor(flight.careerRating) : 'text-muted-foreground')}>
+                <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+                <p className="text-sm description-text mb-1">Career Rating</p>
+                <p className={cn('text-lg font-bold font-mono', flight.careerRating ? 'text-readable' : 'description-text')}>
                   {flight.careerRating || 'N/A'}
                 </p>
               </div>
@@ -209,25 +209,25 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
           {/* Informações Adicionais */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Fuel className="h-5 w-5 text-warning" />
+              <Fuel className="h-5 w-5 text-blue-600" />
               Informações Adicionais
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-                <Fuel className="h-5 w-5 text-warning" />
+                <Fuel className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Combustível Usado</p>
-                  <p className="text-lg font-semibold font-mono">
+                  <p className="text-sm description-text">Combustível Usado</p>
+                  <p className="text-lg font-semibold font-mono text-readable">
                     {flight.fuelUsed ? `${flight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
                   </p>
                 </div>
               </div>
               {flight.route && (
                 <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-                  <Route className="h-5 w-5 text-success" />
+                  <Route className="h-5 w-5 text-blue-600" />
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Rota Planejada</p>
-                    <p className="text-sm font-mono text-foreground break-all">
+                    <p className="text-sm description-text">Rota Planejada</p>
+                    <p className="text-sm font-mono text-readable break-all">
                       {flight.route}
                     </p>
                   </div>
@@ -241,7 +241,7 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
             <div>
               <h3 className="text-lg font-semibold mb-4">Observações</h3>
               <div className="p-4 bg-muted/10 rounded-lg border-l-4 border-primary">
-                <p className="text-foreground italic">"{flight.notes}"</p>
+                <p className="text-readable italic">"{flight.notes}"</p>
               </div>
             </div>
           )}

@@ -20,11 +20,9 @@ export const SupabaseConnectionTest = () => {
     setStatus({});
 
     try {
-      console.log('=== INICIANDO DIAGNÓSTICO SUPABASE ===');
-      console.log('Cliente Supabase:', supabase);
-      
+      // Removido o console.log para reduzir logs
+      // Removido o console.log para reduzir logs
 
-      
       // Teste simples de conexão
       const { data, error } = await supabase.from('flights').select('count').limit(1);
       const connectionOk = !error;
@@ -37,7 +35,7 @@ export const SupabaseConnectionTest = () => {
           : `Falha na conexão com Supabase: ${error?.message}`
       });
     } catch (error) {
-      console.error('Erro ao executar diagnóstico:', error);
+      // Removido o console.error para reduzir logs
       setStatus({
         error: error instanceof Error ? error.message : 'Erro desconhecido'
       });

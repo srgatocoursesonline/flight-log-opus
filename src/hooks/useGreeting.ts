@@ -1,63 +1,75 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-
-interface UserProfile {
-  display_name: string;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useGreeting = () => {
   const { user } = useAuth();
-  const [displayName, setDisplayName] = useState<string>('Capitão');
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Função para obter a saudação baseada no horário
-  const getTimeBasedGreeting = (): string => {
+  const [displayName, setDisplayName] = useState('Capitão');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Função para obter greeting baseado no horário
+  const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    
-    if (hour >= 0 && hour < 12) {
+    if (hour >= 5 && hour < 12) {
       return 'Bom dia';
-    } else if (hour >= 12 && hour < 19) {
+    } else if (hour >= 12 && hour < 18) {
       return 'Boa tarde';
     } else {
       return 'Boa noite';
     }
   };
+  
+  const greeting = getTimeBasedGreeting();
 
-  // Buscar o display_name do usuário
   useEffect(() => {
     const fetchUserProfile = async () => {
+      // Se não há usuário, usar fallback imediatamente
       if (!user) {
         setDisplayName('Capitão');
         setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
+      
       try {
-        setIsLoading(true);
+        // Primeiro, tentar obter nome dos metadados do usuário (mais rápido)
+        const metaDisplayName = user.user_metadata?.display_name || user.user_metadata?.full_name;
+        const emailName = user.email?.split('@')[0];
         
-        // Buscar o perfil do usuário na tabela profiles
+        // Se temos nome nos metadados, usar como fallback inicial
+        if (metaDisplayName) {
+          setDisplayName(metaDisplayName);
+        } else if (emailName) {
+          setDisplayName(emailName.charAt(0).toUpperCase() + emailName.slice(1));
+        }
+        
+        // Tentar buscar o perfil do usuário na tabela profiles
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('display_name')
           .eq('id', user.id)
           .single();
 
-        if (error) {
-          console.error('Erro ao buscar perfil do usuário:', error);
-          // Fallback para o display_name dos metadados do usuário
-          const metaDisplayName = user.user_metadata?.display_name;
-          setDisplayName(metaDisplayName || 'Capitão');
-        } else if (profile?.display_name) {
+        // Se conseguiu buscar o perfil e tem display_name, usar ele
+        if (!error && profile?.display_name) {
           setDisplayName(profile.display_name);
-        } else {
-          // Fallback para o display_name dos metadados do usuário
-          const metaDisplayName = user.user_metadata?.display_name;
-          setDisplayName(metaDisplayName || 'Capitão');
         }
+        // Se não conseguiu buscar ou não tem display_name, manter o fallback já definido
+        
       } catch (error) {
-        console.error('Erro ao buscar dados do usuário:', error);
-        setDisplayName('Capitão');
+        console.warn('Erro ao buscar perfil do usuário:', error);
+        // Manter o nome que já foi definido ou usar fallback final
+        if (displayName === 'Capitão') {
+          const metaDisplayName = user.user_metadata?.display_name || user.user_metadata?.full_name;
+          const emailName = user.email?.split('@')[0];
+          
+          if (metaDisplayName) {
+            setDisplayName(metaDisplayName);
+          } else if (emailName) {
+            setDisplayName(emailName.charAt(0).toUpperCase() + emailName.slice(1));
+          }
+        }
       } finally {
         setIsLoading(false);
       }
@@ -66,16 +78,5 @@ export const useGreeting = () => {
     fetchUserProfile();
   }, [user]);
 
-  // Gerar a saudação completa
-  const getGreeting = (): string => {
-    const timeGreeting = getTimeBasedGreeting();
-    return `${timeGreeting}, ${displayName}`;
-  };
-
-  return {
-    greeting: getGreeting(),
-    displayName,
-    timeGreeting: getTimeBasedGreeting(),
-    isLoading
-  };
+  return { displayName, isLoading, greeting };
 };

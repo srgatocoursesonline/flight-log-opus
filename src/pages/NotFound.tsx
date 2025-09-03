@@ -9,10 +9,7 @@ const NotFound = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
+    // Error tracking without console output
   }, [location.pathname]);
 
   return (

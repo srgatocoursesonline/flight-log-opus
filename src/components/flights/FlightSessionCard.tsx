@@ -101,21 +101,21 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               {session.status === 'active' && (
                 <div className="flex items-center space-x-1">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="h-3 w-3 text-blue-600" />
                   <span>{formatDistanceToNow(new Date(session.startedAt), { locale: ptBR, addSuffix: true })}</span>
                 </div>
               )}
               
               {session.flightTime && (
                 <div className="flex items-center space-x-1">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="h-3 w-3 text-blue-600" />
                   <span>{formatDuration(session.flightTime)}</span>
                 </div>
               )}
               
               {session.totalDistance && (
                 <div className="flex items-center space-x-1">
-                  <Route className="h-3 w-3" />
+                  <Route className="h-3 w-3 text-blue-600" />
                   <span>{formatDistance(session.totalDistance)}</span>
                 </div>
               )}
@@ -127,7 +127,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
                   onClick={() => onViewDetails?.(session.id)}
                   className="h-6 px-2"
                 >
-                  <Eye className="h-3 w-3" />
+                  <Eye className="h-3 w-3 text-blue-600" />
                 </Button>
                 
                 {session.status === 'active' && onCancelSession && (
@@ -174,7 +174,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
         {/* Métricas principais */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
-            <Clock className="h-4 w-4 text-gray-500" />
+            <Clock className="h-4 w-4 text-blue-600" />
             <div>
               <div className="text-xs text-gray-500">Duração</div>
               <div className="font-medium">{formatDuration(session.flightTime)}</div>
@@ -182,7 +182,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
           </div>
           
           <div className="flex items-center space-x-2">
-            <Route className="h-4 w-4 text-gray-500" />
+            <Route className="h-4 w-4 text-blue-600" />
             <div>
               <div className="text-xs text-gray-500">Distância</div>
               <div className="font-medium">{formatDistance(session.totalDistance)}</div>
@@ -190,7 +190,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
           </div>
           
           <div className="flex items-center space-x-2">
-            <Mountain className="h-4 w-4 text-gray-500" />
+            <Mountain className="h-4 w-4 text-blue-600" />
             <div>
               <div className="text-xs text-gray-500">Alt. Máx</div>
               <div className="font-medium">{formatAltitude(session.maxAltitude)}</div>
@@ -198,7 +198,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
           </div>
           
           <div className="flex items-center space-x-2">
-            <Gauge className="h-4 w-4 text-gray-500" />
+            <Gauge className="h-4 w-4 text-blue-600" />
             <div>
               <div className="text-xs text-gray-500">Vel. Máx</div>
               <div className="font-medium">{formatSpeed(session.maxSpeed)}</div>
@@ -210,7 +210,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
         {session.status === 'active' && session.currentLat && session.currentLon && (
           <div className="bg-green-50 p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-2">
-              <MapPin className="h-4 w-4 text-green-600" />
+              <MapPin className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium text-green-800">Posição Atual</span>
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs">
@@ -242,7 +242,7 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
               size="sm"
               onClick={() => onViewDetails?.(session.id)}
             >
-              <Eye className="h-4 w-4 mr-1" />
+              <Eye className="h-4 w-4 mr-1 text-blue-600" />
               Ver Detalhes
             </Button>
             

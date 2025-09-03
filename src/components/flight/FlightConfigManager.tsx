@@ -398,7 +398,7 @@ export const FlightConfigManager = () => {
                   className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    <Plane className="h-5 w-5 text-primary" />
+                    <Plane className="h-5 w-5 text-blue-600" />
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">

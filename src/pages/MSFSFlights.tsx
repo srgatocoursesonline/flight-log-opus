@@ -1,83 +1,55 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Search, 
-  Filter, 
   Plane, 
-  Download,
-  RefreshCw,
-  Trash2,
-  MapPin,
-  Clock,
-  Mountain,
-  Gauge,
-  Calendar,
-  BarChart3
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Filter,
+  Search,
+  ArrowUpDown,
+  Trash2
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useSupabaseMSFSFlights, type MSFSFlight } from '@/hooks/supabase/useSupabaseMSFSFlights';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+import { useSupabaseMSFSFlights } from '@/hooks/supabase/useSupabaseMSFSFlights';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-export default function MSFSFlights() {
+const MSFSFlights = () => {
   const { t } = useTranslation();
-  const { 
-    flights, 
-    stats, 
-    loading, 
-    error, 
-    deleteFlight, 
-    clearAllFlights, 
-    refresh 
-  } = useSupabaseMSFSFlights();
-  
+  const { flights, deleteFlight, clearAllFlights, isLoading } = useSupabaseMSFSFlights();
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'duration' | 'distance' | 'aircraft'>('date');
+  const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [aircraftFilter, setAircraftFilter] = useState<string>('all');
+  const [aircraftFilter, setAircraftFilter] = useState('all');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [isClearing, setIsClearing] = useState(false);
 
   // Get unique aircraft types for filter
-  const uniqueAircraft = useMemo(() => {
-    const aircraft = [...new Set(flights.map(f => f.aircraft_type))];
-    return aircraft.sort();
+  const aircraftTypes = useMemo(() => {
+    const types = new Set(flights.map(flight => flight.aircraft_type));
+    return Array.from(types).sort();
   }, [flights]);
 
   // Filter and sort flights
-  const filteredAndSortedFlights = useMemo(() => {
-    const filtered = flights.filter(flight => {
+  const filteredFlights = useMemo(() => {
+    let filtered = flights.filter(flight => {
       const matchesSearch = 
-        flight.aircraft_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        flight.callsign.toLowerCase().includes(searchTerm.toLowerCase()) ||
         flight.departure_icao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        flight.arrival_icao.toLowerCase().includes(searchTerm.toLowerCase());
+        flight.arrival_icao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        flight.aircraft_type.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesAircraft = aircraftFilter === 'all' || flight.aircraft_type === aircraftFilter;
+      const matchesAircraft = 
+        aircraftFilter === 'all' || flight.aircraft_type === aircraftFilter;
       
       return matchesSearch && matchesAircraft;
     });
 
-    // Sort flights
     filtered.sort((a, b) => {
       let aValue: any, bValue: any;
       
@@ -117,363 +89,223 @@ export default function MSFSFlights() {
       // Force page refresh to ensure UI updates
       window.location.reload();
     } catch (error) {
-      console.error('Error deleting flight:', error);
+      // Error handling without console output
     } finally {
       setIsDeleting(null);
     }
   };
 
   const handleClearAll = async () => {
-    setIsClearing(true);
-    try {
-      await clearAllFlights();
-    } finally {
-      setIsClearing(false);
+    if (confirm(t('msfs.clearAllConfirm'))) {
+      try {
+        await clearAllFlights();
+        // Force page refresh to ensure UI updates
+        window.location.reload();
+      } catch (error) {
+        // Error handling without console output
+      }
     }
   };
 
-  const exportToCSV = () => {
-    if (flights.length === 0) {
-      toast.error('Nenhum voo para exportar');
-      return;
-    }
-
-    const headers = [
-      'Data/Hora Partida',
-      'Data/Hora Chegada', 
-      'Aeronave',
-      'Partida (ICAO)',
-      'Chegada (ICAO)',
-      'Tempo de Voo (min)',
-      'Distância (NM)',
-      'Altitude Máxima (ft)',
-      'Velocidade Máxima (kts)'
-    ];
-
-    const csvContent = [
-      headers.join(','),
-      ...filteredAndSortedFlights.map(flight => [
-        new Date(flight.departure_time).toLocaleString('pt-BR'),
-        new Date(flight.arrival_time).toLocaleString('pt-BR'),
-        flight.aircraft_type,
-        flight.departure_icao,
-        flight.arrival_icao,
-        flight.flight_time_minutes,
-        Math.round(flight.distance_nm),
-        Math.round(flight.max_altitude_ft),
-        Math.round(flight.max_speed_kts)
-      ].join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `msfs-flights-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast.success('Voos exportados com sucesso!');
-  };
-
-  const formatFlightTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-pulse text-center">
+          <Plane className="h-12 w-12 text-primary mx-auto mb-4" />
+          <p>{t('msfs.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pb-20 lg:pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Plane className="h-8 w-8" />
-            Voos MSFS 2024
+          <h1 className="mobile-title gradient-title">
+            {t('msfs.title')}
           </h1>
-          <p className="text-muted-foreground mt-2">
-            Histórico completo de voos capturados automaticamente do Microsoft Flight Simulator
+          <p className="text-muted-foreground">
+            {t('msfs.subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={refresh}
-            disabled={loading}
+        <div className="flex gap-2">
+          <Button 
+            variant="destructive" 
+            onClick={handleClearAll}
+            disabled={flights.length === 0}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Atualizar
+            <Trash2 className="h-4 w-4 mr-2" />
+            {t('msfs.clearAll')}
           </Button>
-          {flights.length > 0 && (
-            <>
-              <Button
-                variant="outline"
-                onClick={exportToCSV}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar CSV
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="text-destructive hover:text-destructive"
-                    disabled={isClearing}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Limpar Tudo
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Limpar Histórico</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tem certeza que deseja limpar todo o histórico de voos do MSFS? 
-                      Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleClearAll}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Limpar Tudo
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          )}
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Voos</CardTitle>
-              <Plane className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalFlights}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tempo Total</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatFlightTime(stats.totalFlightTime)}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Distância Total</CardTitle>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Math.round(stats.totalDistance).toLocaleString()} NM</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aeronave Favorita</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.mostUsedAircraft || 'N/A'}</div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por aeronave, partida ou chegada..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            {t('msfs.filters')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('msfs.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
             
-            <Select value={aircraftFilter} onValueChange={setAircraftFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Filtrar por aeronave" />
+            <Combobox
+              options={[
+                { value: 'all', label: t('msfs.allAircraft') },
+                ...aircraftTypes.map(type => ({ value: type, label: type }))
+              ]}
+              value={aircraftFilter}
+              onValueChange={setAircraftFilter}
+              placeholder={t('msfs.aircraftType')}
+              searchPlaceholder="Pesquisar tipo de aeronave..."
+              emptyMessage="Nenhum tipo encontrado."
+            />
+            
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('msfs.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as aeronaves</SelectItem>
-                {uniqueAircraft.map(aircraft => (
-                  <SelectItem key={aircraft} value={aircraft}>
-                    {aircraft}
-                  </SelectItem>
-                ))}
+                <SelectItem value="date">{t('msfs.sortDate')}</SelectItem>
+                <SelectItem value="duration">{t('msfs.sortDuration')}</SelectItem>
+                <SelectItem value="distance">{t('msfs.sortDistance')}</SelectItem>
+                <SelectItem value="aircraft">{t('msfs.sortAircraft')}</SelectItem>
               </SelectContent>
             </Select>
             
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Ordenar por" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Data</SelectItem>
-                <SelectItem value="duration">Duração</SelectItem>
-                <SelectItem value="distance">Distância</SelectItem>
-                <SelectItem value="aircraft">Aeronave</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="w-full md:w-auto"
+              className="flex items-center gap-2"
             >
-              <Filter className="h-4 w-4 mr-2" />
-              {sortOrder === 'asc' ? 'Crescente' : 'Decrescente'}
+              <ArrowUpDown className="h-4 w-4" />
+              {sortOrder === 'asc' ? t('msfs.ascending') : t('msfs.descending')}
             </Button>
           </div>
         </CardContent>
       </Card>
 
+      {/* Stats */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold text-primary">{flights.length}</p>
+            <p className="text-sm text-muted-foreground">{t('msfs.totalFlights')}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold text-primary">
+              {flights.reduce((sum, flight) => sum + (flight.flight_time_minutes || 0), 0)}min
+            </p>
+            <p className="text-sm text-muted-foreground">{t('msfs.totalTime')}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold text-primary">
+              {flights.reduce((sum, flight) => sum + (flight.distance_nm || 0), 0)}NM
+            </p>
+            <p className="text-sm text-muted-foreground">{t('msfs.totalDistance')}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold text-primary">
+              {aircraftTypes.length}
+            </p>
+            <p className="text-sm text-muted-foreground">{t('msfs.aircraftTypes')}</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Flights List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Histórico de Voos ({filteredAndSortedFlights.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-              <span>Carregando voos...</span>
-            </div>
-          ) : filteredAndSortedFlights.length === 0 ? (
-            <div className="text-center py-8">
-              <Plane className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">
-                {flights.length === 0 
-                  ? 'Nenhum voo do MSFS encontrado'
-                  : 'Nenhum voo corresponde aos filtros aplicados'
-                }
-              </p>
-              {flights.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Inicie o serviço companheiro para começar a registrar seus voos automaticamente.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredAndSortedFlights.map((flight) => (
-                <div key={flight.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="font-mono">
-                          {flight.aircraft_type}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {formatDateTime(flight.departure_time)}
+      <div className="space-y-4">
+        {filteredFlights.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Plane className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">{t('msfs.noFlights')}</h3>
+              <p className="text-muted-foreground">{t('msfs.noFlightsDesc')}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          filteredFlights.map(flight => (
+            <Card key={flight.id} className="fade-in">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Plane className="h-4 w-4 text-primary" />
+                      <span className="font-semibold">{flight.callsign}</span>
+                      <Badge variant="secondary">{flight.aircraft_type}</Badge>
+                    </div>
+                    
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {flight.departure_icao} → {flight.arrival_icao}
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-mono font-semibold">
-                            {flight.departure_icao}
-                          </span>
-                          <span className="text-muted-foreground">→</span>
-                          <span className="font-mono font-semibold">
-                            {flight.arrival_icao}
-                          </span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {format(new Date(flight.departure_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                        </span>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span>{formatFlightTime(flight.flight_time_minutes)}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span>{Math.round(flight.distance_nm)} NM</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mountain className="h-4 w-4 text-muted-foreground" />
-                          <span>{Math.round(flight.max_altitude_ft).toLocaleString()} ft</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Gauge className="h-4 w-4 text-muted-foreground" />
-                          <span>{Math.round(flight.max_speed_kts)} kts</span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {flight.flight_time_minutes}min ({Math.round(flight.distance_nm)}NM)
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">
+                          LR: {flight.landing_rate} | EP: {flight.experience_points}
+                        </span>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2 ml-4">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            disabled={isDeleting === flight.id}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Deletar Voo</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Tem certeza que deseja deletar este voo? Esta ação não pode ser desfeita.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteFlight(flight.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Deletar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
                   </div>
+                  
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteFlight(flight.id)}
+                    disabled={isDeleting === flight.id}
+                  >
+                    {isDeleting === flight.id ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default MSFSFlights;

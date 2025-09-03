@@ -256,10 +256,10 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
       )}
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto glass-panel">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">
-            <Receipt className="h-5 w-5 text-primary" />
-            {expense ? 'Editar Despesa' : 'Nova Despesa'}
-          </DialogTitle>
+          <DialogTitle className="flex items-center gap-2 modal-title">
+          <Receipt className="h-5 w-5 text-primary" />
+          {expense ? 'Editar Despesa' : 'Nova Despesa'}
+        </DialogTitle>
           <DialogDescription>
             {expense ? 'Edite os dados da despesa selecionada' : 'Registre uma nova despesa no sistema financeiro'}
           </DialogDescription>
@@ -268,7 +268,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Descrição */}
           <div>
-            <Label htmlFor="description" className="text-foreground">Descrição *</Label>
+            <Label htmlFor="description" className="label-text">Descrição *</Label>
             <Input
               id="description"
               placeholder="Ex: Abastecimento do Cessna 172"
@@ -283,7 +283,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
           {/* Categoria e Valor */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="category" className="text-foreground">Categoria *</Label>
+              <Label htmlFor="category" className="label-text">Categoria *</Label>
                 <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Selecione a categoria" />
@@ -297,12 +297,12 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
                 </SelectContent>
               </Select>
                 {prefillCategoryName && (
-                  <p className="text-xs text-muted-foreground mt-1">Categoria selecionada: {prefillCategoryName}</p>
+                  <p className="text-xs description-text mt-1">Categoria selecionada: {prefillCategoryName}</p>
                 )}
             </div>
             
             <div>
-              <Label htmlFor="amount" className="text-foreground">Valor (CR) *</Label>
+              <Label htmlFor="amount" className="label-text">Valor (CR) *</Label>
               <Input
                 id="amount"
                 type="number"
@@ -319,7 +319,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
 
           {/* Data */}
           <div>
-            <Label htmlFor="date" className="text-foreground">Data *</Label>
+            <Label htmlFor="date" className="label-text">Data *</Label>
             <Input
               id="date"
               type="date"
@@ -332,7 +332,7 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
 
           {/* Observações */}
           <div>
-            <Label htmlFor="notes" className="text-foreground">Observações</Label>
+            <Label htmlFor="notes" className="label-text">Observações</Label>
             <Textarea
               id="notes"
               placeholder="Detalhes adicionais sobre a despesa..."

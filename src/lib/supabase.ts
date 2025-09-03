@@ -14,8 +14,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ ERRO CRÍTICO: Nem mesmo os valores fallback estão funcionando!');
-  console.error('Por favor, contate o suporte técnico.');
+  // Error handling without console output
   
   // Criar objeto de erro detalhado
   const error = new Error(
@@ -50,18 +49,17 @@ try {
       const { error } = await supabase.from('profiles').select('id').limit(1);
       
       if (error) {
-        console.error('Erro ao testar conexão com Supabase:', error.message);
-        console.error('Código:', error.code, 'Detalhes:', error);
+        // Error handling without console output
       } else {
     
       }
     } catch (testError) {
-      console.error('Erro não tratado ao testar Supabase:', testError);
+      // Error handling without console output
     }
   }, 1000); // Testar após 1 segundo para não bloquear a inicialização
 
 } catch (error) {
-  console.error('Erro crítico ao criar cliente Supabase:', error);
+  // Error handling without console output
   // Criar um cliente vazio com métodos simulados para evitar que a aplicação quebre
   supabase = {
     auth: {

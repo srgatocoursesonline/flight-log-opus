@@ -4,7 +4,6 @@ export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('SW registered: ', registration);
       
       // Check for updates
       registration.addEventListener('updatefound', () => {
@@ -22,7 +21,7 @@ export const registerServiceWorker = async () => {
       });
       
     } catch (error) {
-      console.log('SW registration failed: ', error);
+      // Error handling without console output
     }
   }
 };
@@ -40,5 +39,4 @@ export const unregisterServiceWorker = async () => {
 export const installPWA = () => {
   // PWA install functionality disabled to avoid console warnings
   // Can be re-enabled when proper install UI is implemented
-  console.log('PWA install functionality available but not configured');
 };

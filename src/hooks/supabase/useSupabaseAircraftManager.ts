@@ -330,7 +330,7 @@ export const useSupabaseAircraftManager = () => {
       .filter(aircraft => aircraft.isActive)
       .map(aircraft => aircraft.name);
     
-    return [...activeCustomNames, ...defaultAircraft];
+    return [...activeCustomNames, ...defaultAircraft].sort();
   };
 
   return {

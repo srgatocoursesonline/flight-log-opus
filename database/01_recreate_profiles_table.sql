@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email TEXT,
   avatar_url TEXT,
   total_flights INTEGER DEFAULT 0,
-  total_hours INTEGER DEFAULT 0,
+  total_hours INTEGER DEFAULT 0, -- Manter para compatibilidade
+  total_minutes INTEGER DEFAULT 0, -- Nova coluna para armazenar minutos
   career_rating INTEGER DEFAULT 0,
   total_rating INTEGER DEFAULT 0,
   career_level INTEGER DEFAULT 1,
@@ -30,7 +31,8 @@ COMMENT ON COLUMN profiles.initial_flights IS 'Número inicial de voos (históri
 COMMENT ON COLUMN profiles.initial_hours IS 'Horas iniciais de voo (histórico anterior ao sistema)';
 COMMENT ON COLUMN profiles.display_name IS 'Nome de exibição do piloto';
 COMMENT ON COLUMN profiles.total_flights IS 'Total de voos registrados no sistema';
-COMMENT ON COLUMN profiles.total_hours IS 'Total de horas de voo registradas no sistema';
+COMMENT ON COLUMN profiles.total_hours IS 'Total de horas de voo registradas no sistema (obsoleto)';
+COMMENT ON COLUMN profiles.total_minutes IS 'Total de minutos de voo registrados no sistema';
 COMMENT ON COLUMN profiles.career_rating IS 'Pontuação de carreira do piloto';
 COMMENT ON COLUMN profiles.career_level IS 'Nível de carreira do piloto';
 COMMENT ON COLUMN profiles.career_class IS 'Classe de carreira do piloto (D, C, B, A)';

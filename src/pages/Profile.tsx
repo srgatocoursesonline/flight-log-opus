@@ -5,13 +5,19 @@ import { autoRefresh } from "@/utils/autoRefresh";
 import { useState, useEffect } from "react";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { useProfile } from "@/hooks/useProfile";
+import { useProfileBaseline } from "@/hooks/useProfileBaseline";
 import { useProfileFinancialSync } from "@/hooks/useProfileFinancialSync";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { debugTrace } from "@/utils/debugTrace";
+import { setupDatabaseConsistencyMonitor } from "@/utils/databaseVerify";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 const Profile = () => {
   const { t } = useTranslation();
-  const { profile, isLoading, fetchProfile, getProfileStats } = useProfile();
+  const { user } = useAuth();
+  const { profile, isLoading, fetchProfile, getProfileStats, validateAndFixProfileStats } = useProfile();
+  const { getRealTimeStats } = useProfileBaseline();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [stats, setStats] = useState<any>(null);
   
@@ -30,15 +36,109 @@ const Profile = () => {
 
   // Calcular estatísticas quando o perfil mudar
   useEffect(() => {
-    if (profile) {
-      const profileStats = getProfileStats();
-      setStats(profileStats);
+    const loadProfileStats = async () => {
+      if (profile) {
+        // Add trace for profile data
+        debugTrace.addTrace('Profile.tsx useEffect - Initial profile', {
+          initial_flights: profile.initial_flights,
+          total_flights: profile.total_flights,
+          initial_minutes: profile.initial_minutes,
+          total_minutes: profile.total_minutes,
+          calculatedTotal: (profile.initial_flights || 0) + (profile.total_flights || 0)
+        });
+        
+        try {
+          // Buscar estatísticas em tempo real (agora assincronamente)
+          const realTimeStats = await getRealTimeStats();
+          
+          if (realTimeStats) {
+            // Add trace for realTimeStats data
+            debugTrace.addTrace('Profile.tsx useEffect - getRealTimeStats result', {
+              initial_flights: profile.initial_flights,
+              total_flights: profile.total_flights,
+              baselineFlights: realTimeStats.baselineFlights,
+              flightsDone: realTimeStats.flightsDone,
+              totalFlights: realTimeStats.totalFlights
+            });
+            
+            // Important: We only need basic stats from getProfileStats without flight counts
+            const profileStats = getProfileStats();
+            
+            // Add trace for profileStats data
+            debugTrace.addTrace('Profile.tsx useEffect - getProfileStats result', {
+              initial_flights: profile.initial_flights,
+              total_flights: profile.total_flights,
+              totalFlights: profileStats.totalFlights
+            });
+            
+            // Use a simplified approach: set stats directly instead of merging potentially duplicate calculations
+            setStats({
+              dynamicCR: profileStats.dynamicCR,
+              totalFlights: realTimeStats.totalFlights, // Use realTimeStats for flight counts
+              totalHours: realTimeStats.totalHours,
+              totalMinutes: realTimeStats.totalMinutes,
+              careerDuration: profileStats.careerDuration,
+              perfectFlightRate: profileStats.perfectFlightRate,
+              perfectFlights: profileStats.perfectFlights,
+              achievements: profileStats.achievements
+            });
+            
+            // Add trace for final stats
+            debugTrace.addTrace('Profile.tsx useEffect - Final stats set', {
+              initial_flights: profile.initial_flights,
+              total_flights: profile.total_flights,
+              totalFlights: realTimeStats.totalFlights
+            });
+            
+          } else {
+            const profileStats = getProfileStats();
+            
+            // Add trace for fallback
+            debugTrace.addTrace('Profile.tsx useEffect - Fallback stats', {
+              initial_flights: profile.initial_flights,
+              total_flights: profile.total_flights,
+              totalFlights: profileStats.totalFlights
+            });
+            
+            setStats(profileStats);
+          }
+        } catch (error) {
+          const profileStats = getProfileStats();
+          setStats(profileStats);
+        }
+      }
+    };
+    
+    loadProfileStats();
+  }, [profile, getProfileStats, getRealTimeStats]);
+
+  // Configurar monitor de consistência do banco de dados
+  useEffect(() => {
+    if (user?.id) {
+      // Configurar monitor para verificar a cada 10 minutos
+      const stopMonitor = setupDatabaseConsistencyMonitor(user.id, 10);
+      
+      // Cleanup: parar o monitor quando o componente for desmontado
+      return () => {
+        if (stopMonitor) stopMonitor();
+      };
     }
-  }, [profile, getProfileStats]);
+  }, [user?.id]);
+  
+  // Validar e corrigir estatísticas do perfil ao carregar a página
+  useEffect(() => {
+    if (profile) {
+      try {
+        validateAndFixProfileStats();
+      } catch (error) {
+        // Fallback silencioso - não quebra a página
+      }
+    }
+  }, [profile, validateAndFixProfileStats]);
 
   if (isLoading) {
     return (
-      <div className="space-y-6 pb-20 lg:pb-6">
+      <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
         <div className="animate-pulse">
           <div className="h-8 bg-muted rounded w-1/3 mb-2"></div>
           <div className="h-4 bg-muted rounded w-1/2"></div>
@@ -48,10 +148,10 @@ const Profile = () => {
   }
   
   return (
-    <div className="space-y-6 pb-20 lg:pb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
+    <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 fade-in">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight gradient-title">
+          <h1 className="mobile-title gradient-title">
             {t('profile.title')}
           </h1>
           <p className="text-muted-foreground">
@@ -64,7 +164,7 @@ const Profile = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-2 lg:gap-3 lg:grid-cols-3">
         <div className="hud-display stats-card fade-in p-6" style={{ animationDelay: '0.1s' }}>
           <div className="text-center">
             <Avatar className="w-20 h-20 mx-auto mb-4">
@@ -85,9 +185,12 @@ const Profile = () => {
               <div>
                 <p className="text-2xl font-bold text-foreground font-mono">{stats?.totalFlights || 0}</p>
                 <p className="text-xs text-muted-foreground uppercase">{t('profile.flights')}</p>
+                <p className="text-[10px] text-muted-foreground opacity-50">
+                  {profile?.initial_flights || 0} iniciais + {((stats?.totalFlights || 0) - (profile?.initial_flights || 0))} sistema
+                </p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground font-mono">{stats?.totalHours || 0}</p>
+                <p className="text-2xl font-bold text-foreground font-mono">{stats?.totalHours?.toFixed(2) || '0.00'}</p>
                 <p className="text-xs text-muted-foreground uppercase">{t('profile.hours')}</p>
               </div>
             </div>
@@ -176,8 +279,8 @@ const Profile = () => {
         profileData={profile ? {
           display_name: profile.display_name,
           avatar_url: profile.avatar_url,
-          total_flights: profile.total_flights,
-          total_hours: profile.total_hours,
+          initial_flights: profile.initial_flights, // Mudança: usar initial_flights
+          initial_minutes: profile.initial_minutes, // Mudança: initial_hours -> initial_minutes
           career_started: profile.career_started,
           achievements: profile.achievements,
           perfect_flights: profile.perfect_flights,

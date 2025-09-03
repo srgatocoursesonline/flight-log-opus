@@ -13,29 +13,29 @@ export const FlightStats = () => {
       title: 'Total de Voos',
       value: stats.totalFlights,
       icon: Plane,
-      color: 'text-primary',
-      bgColor: 'bg-primary/20'
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/20'
     },
     {
       title: 'Horas de Voo',
       value: `${stats.totalFlightTime}h`,
       icon: Clock,
-      color: 'text-accent',
-      bgColor: 'bg-accent/20'
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/20'
     },
     {
       title: 'Distância Total',
       value: `${stats.totalDistance.toLocaleString()} nm`,
       icon: Route,
-      color: 'text-success',
-      bgColor: 'bg-success/20'
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/20'
     },
     {
       title: 'CR Médio',
       value: stats.averageRating,
       icon: Star,
-      color: 'text-warning',
-      bgColor: 'bg-warning/20'
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/20'
     }
   ];
 
@@ -50,7 +50,7 @@ export const FlightStats = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-lg font-bold text-foreground font-mono">{stat.value}</p>
+                <p className="text-lg font-bold font-mono text-foreground">{stat.value}</p>
               </div>
             </div>
           </CardContent>

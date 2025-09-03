@@ -22,6 +22,9 @@ import SuperDiagnostic from "./pages/super-diagnostic";
 import Diagnostic from "./pages/Diagnostic";
 import RealTimeTracking from "./pages/RealTimeTracking";
 import FlightMaps from "./pages/FlightMaps";
+import Maintenance from "./pages/Maintenance";
+import Purchases from "./pages/Purchases";
+import FinancialReports from "./pages/FinancialReports";
 
 
 const queryClient = new QueryClient();
@@ -81,6 +84,9 @@ const AppContent = () => {
           <Route path="history" element={<History />} />
           <Route path="goals" element={<Goals />} />
           <Route path="financial" element={<Financial />} />
+          <Route path="manutencao" element={<Maintenance />} />
+          <Route path="compras" element={<Purchases />} />
+          <Route path="relatorios-financeiros" element={<FinancialReports />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>

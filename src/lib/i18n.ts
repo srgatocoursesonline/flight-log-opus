@@ -15,8 +15,16 @@ const ptBR = {
       history: "Histórico",
       goals: "Metas",
       financial: "Financeiro",
+      maintenance: "Manutenção",
+      purchases: "Compras",
+      financialReports: "Relatórios Financeiros",
       profile: "Perfil",
-      settings: "Configurações"
+      settings: "Configurações",
+      more: "Mais",
+      // Seções
+      operational: "Operacional",
+      financialSection: "Financeiro",
+      administrative: "Administrativo"
     },
     
     // Dashboard
@@ -144,40 +152,74 @@ const ptBR = {
     settings: {
       title: "Configurações",
       subtitle: "Personalize sua experiência de voo.",
-      general: "Geral",
-      language: "Idioma",
-      theme: "Tema",
-      notifications: "Notificações",
-      privacy: "Privacidade",
-      about: "Sobre",
-      version: "Versão",
-      save: "Salvar Configurações",
-      resetDefaults: "Restaurar Padrões",
-      flightReminders: "Lembretes de Voo",
-      flightRemindersDesc: "Receba notificações sobre voos futuros",
-      goalProgress: "Progresso das Metas",
-      goalProgressDesc: "Atualizações sobre suas metas de carreira",
-      achievementUnlocked: "Conquista Desbloqueada",
-      achievementUnlockedDesc: "Comemore suas conquistas",
-      appPreferences: "Preferências do App",
-      offlineMode: "Modo Offline",
-      offlineModeDesc: "Cache dados para uso offline",
-      autoSync: "Sincronização Automática",
-      autoSyncDesc: "Sincroniza automaticamente quando online",
-      analytics: "Análises",
-      analyticsDesc: "Ajude a melhorar o app com dados de uso",
-      dataManagement: "Gerenciamento de Dados",
-      exportData: "Exportar Dados",
-      exportDataDesc: "Baixe seus dados de voo",
-      export: "Exportar",
-      backup: "Backup",
-      backupDesc: "Crie um backup dos seus dados",
-      resetData: "Redefinir Dados",
-      resetDataDesc: "Apagar permanentemente todos os dados de voo",
-      reset: "Redefinir",
-      privacySecurity: "Privacidade e Segurança",
-      securityFeatures: "Recursos de segurança estarão disponíveis quando você se conectar ao Supabase para funcionalidade backend.",
-      connectSupabase: "Conectar Supabase"
+      
+      // Notifications section
+      notifications: {
+        title: "Notificações",
+        email: "Notificações por Email",
+        emailDesc: "Receba atualizações importantes por email",
+        push: "Notificações Push",
+        pushDesc: "Receba notificações em tempo real no dispositivo"
+      },
+      
+      // Financial section
+      financial: {
+        title: "Financeiro",
+        currency: "Moeda",
+        selectCurrency: "Selecione a moeda",
+        initialBalance: "Saldo Inicial",
+        initialBalanceDesc: "Defina seu saldo inicial para cálculos financeiros"
+      },
+      
+      // Flights section
+      flights: {
+        title: "Voos",
+        autoSync: "Sincronização Automática",
+        autoSyncDesc: "Sincroniza automaticamente dados de voo",
+        offlineMode: "Modo Offline",
+        offlineModeDesc: "Permite uso offline com cache de dados"
+      },
+      
+      // Career section
+      career: {
+        title: "Carreira",
+        level: "Nível de Carreira",
+        selectLevel: "Selecione o nível",
+        class: "Classe de Piloto",
+        selectClass: "Selecione a classe"
+      },
+      
+      // App section
+      app: {
+        title: "Aplicativo",
+        language: "Idioma",
+        selectLanguage: "Selecione o idioma",
+        theme: "Tema",
+        selectTheme: "Selecione o tema",
+        light: "Claro",
+        dark: "Escuro",
+        system: "Sistema"
+      },
+      
+      // Data section
+      data: {
+        title: "Dados e Backup",
+        export: "Exportar",
+        import: "Importar",
+        backup: "Backup",
+        reset: "Redefinir"
+      },
+      
+      // Security section
+      security: {
+        title: "Segurança",
+        currentPassword: "Senha Atual",
+        newPassword: "Nova Senha",
+        confirmPassword: "Confirmar Senha",
+        changePassword: "Alterar Senha",
+        connectAccount: "Conectar Conta",
+        deleteAccount: "Excluir Conta"
+      }
     },
     
     // Financial Page
@@ -340,8 +382,16 @@ const enUS = {
       history: "History", 
       goals: "Goals",
       financial: "Financial",
+      maintenance: "Maintenance",
+      purchases: "Purchases",
+      financialReports: "Financial Reports",
       profile: "Profile",
-      settings: "Settings"
+      settings: "Settings",
+      more: "More",
+      // Sections
+      operational: "Operational",
+      financialSection: "Financial",
+      administrative: "Administrative"
     },
     
     // Dashboard
@@ -464,40 +514,74 @@ const enUS = {
     settings: {
       title: "Settings",
       subtitle: "Customize your flight experience.",
-      general: "General",
-      language: "Language",
-      theme: "Theme",
-      notifications: "Notifications",
-      privacy: "Privacy",
-      about: "About",
-      version: "Version",
-      save: "Save Settings",
-      resetDefaults: "Reset to Defaults",
-      flightReminders: "Flight Reminders",
-      flightRemindersDesc: "Get notified about upcoming flights",
-      goalProgress: "Goal Progress",
-      goalProgressDesc: "Updates on your career goals",
-      achievementUnlocked: "Achievement Unlocked",
-      achievementUnlockedDesc: "Celebrate your accomplishments",
-      appPreferences: "App Preferences",
-      offlineMode: "Offline Mode",
-      offlineModeDesc: "Cache data for offline use",
-      autoSync: "Auto-sync",
-      autoSyncDesc: "Automatically sync when online",
-      analytics: "Analytics",
-      analyticsDesc: "Help improve the app with usage data",
-      dataManagement: "Data Management",
-      exportData: "Export Data",
-      exportDataDesc: "Download your flight data",
-      export: "Export",
-      backup: "Backup",
-      backupDesc: "Create a backup of your data",
-      resetData: "Reset Data",
-      resetDataDesc: "Permanently delete all flight data",
-      reset: "Reset",
-      privacySecurity: "Privacy & Security",
-      securityFeatures: "Security features will be available when you connect to Supabase for backend functionality.",
-      connectSupabase: "Connect Supabase"
+      
+      // Notifications section
+      notifications: {
+        title: "Notifications",
+        email: "Email Notifications",
+        emailDesc: "Receive important updates via email",
+        push: "Push Notifications",
+        pushDesc: "Get real-time notifications on your device"
+      },
+      
+      // Financial section
+      financial: {
+        title: "Financial",
+        currency: "Currency",
+        selectCurrency: "Select currency",
+        initialBalance: "Initial Balance",
+        initialBalanceDesc: "Set your initial balance for financial calculations"
+      },
+      
+      // Flights section
+      flights: {
+        title: "Flights",
+        autoSync: "Auto Sync",
+        autoSyncDesc: "Automatically sync flight data",
+        offlineMode: "Offline Mode",
+        offlineModeDesc: "Enable offline usage with data caching"
+      },
+      
+      // Career section
+      career: {
+        title: "Career",
+        level: "Career Level",
+        selectLevel: "Select level",
+        class: "Pilot Class",
+        selectClass: "Select class"
+      },
+      
+      // App section
+      app: {
+        title: "Application",
+        language: "Language",
+        selectLanguage: "Select language",
+        theme: "Theme",
+        selectTheme: "Select theme",
+        light: "Light",
+        dark: "Dark",
+        system: "System"
+      },
+      
+      // Data section
+      data: {
+        title: "Data & Backup",
+        export: "Export",
+        import: "Import",
+        backup: "Backup",
+        reset: "Reset"
+      },
+      
+      // Security section
+      security: {
+        title: "Security",
+        currentPassword: "Current Password",
+        newPassword: "New Password",
+        confirmPassword: "Confirm Password",
+        changePassword: "Change Password",
+        connectAccount: "Connect Account",
+        deleteAccount: "Delete Account"
+      }
     },
     
     // Financial Page

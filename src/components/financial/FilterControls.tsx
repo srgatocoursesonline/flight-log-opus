@@ -40,7 +40,7 @@ export const FilterControls = ({
       <CardContent className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Filter className="h-4 w-4 text-primary" />
-          <Label className="text-sm font-medium text-foreground">Filtros</Label>
+          <Label className="text-sm font-medium label-text">Filtros</Label>
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -57,9 +57,9 @@ export const FilterControls = ({
         <div className="grid gap-3 md:grid-cols-3">
           {/* Filtro de Categoria */}
           <div className="space-y-1">
-            <Label htmlFor="category-filter" className="text-xs text-muted-foreground">
-              Categoria
-            </Label>
+            <Label htmlFor="category-filter" className="text-xs description-text">
+          Categoria
+        </Label>
             <Select value={selectedCategory} onValueChange={onCategoryChange}>
               <SelectTrigger className="h-8">
                 <SelectValue placeholder="Todas as categorias" />
@@ -80,9 +80,9 @@ export const FilterControls = ({
 
           {/* Filtro de Data Inicial */}
           <div className="space-y-1">
-            <Label htmlFor="start-date" className="text-xs text-muted-foreground">
-              Data Inicial
-            </Label>
+            <Label htmlFor="start-date" className="text-xs description-text">
+          Data Inicial
+        </Label>
             <div className="relative">
               <Input
                 id="start-date"
@@ -91,15 +91,15 @@ export const FilterControls = ({
                 onChange={(e) => onStartDateChange(e.target.value)}
                 className="h-8 pr-8"
               />
-              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
             </div>
           </div>
 
           {/* Filtro de Data Final */}
           <div className="space-y-1">
-            <Label htmlFor="end-date" className="text-xs text-muted-foreground">
-              Data Final
-            </Label>
+            <Label htmlFor="end-date" className="text-xs description-text">
+          Data Final
+        </Label>
             <div className="relative">
               <Input
                 id="end-date"
@@ -108,7 +108,7 @@ export const FilterControls = ({
                 onChange={(e) => onEndDateChange(e.target.value)}
                 className="h-8 pr-8"
               />
-              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
             </div>
           </div>
         </div>

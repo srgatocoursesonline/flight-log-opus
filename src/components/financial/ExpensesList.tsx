@@ -227,10 +227,10 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
         hasActiveFilters={hasActiveFilters}
       />
       
-      <Card className="hud-display">
+      <Card className="hud-display stats-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Receipt className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-xs font-medium">
+            <Receipt className="h-4 w-4 text-primary icon-hover" />
             Despesas Registradas ({filteredExpenses.length}{expenses.length !== filteredExpenses.length ? ` de ${expenses.length}` : ''})
           </CardTitle>
         </CardHeader>
@@ -242,26 +242,26 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
               return (
                 <div 
                   key={expense.id} 
-                  className="flight-item p-4 border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                  className="flight-item p-2 border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">{categoryInfo.icon}</div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="text-sm">{categoryInfo.icon}</div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-foreground truncate text-sm" title={expense.description}>
+                          <h4 className="font-medium text-foreground truncate text-xs" title={expense.description}>
                             {expense.description}
                           </h4>
-                          <Badge variant={getStatusColor(expense.amount)} className="text-xs">
+                          <Badge variant={getStatusColor(expense.amount)} className="text-xs px-1 py-0 text-[10px]">
                             {categoryInfo.name}
                           </Badge>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="truncate" title={`Data: ${formatDate(expense.date)}`}>📅 {formatDate(expense.date)}</span>
-                          <span className="font-mono font-bold text-foreground truncate" title={`Valor: -${formatCR(expense.amount)} CR`}>
+                          <span className="expense-amount truncate" title={`Valor: -${formatCR(expense.amount)} CR`}>
                             -{formatCR(expense.amount)} CR
                           </span>
                         </div>

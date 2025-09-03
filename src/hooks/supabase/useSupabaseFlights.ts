@@ -242,20 +242,54 @@ export const useSupabaseFlights = () => {
       if (updates.originAirportInfo !== undefined) dbUpdates.origin_airport_info = updates.originAirportInfo ? JSON.stringify(updates.originAirportInfo) : null;
       if (updates.destinationAirportInfo !== undefined) dbUpdates.destination_airport_info = updates.destinationAirportInfo ? JSON.stringify(updates.destinationAirportInfo) : null;
 
-      const { error } = await supabase
+      const { data: flightData, error } = await supabase
+        .from('flights')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching flight data:', error);
+        toast.error('Erro ao buscar dados do voo');
+        return;
+      }
+
+      const previousStatus = flightData.status;
+      // Verificar se o status está mudando para "Concluído"
+      const isStatusChangingToCompleted = updates.status === 'Concluído' && previousStatus !== 'Concluído';
+
+      const { error: updateError } = await supabase
         .from('flights')
         .update(dbUpdates)
         .eq('id', id)
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error updating flight:', error);
+      if (updateError) {
+        console.error('Error updating flight:', updateError);
         toast.error('Erro ao atualizar voo');
         return;
       }
 
       // Refresh data to ensure consistency
       await fetchFlights();
+
+      // Emitir evento customizado quando o status muda para "Concluído"
+      if (isStatusChangingToCompleted) {
+        try {
+          window.dispatchEvent(new CustomEvent('flightCompleted', {
+            detail: {
+              flightId: id,
+              flightTime: updates.flightTime || flightData.flight_time,
+              userId: user.id
+            }
+          }));
+        } catch (eventError) {
+          console.error('Erro ao emitir evento flightCompleted:', eventError);
+          // Fallback: Forçar atualização do perfil
+          window.dispatchEvent(new CustomEvent('refreshProfile'));
+        }
+      }
 
       toast.success('Voo atualizado com sucesso!');
     } catch (error) {

@@ -68,16 +68,12 @@ export const EnvDebug = () => {
       // Importar o cliente Supabase
       const { supabase } = await import('@/lib/supabase');
       
-      console.log('Cliente Supabase importado:', supabase);
-      
       // Testar autenticação
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         throw new Error(`Erro de sessão: ${sessionError.message}`);
       }
-      
-      console.log('Sessão obtida:', sessionData);
       
       // Testar consulta ao banco
       const { data, error } = await supabase
@@ -89,8 +85,6 @@ export const EnvDebug = () => {
         throw new Error(`Erro de banco: ${error.message}`);
       }
       
-      console.log('Dados do banco obtidos:', data);
-      
       setConnectionStatus({
         success: true,
         data: {
@@ -100,7 +94,6 @@ export const EnvDebug = () => {
       });
       
     } catch (error: any) {
-      console.error('Erro no teste de conexão:', error);
       setConnectionStatus({
         success: false,
         error: error.message
@@ -137,7 +130,7 @@ export const EnvDebug = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto px-6 pt-8 pb-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
@@ -285,5 +278,3 @@ export const EnvDebug = () => {
     </div>
   );
 };
-
-export default EnvDebug;

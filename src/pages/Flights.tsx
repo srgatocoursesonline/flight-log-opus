@@ -168,11 +168,11 @@ const Flights = () => {
     );
   }
   return (
-    <div className="space-y-6 pb-20 lg:pb-6">
+    <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 fade-in">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight gradient-title">
+          <h1 className="mobile-title gradient-title">
             {t('flights.title')}
           </h1>
           <p className="text-muted-foreground">
@@ -192,7 +192,7 @@ const Flights = () => {
       <FlightStats />
 
       {/* Filtros e Busca */}
-      <div className="flex flex-col lg:flex-row gap-4 fade-in" style={{ animationDelay: '0.1s' }}>
+      <div className="flex flex-col lg:flex-row gap-2 fade-in" style={{ animationDelay: '0.1s' }}>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -204,7 +204,7 @@ const Flights = () => {
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-1 lg:gap-2">
           {/* Toggle de Sessões Rastreadas */}
           <Button
             variant={showSessions ? 'default' : 'outline'}
@@ -282,7 +282,7 @@ const Flights = () => {
       {filteredAndSortedFlights.length === 0 && filteredAndSortedSessions.length === 0 ? (
         <div className="hud-display stats-card p-6 fade-in" style={{ animationDelay: '0.2s' }}>
           <div className="text-center py-12">
-            <Plane className="h-12 w-12 text-muted-foreground mx-auto mb-4 icon-hover" />
+            <Plane className="h-12 w-12 text-blue-600 mx-auto mb-4 icon-hover" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {flights.length === 0 && sessions.length === 0 ? t('flights.noFlights') : 'Nenhum voo encontrado'}
             </h3>

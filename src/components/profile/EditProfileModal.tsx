@@ -20,8 +20,8 @@ interface EditProfileModalProps {
   profileData?: {
     display_name: string;
     avatar_url?: string;
-    total_flights: number;
-    total_hours: number;
+    initial_flights: number;    // Mudança: usar initial_flights
+    initial_minutes: number;    // Mudança: initial_hours -> initial_minutes
     career_started?: string;
     achievements?: string;
     perfect_flights?: number;
@@ -39,11 +39,23 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
   // Sincronização automática do career_rating com lucro líquido
   const { currentNetProfit } = useProfileFinancialSync();
 
-  const [formData, setFormData] = useState({
+  // Definindo tipos para o estado
+  type FormData = {
+    display_name: string;
+    avatar_url: string;
+    initial_flights: number;
+    initial_minutes: number;
+    career_started: string;
+    achievements: string;
+    perfect_flights: number;
+    description: string;
+  };
+
+  const [formData, setFormData] = useState<FormData>({
     display_name: profileData?.display_name || "Cmdte. Rodrigo",
     avatar_url: profileData?.avatar_url || "",
-    initial_flights: profileData?.total_flights || 0,
-    initial_hours: profileData?.total_hours || 0,
+    initial_flights: profileData?.initial_flights || 0,
+    initial_minutes: profileData?.initial_minutes || 0,
     career_started: profileData?.career_started || new Date().toISOString().split('T')[0],
     achievements: profileData?.achievements || "",
     perfect_flights: profileData?.perfect_flights || 0,
@@ -56,21 +68,21 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
     netProfit: 0
   });
 
-  // Atualizar formData quando profileData mudar
+  // Atualizar formData apenas quando o modal abre pela primeira vez
   useEffect(() => {
     if (profileData && isOpen) {
       setFormData({
         display_name: profileData.display_name || "Cmdte. Rodrigo",
         avatar_url: profileData.avatar_url || "",
-        initial_flights: profileData.total_flights || 0,
-        initial_hours: profileData.total_hours || 0,
+        initial_flights: profileData.initial_flights || 0,
+        initial_minutes: profileData.initial_minutes || 0,
         career_started: profileData.career_started || new Date().toISOString().split('T')[0],
         achievements: profileData.achievements || "",
         perfect_flights: profileData.perfect_flights || 0,
         description: profileData.description || ""
       });
     }
-  }, [profileData, isOpen]); // Adicionar isOpen como dependência
+  }, [isOpen]); // Remover profileData das dependências para evitar sobrescrever durante edição
 
   // Carregar estatísticas financeiras apenas quando o modal abrir
   useEffect(() => {
@@ -79,7 +91,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         const stats = getFinancialStats(); // getFinancialStats não aceita parâmetros
         setFinancialStats(stats);
       } catch (error) {
-        console.error('Erro ao carregar estatísticas financeiras:', error);
+        // Error handling without console.log
       }
     }
   }, [isOpen, user?.id, getFinancialStats]); // Manter getFinancialStats nas dependências
@@ -122,7 +134,6 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         description: "Avatar atualizado com sucesso",
       });
     } catch (error) {
-      console.error('Erro ao fazer upload do avatar:', error);
       toast({
         title: "Erro",
         description: "Erro ao fazer upload do avatar",
@@ -139,8 +150,8 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       await updateProfile({
         display_name: formData.display_name,
         avatar_url: formData.avatar_url,
-        total_flights: formData.initial_flights,
-        total_hours: formData.initial_hours,
+        initial_flights: formData.initial_flights,
+        initial_minutes: formData.initial_minutes, // Manter em minutos
         career_started: formData.career_started,
         achievements: formData.achievements,
         perfect_flights: formData.perfect_flights,
@@ -155,7 +166,6 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       
       onClose();
     } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
       toast({
         title: "Erro",
         description: "Erro ao atualizar perfil",
@@ -244,9 +254,13 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                 id="initial_flights"
                 type="number"
                 min="0"
-                value={formData.initial_flights}
-                onChange={(e) => setFormData(prev => ({ ...prev, initial_flights: parseInt(e.target.value) || 0 }))}
-                placeholder="127"
+                value={formData.initial_flights || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numValue = value === "" ? 0 : Number(value);
+                  setFormData(prev => ({ ...prev, initial_flights: numValue }));
+                }}
+                placeholder="Ex: 127"
               />
               <p className="text-xs text-muted-foreground">
                 Novos voos serão somados a este valor automaticamente
@@ -254,17 +268,23 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="initial_hours">Horas Iniciais (Histórico)</Label>
+              <Label htmlFor="initial_minutes">Horas de Voo Iniciais</Label>
               <Input
-                id="initial_hours"
+                id="initial_minutes"
                 type="number"
                 min="0"
-                value={formData.initial_hours}
-                onChange={(e) => setFormData(prev => ({ ...prev, initial_hours: parseInt(e.target.value) || 0 }))}
-                placeholder="348"
+                step="0.1"
+                value={formData.initial_minutes ? (formData.initial_minutes / 60).toFixed(1) : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const hoursValue = value === "" ? 0 : Number(value);
+                  const minutesValue = Math.round(hoursValue * 60);
+                  setFormData(prev => ({ ...prev, initial_minutes: minutesValue }));
+                }}
+                placeholder="Ex: 200.5 (horas)"
               />
               <p className="text-xs text-muted-foreground">
-                Novas horas serão somadas a este valor automaticamente
+                Novas horas de voo serão somadas a este valor automaticamente
               </p>
             </div>
           </div>
@@ -295,8 +315,12 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                   id="perfect_flights"
                   type="number"
                   min="0"
-                  value={formData.perfect_flights}
-                  onChange={(e) => setFormData(prev => ({ ...prev, perfect_flights: parseInt(e.target.value) || 0 }))}
+                  value={formData.perfect_flights || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numValue = value === "" ? 0 : Number(value);
+                    setFormData(prev => ({ ...prev, perfect_flights: numValue }));
+                  }}
                   placeholder="42"
                 />
               </div>
@@ -325,11 +349,11 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between">
                 <span>Total de Voos:</span>
-                <span className="font-mono">{formData.initial_flights + financialStats.flightStats.totalFlights}</span>
+                <span className="font-mono">{formData.initial_flights} voos de histórico</span>
               </div>
               <div className="flex justify-between">
                 <span>Total de Horas:</span>
-                <span className="font-mono">{formData.initial_hours + (financialStats.flightStats.totalFlightTime || 0)}h</span>
+                <span className="font-mono">{formData.initial_minutes}h</span>
               </div>
               <div className="flex justify-between">
                 <span>CR Atual:</span>

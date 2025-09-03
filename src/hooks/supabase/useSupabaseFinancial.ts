@@ -49,7 +49,7 @@ export const useSupabaseFinancial = () => {
 
 
       if (error) {
-        console.error('Error fetching transactions:', error);
+        // Removido o console.error para reduzir logs
         setError('Erro ao carregar transações financeiras');
         toast.error('Erro ao carregar transações financeiras');
         return;
@@ -60,7 +60,7 @@ export const useSupabaseFinancial = () => {
       const revenueTransactions: Transaction[] = [];
 
 
-      
+
       data.forEach(item => {
         const transaction: Transaction = {
           id: item.id,
@@ -81,7 +81,7 @@ export const useSupabaseFinancial = () => {
       setExpenses(expenseTransactions);
       setRevenues(revenueTransactions);
     } catch (error) {
-      console.error('Error in fetchTransactions:', error);
+      // Removido o console.error para reduzir logs
       setError('Erro ao conectar com o banco de dados');
       toast.error('Erro ao conectar com o banco de dados');
     } finally {
@@ -118,7 +118,7 @@ export const useSupabaseFinancial = () => {
         .single();
 
       if (error) {
-        console.error('Error adding revenue:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao adicionar receita');
         return;
       }
@@ -127,7 +127,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success(`Receita "${revenue.description}" adicionada com sucesso!`);
     } catch (error) {
-      console.error('Error in addRevenue:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao adicionar receita');
     }
   }, [user, fetchTransactions]);
@@ -160,7 +160,7 @@ export const useSupabaseFinancial = () => {
         .eq('transaction_type', 'revenue');
 
       if (error) {
-        console.error('Error updating revenue:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao atualizar receita');
         return;
       }
@@ -169,7 +169,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success('Receita atualizada com sucesso!');
     } catch (error) {
-      console.error('Error in updateRevenue:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao atualizar receita');
     }
   }, [user, fetchTransactions]);
@@ -190,7 +190,7 @@ export const useSupabaseFinancial = () => {
         .eq('transaction_type', 'revenue');
 
       if (error) {
-        console.error('Error deleting revenue:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao deletar receita');
         return;
       }
@@ -199,7 +199,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success('Receita deletada com sucesso!');
     } catch (error) {
-      console.error('Error in deleteRevenue:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao deletar receita');
     }
   }, [user, fetchTransactions]);
@@ -226,7 +226,7 @@ export const useSupabaseFinancial = () => {
         .single();
 
       if (error) {
-        console.error('Error adding expense:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao adicionar despesa');
         return;
       }
@@ -235,7 +235,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success(`Despesa "${expense.description}" adicionada com sucesso!`);
     } catch (error) {
-      console.error('Error in addExpense:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao adicionar despesa');
     }
   }, [user, fetchTransactions]);
@@ -268,7 +268,7 @@ export const useSupabaseFinancial = () => {
         .eq('transaction_type', 'expense');
 
       if (error) {
-        console.error('Error updating expense:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao atualizar despesa');
         return;
       }
@@ -277,7 +277,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success('Despesa atualizada com sucesso!');
     } catch (error) {
-      console.error('Error in updateExpense:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao atualizar despesa');
     }
   }, [user, fetchTransactions]);
@@ -298,7 +298,7 @@ export const useSupabaseFinancial = () => {
         .eq('transaction_type', 'expense');
 
       if (error) {
-        console.error('Error deleting expense:', error);
+        // Removido o console.error para reduzir logs
         toast.error('Erro ao deletar despesa');
         return;
       }
@@ -307,7 +307,7 @@ export const useSupabaseFinancial = () => {
       await fetchTransactions();
       toast.success('Despesa deletada com sucesso!');
     } catch (error) {
-      console.error('Error in deleteExpense:', error);
+      // Removido o console.error para reduzir logs
       toast.error('Erro ao deletar despesa');
     }
   }, [user, fetchTransactions]);

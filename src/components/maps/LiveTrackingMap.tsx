@@ -121,6 +121,64 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
   };
 
   // ============================================
+  // MESSAGE HANDLING
+  // ============================================
+
+  const handleWebSocketMessage = useCallback((message: WebSocketMessage) => {
+    switch (message.type) {
+      case 'auth_success':
+        console.log('✅ Autenticação bem-sucedida');
+        toast.success('Dispositivo autenticado');
+        break;
+        
+      case 'auth_error':
+        console.error('❌ Erro de autenticação:', message.message);
+        toast.error('Erro de autenticação: ' + message.message);
+        break;
+        
+      case 'flight_started':
+        console.log('🛫 Voo iniciado:', message.data);
+        setCurrentSession(message.data);
+        setFlightPath([]);
+        toast.success('Voo iniciado: ' + message.data.aircraft);
+        break;
+        
+      case 'flight_ended':
+        console.log('🛬 Voo finalizado:', message.data);
+        setCurrentSession(null);
+        toast.info('Voo finalizado');
+        break;
+        
+      case 'flight_data': {
+        const flightData = message.data as FlightPoint;
+        setCurrentPosition(flightData);
+        
+        // Adicionar ponto ao caminho do voo
+        setFlightPath(prev => {
+          const newPath = [...prev, [flightData.latitude, flightData.longitude] as [number, number]];
+          // Manter apenas os últimos 500 pontos para performance
+          return newPath.slice(-500);
+        });
+        
+        // Seguir aeronave no mapa se habilitado
+        if (followAircraft && mapRef.current) {
+          mapRef.current.setView([flightData.latitude, flightData.longitude], mapRef.current.getZoom());
+        }
+        break;
+      }
+        
+      case 'error':
+        console.error('❌ Erro do servidor:', message.message);
+        toast.error('Erro: ' + message.message);
+        break;
+        
+      case 'pong':
+        // Resposta ao ping - manter conexão viva
+        break;
+    }
+  }, [followAircraft]);
+
+  // ============================================
   // WEBSOCKET CONNECTION
   // ============================================
 
@@ -185,64 +243,6 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
       wsRef.current = null;
     }
     setIsConnected(false);
-  };
-
-  // ============================================
-  // MESSAGE HANDLING
-  // ============================================
-
-  const handleWebSocketMessage = (message: WebSocketMessage) => {
-    switch (message.type) {
-      case 'auth_success':
-        console.log('✅ Autenticação bem-sucedida');
-        toast.success('Dispositivo autenticado');
-        break;
-        
-      case 'auth_error':
-        console.error('❌ Erro de autenticação:', message.message);
-        toast.error('Erro de autenticação: ' + message.message);
-        break;
-        
-      case 'flight_started':
-        console.log('🛫 Voo iniciado:', message.data);
-        setCurrentSession(message.data);
-        setFlightPath([]);
-        toast.success('Voo iniciado: ' + message.data.aircraft);
-        break;
-        
-      case 'flight_ended':
-        console.log('🛬 Voo finalizado:', message.data);
-        setCurrentSession(null);
-        toast.info('Voo finalizado');
-        break;
-        
-      case 'flight_data': {
-        const flightData = message.data as FlightPoint;
-        setCurrentPosition(flightData);
-        
-        // Adicionar ponto ao caminho do voo
-        setFlightPath(prev => {
-          const newPath = [...prev, [flightData.latitude, flightData.longitude] as [number, number]];
-          // Manter apenas os últimos 500 pontos para performance
-          return newPath.slice(-500);
-        });
-        
-        // Seguir aeronave no mapa se habilitado
-        if (followAircraft && mapRef.current) {
-          mapRef.current.setView([flightData.latitude, flightData.longitude], mapRef.current.getZoom());
-        }
-        break;
-      }
-        
-      case 'error':
-        console.error('❌ Erro do servidor:', message.message);
-        toast.error('Erro: ' + message.message);
-        break;
-        
-      case 'pong':
-        // Resposta ao ping - manter conexão viva
-        break;
-    }
   };
 
   // ============================================

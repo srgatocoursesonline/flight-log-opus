@@ -143,11 +143,11 @@ export const MSFSFlights = ({
       {showHeader && (
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Plane className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plane className="h-4 w-4" />
               Voos MSFS 2024
               {stats && (
-                <Badge variant="secondary" className="ml-2">
+                <Badge variant="secondary" className="ml-2 text-xs">
                   {stats.totalFlights} voos
                 </Badge>
               )}
@@ -200,28 +200,28 @@ export const MSFSFlights = ({
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-lg font-bold text-primary">
                   {stats.totalFlights}
                 </div>
-                <div className="text-sm text-muted-foreground">Voos</div>
+                <div className="text-xs text-muted-foreground">Voos</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-lg font-bold text-primary">
                   {formatFlightTime(stats.totalFlightTime)}
                 </div>
-                <div className="text-sm text-muted-foreground">Tempo Total</div>
+                <div className="text-xs text-muted-foreground">Tempo Total</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-lg font-bold text-primary">
                   {Math.round(stats.totalDistance)} NM
                 </div>
-                <div className="text-sm text-muted-foreground">Distância</div>
+                <div className="text-xs text-muted-foreground">Distância</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-lg font-bold text-primary">
                   {stats.mostUsedAircraft || 'N/A'}
                 </div>
-                <div className="text-sm text-muted-foreground">Aeronave Favorita</div>
+                <div className="text-xs text-muted-foreground">Aeronave Favorita</div>
               </div>
             </div>
           )}
@@ -230,11 +230,11 @@ export const MSFSFlights = ({
       <CardContent>
         {displayFlights.length === 0 ? (
           <div className="text-center py-8">
-            <Plane className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-4">
+            <Plane className="h-8 w-8 mx-auto text-blue-600 mb-3" />
+            <p className="text-sm text-muted-foreground mb-3">
               Nenhum voo do MSFS encontrado
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Inicie o serviço companheiro para começar a registrar seus voos automaticamente.
             </p>
           </div>
@@ -245,42 +245,42 @@ export const MSFSFlights = ({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline" className="font-mono">
+                      <Badge variant="outline" className="font-mono text-xs">
                         {flight.aircraft_type}
                       </Badge>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {formatDateTime(flight.departure_time)}
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-mono font-semibold">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                        <span className="font-mono font-semibold text-sm">
                           {flight.departure_icao}
                         </span>
-                        <span className="text-muted-foreground">→</span>
-                        <span className="font-mono font-semibold">
+                        <span className="text-muted-foreground text-sm">→</span>
+                        <span className="font-mono font-semibold text-sm">
                           {flight.arrival_icao}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Clock className="h-4 w-4 text-blue-600" />
                         <span>{formatFlightTime(flight.flight_time_minutes)}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <MapPin className="h-4 w-4 text-blue-600" />
                         <span>{Math.round(flight.distance_nm)} NM</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Mountain className="h-4 w-4 text-muted-foreground" />
+                        <Mountain className="h-4 w-4 text-blue-600" />
                         <span>{Math.round(flight.max_altitude_ft).toLocaleString()} ft</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Gauge className="h-4 w-4 text-muted-foreground" />
+                        <Gauge className="h-4 w-4 text-blue-600" />
                         <span>{Math.round(flight.max_speed_kts)} kts</span>
                       </div>
                     </div>
