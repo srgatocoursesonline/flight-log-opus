@@ -1,4 +1,4 @@
-import { Trophy, AlertCircle } from 'lucide-react';
+import { Trophy, AlertCircle, Edit3, Save, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useSupabaseCareerManager } from '@/hooks/supabase/useSupabaseCareerManager';
@@ -6,15 +6,34 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useProfileFinancialSync } from '@/hooks/useProfileFinancialSync';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 export function CareerRatingCard() {
-  const { careerData, isLoading, refresh } = useSupabaseCareerManager();
+  const { careerData, isLoading, refresh, updateCareerData } = useSupabaseCareerManager();
   const [showReminder, setShowReminder] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    totalRating: 0,
+    level: 1,
+    careerClass: 'D' as 'S' | 'A' | 'B' | 'C' | 'D'
+  });
   const navigate = useNavigate();
   
   // Sincronização automática do career_rating com lucro líquido
   useProfileFinancialSync();
 
+  // Sincronizar dados de edição quando careerData muda
+  useEffect(() => {
+    if (careerData) {
+      setEditData({
+        totalRating: careerData.totalRating,
+        level: careerData.level,
+        careerClass: careerData.careerClass
+      });
+    }
+  }, [careerData]);
   
   // Verificar se o lembrete deve ser exibido (baseado em localStorage)
   useEffect(() => {
@@ -37,6 +56,39 @@ export function CareerRatingCard() {
       const event = new CustomEvent('openCareerSection');
       window.dispatchEvent(event);
     }, 100);
+  };
+
+  const startEditing = () => {
+    if (careerData) {
+      setEditData({
+        totalRating: careerData.totalRating,
+        level: careerData.level,
+        careerClass: careerData.careerClass
+      });
+    }
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    if (careerData) {
+      setEditData({
+        totalRating: careerData.totalRating,
+        level: careerData.level,
+        careerClass: careerData.careerClass
+      });
+    }
+  };
+
+  const saveChanges = async () => {
+    try {
+      await updateCareerData(editData);
+      setIsEditing(false);
+      toast.success('Dados de carreira atualizados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+      toast.error('Erro ao salvar os dados');
+    }
   };
 
   const getClassColor = (careerClass: string) => {
@@ -88,29 +140,111 @@ export function CareerRatingCard() {
     <div className="mobile-card hud-display stats-card relative overflow-hidden">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <p className="mobile-card-title text-readable-muted uppercase tracking-wider">
-            Rating de Carreira
-          </p>
-          <div className="mt-1 flex items-baseline gap-2">
-            <p className="mobile-value text-yellow-700 dark:text-yellow-400 font-mono">
-              {isLoading ? '...' : (careerData?.totalRating?.toLocaleString() || '0')}
+          <div className="flex items-center justify-between mb-2">
+            <p className="mobile-card-title text-readable-muted uppercase tracking-wider">
+              Rating de Carreira
             </p>
-            <span className="mobile-trend text-success">
-              +5.2%
-            </span>
+            {!isEditing && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={startEditing}
+                className="h-6 w-6 p-0 hover:bg-primary/10"
+                title="Editar CR, Nível e Classe"
+              >
+                <Edit3 className="h-3 w-3" />
+              </Button>
+            )}
           </div>
-          {careerData && (
-            <p className="mobile-card-subtitle text-readable-muted mt-1">
-              Classe {careerData.careerClass} • Nível {careerData.level}
-            </p>
+          
+          {isEditing ? (
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-readable-muted mb-1 block">Rating Total</label>
+                <Input
+                  type="number"
+                  value={editData.totalRating}
+                  onChange={(e) => setEditData(prev => ({ ...prev, totalRating: parseInt(e.target.value) || 0 }))}
+                  className="h-8 text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-readable-muted mb-1 block">Nível</label>
+                  <Input
+                    type="number"
+                    value={editData.level}
+                    onChange={(e) => setEditData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
+                    className="h-8 text-sm"
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-readable-muted mb-1 block">Classe</label>
+                  <Select
+                    value={editData.careerClass}
+                    onValueChange={(value: 'S' | 'A' | 'B' | 'C' | 'D') => setEditData(prev => ({ ...prev, careerClass: value }))}
+                  >
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="S">Classe S (Elite)</SelectItem>
+                      <SelectItem value="A">Classe A (Especialista)</SelectItem>
+                      <SelectItem value="B">Classe B (Profissional)</SelectItem>
+                      <SelectItem value="C">Classe C (Experiente)</SelectItem>
+                      <SelectItem value="D">Classe D (Iniciante)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  size="sm"
+                  onClick={saveChanges}
+                  className="h-7 px-3 text-xs"
+                  disabled={isLoading}
+                >
+                  <Save className="h-3 w-3 mr-1" />
+                  Salvar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelEditing}
+                  className="h-7 px-3 text-xs"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mt-1 flex items-baseline gap-2">
+                <p className="mobile-value text-yellow-700 dark:text-yellow-400 font-mono">
+                  {isLoading ? '...' : (careerData?.totalRating?.toLocaleString() || '0')}
+                </p>
+                <span className="mobile-trend text-success">
+                  +5.2%
+                </span>
+              </div>
+              {careerData && (
+                <p className="mobile-card-subtitle text-readable-muted mt-1">
+                  Classe {careerData.careerClass} • Nível {careerData.level}
+                </p>
+              )}
+            </>
           )}
         </div>
         
-        <div className="mobile-icon-container rounded-lg bg-primary/10 icon-hover flex-shrink-0">
-          <div className="text-primary">
-            <Trophy className="h-6 w-6" />
+        {!isEditing && (
+          <div className="mobile-icon-container rounded-lg bg-primary/10 icon-hover flex-shrink-0">
+            <div className="text-primary">
+              <Trophy className="h-6 w-6" />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       
       {/* HUD-style corner decorations */}
