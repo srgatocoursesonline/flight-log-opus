@@ -317,17 +317,12 @@ export const Navigation = () => {
       <div className="lg:hidden">
         {/* Mobile Drawer */}
         <MobileDrawer 
-          isOpen={isDrawerOpen} 
-          onClose={() => setIsDrawerOpen(false)}
-          menuStructure={menuStructure}
-          currentPath={location.pathname}
-          onNavigate={handleNavClick}
-          loadingPath={loadingPath}
+          open={isDrawerOpen} 
+          onOpenChange={setIsDrawerOpen}
         />
 
         {/* Mobile Bottom Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <nav className="glass-panel border-t border-border/50">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-border/50">
             <div className="flex items-center justify-around py-2 px-4">
               {/* 4 atalhos principais */}
               {getBottomBarItems().map((item) => {
@@ -379,7 +374,6 @@ export const Navigation = () => {
               </Button>
             </div>
           </nav>
-        </div>
       </div>
     </>
   );

@@ -92,7 +92,7 @@ export function CareerRatingCard() {
             Rating de Carreira
           </p>
           <div className="mt-1 flex items-baseline gap-2">
-            <p className="mobile-value text-yellow-600 font-mono">
+            <p className="mobile-value text-yellow-700 dark:text-yellow-400 font-mono">
               {isLoading ? '...' : (careerData?.totalRating?.toLocaleString() || '0')}
             </p>
             <span className="mobile-trend text-success">

@@ -203,25 +203,25 @@ export const MSFSFlights = ({
                 <div className="text-lg font-bold text-primary">
                   {stats.totalFlights}
                 </div>
-                <div className="text-xs text-muted-foreground">Voos</div>
+                <div className="text-xs text-readable-muted">Voos</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {formatFlightTime(stats.totalFlightTime)}
                 </div>
-                <div className="text-xs text-muted-foreground">Tempo Total</div>
+                <div className="text-xs text-readable-muted">Tempo Total</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {Math.round(stats.totalDistance)} NM
                 </div>
-                <div className="text-xs text-muted-foreground">Distância</div>
+                <div className="text-xs text-readable-muted">Distância</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {stats.mostUsedAircraft || 'N/A'}
                 </div>
-                <div className="text-xs text-muted-foreground">Aeronave Favorita</div>
+                <div className="text-xs text-readable-muted">Aeronave Favorita</div>
               </div>
             </div>
           )}
@@ -231,10 +231,10 @@ export const MSFSFlights = ({
         {displayFlights.length === 0 ? (
           <div className="text-center py-8">
             <Plane className="h-8 w-8 mx-auto text-blue-600 mb-3" />
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-readable-muted mb-3">
               Nenhum voo do MSFS encontrado
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-readable-muted">
               Inicie o serviço companheiro para começar a registrar seus voos automaticamente.
             </p>
           </div>
@@ -248,7 +248,7 @@ export const MSFSFlights = ({
                       <Badge variant="outline" className="font-mono text-xs">
                         {flight.aircraft_type}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-readable-muted">
                         {formatDateTime(flight.departure_time)}
                       </span>
                     </div>
@@ -259,7 +259,7 @@ export const MSFSFlights = ({
                         <span className="font-mono font-semibold text-sm">
                           {flight.departure_icao}
                         </span>
-                        <span className="text-muted-foreground text-sm">→</span>
+                        <span className="text-readable-muted text-sm">→</span>
                         <span className="font-mono font-semibold text-sm">
                           {flight.arrival_icao}
                         </span>

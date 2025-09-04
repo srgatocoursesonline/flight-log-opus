@@ -177,8 +177,8 @@ const Profile = () => {
             <p className="text-sm text-muted-foreground mb-4">{profile?.description || t('profile.professionalPilot')}</p>
             
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Star className="h-4 w-4 text-accent fill-current" />
-              <span className="font-bold text-accent font-mono">CR {stats?.dynamicCR?.toLocaleString('pt-BR') || '0'}</span>
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-400" />
+              <span className="font-bold text-green-500 font-mono">CR {stats?.dynamicCR?.toLocaleString('pt-BR') || '0'}</span>
             </div>
             
             <div className="grid grid-cols-2 gap-4 text-center">

@@ -51,7 +51,7 @@ const Index = () => {
               subtitle={t('dashboard.thisMonth', { count: Math.floor(stats.totalFlights * 0.15) })}
               icon={<Plane className="h-6 w-6" />}
               trend={{ value: 12.3, isPositive: true }}
-              valueColor="text-white"
+              valueColor="text-gray-900 dark:text-white"
             />
           </div>
           <div className="mobile-slide-up" style={{animationDelay: '200ms'}}>
@@ -61,7 +61,7 @@ const Index = () => {
               subtitle={t('dashboard.last30Days')}
               icon={<Clock className="h-6 w-6 text-blue-600" />}
               trend={{ value: 8.1, isPositive: true }}
-              valueColor="text-white"
+              valueColor="text-gray-900 dark:text-white"
             />
           </div>
           <div className="mobile-slide-up" style={{animationDelay: '300ms'}}>

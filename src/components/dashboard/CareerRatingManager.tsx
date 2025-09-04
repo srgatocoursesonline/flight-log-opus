@@ -156,7 +156,7 @@ export const CareerRatingManager = () => {
       case 'B': return 'bg-green-500/20 text-green-500 border-green-500/30';
       case 'C': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
       case 'D': return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
-      default: return 'bg-muted/30 text-muted-foreground border-muted/50';
+      default: return 'bg-muted/30 text-readable-muted border-muted/50';
     }
   };
 
@@ -276,7 +276,7 @@ export const CareerRatingManager = () => {
             <div className="flex items-center justify-between px-4 py-3 bg-muted/20 rounded-lg">
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">Status Atual:</span>
+                <span className="text-sm text-readable-muted">Status Atual:</span>
                 <span className="text-sm font-medium">
                   Nível {careerData.level}
                 </span>
@@ -285,7 +285,7 @@ export const CareerRatingManager = () => {
                 </Badge>
               </div>
               {careerData.lastUpdated && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-readable-muted">
                   Última atualização: {formatDate(careerData.lastUpdated)}
                 </span>
               )}

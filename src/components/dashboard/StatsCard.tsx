@@ -31,7 +31,7 @@ export const StatsCard = ({
             {title}
           </p>
           <div className="mt-1 flex items-baseline gap-2">
-            <p className={cn("mobile-value font-mono", valueColor || "text-green-500")}>
+            <p className={cn("mobile-value font-mono", valueColor || "text-green-600 dark:text-green-400")}>
               {value}
             </p>
             {trend && (
