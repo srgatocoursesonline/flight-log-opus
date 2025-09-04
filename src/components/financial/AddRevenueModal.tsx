@@ -159,13 +159,17 @@ export const AddRevenueModal = forwardRef<AddRevenueModalRef, AddRevenueModalPro
     };
 
     try {
-      if (revenue) {
+      // Only update if we have a revenue AND no initialValues (not a clone)
+      const isEditing = revenue && !initialValues;
+      
+      if (isEditing) {
         await updateRevenue(revenue.id, revenueData);
         toast({
           title: "Sucesso!",
           description: "Receita atualizada com sucesso",
         });
       } else {
+        // Always create new revenue for clones or new entries
         await addRevenue(revenueData);
         toast({
           title: "Sucesso!",

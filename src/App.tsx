@@ -25,6 +25,7 @@ import FlightMaps from "./pages/FlightMaps";
 import Maintenance from "./pages/Maintenance";
 import Purchases from "./pages/Purchases";
 import FinancialReports from "./pages/FinancialReports";
+import Companies from "./pages/Companies";
 
 
 const queryClient = new QueryClient();
@@ -87,6 +88,7 @@ const AppContent = () => {
           <Route path="manutencao" element={<Maintenance />} />
           <Route path="compras" element={<Purchases />} />
           <Route path="relatorios-financeiros" element={<FinancialReports />} />
+          <Route path="companies" element={<Companies />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>

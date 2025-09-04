@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight, Trophy } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight, Trophy, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -10,6 +10,8 @@ import { RevenueCategoriesManager } from "@/components/financial/RevenueCategori
 import { FinancialSettingsManager } from "@/components/financial/FinancialSettingsManager";
 import { FlightConfigManager } from "@/components/flight/FlightConfigManager";
 import { CareerRatingManager } from "@/components/career/CareerRatingManager";
+import MaintenanceCategoriesManager from "@/components/maintenance/MaintenanceCategoriesManager";
+import MaintenanceItemsManager from "@/components/maintenance/MaintenanceItemsManager";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -19,6 +21,7 @@ const Settings = () => {
     notifications: false,
     financial: false,
     flight: false,
+    maintenance: false,
     career: false,
     app: false,
     data: false,
@@ -177,6 +180,42 @@ const Settings = () => {
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <FlightConfigManager />
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        {/* Seção: Configurações de Manutenção */}
+        <Collapsible open={openSections.maintenance} onOpenChange={() => toggleSection('maintenance')}>
+          <div className="hud-display stats-card settings-section fade-in" style={{ animationDelay: '0.35s' }}>
+            <CollapsibleTrigger className="w-full text-left settings-trigger rounded-lg">
+              <div className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-3">
+                  <Wrench className="h-6 w-6 text-primary icon-hover" />
+                  <h3 className="text-lg font-semibold text-foreground">{t('settings.maintenance.title')}</h3>
+                </div>
+                <div data-chevron>
+                  {openSections.maintenance ? (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform" />
+                  )}
+                </div>
+              </div>
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent className="settings-content">
+              <div className="px-6 pb-6 border-t border-border/50">
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-md font-medium text-foreground mb-4">{t('settings.maintenance.categories')}</h4>
+                    <MaintenanceCategoriesManager />
+                  </div>
+                  <div>
+                    <h4 className="text-md font-medium text-foreground mb-4">{t('settings.maintenance.items')}</h4>
+                    <MaintenanceItemsManager />
+                  </div>
+                </div>
               </div>
             </CollapsibleContent>
           </div>

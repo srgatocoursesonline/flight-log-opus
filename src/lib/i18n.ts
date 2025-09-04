@@ -24,7 +24,9 @@ const ptBR = {
       // Seções
       operational: "Operacional",
       financialSection: "Financeiro",
-      administrative: "Administrativo"
+      business: "Negócios",
+      administrative: "Administrativo",
+      companies: "Minhas Empresas"
     },
     
     // Dashboard
@@ -211,6 +213,12 @@ const ptBR = {
       },
       
       // Security section
+      maintenance: {
+        title: "Manutenção",
+        categories: "Categorias de Manutenção",
+        items: "Itens de Manutenção"
+      },
+      
       security: {
         title: "Segurança",
         currentPassword: "Senha Atual",
@@ -365,6 +373,37 @@ const ptBR = {
       signOutSuccess: "Logout realizado com sucesso",
       signOutError: "Erro ao fazer logout",
       signingOut: "Saindo..."
+    },
+
+    // Companies Page
+    companies: {
+      title: "Minhas Empresas",
+      subtitle: "Gerencie e expanda seu portfólio de empresas de aviação.",
+      companiesOwned: "Empresas Adquiridas",
+      availableForPurchase: "Disponíveis para Compra",
+      pendingQualifications: "Qualificações Pendentes",
+      eligibleCompanies: "Empresas Elegíveis",
+      qualificationsPending: "Qualificações Pendentes",
+      owned: "Adquirida",
+      available: "Disponível",
+      locked: "Bloqueada",
+      purchase: "Comprar",
+      viewDetails: "Ver Detalhes",
+      unlockRequirements: "Requisitos para Desbloqueio",
+      specialization: "Especialização",
+      aircraft: "Aeronave",
+      // Company Types
+      touristFlight: "Voo Turístico",
+      parachuting: "Aviação de Paraquedismo",
+      cargoTransport: "Transporte de Carga",
+      passengerTransport: "Transporte de Passageiros",
+      charterService: "Serviço de Fretamento",
+      medevac: "Medevac",
+      agriculturalAviation: "Aviação Agrícola",
+      aerialAdvertising: "Publicidade Aérea",
+      firefighting: "Luta Aérea Contra Incêndios",
+      searchRescue: "Busca e Salvamento",
+      aerialConstruction: "Construção Aérea"
     }
   }
 };
@@ -388,10 +427,12 @@ const enUS = {
       profile: "Profile",
       settings: "Settings",
       more: "More",
-      // Sections
+      // Seções
       operational: "Operational",
       financialSection: "Financial",
-      administrative: "Administrative"
+      business: "Business",
+      administrative: "Administrative",
+      companies: "My Companies"
     },
     
     // Dashboard
@@ -573,6 +614,12 @@ const enUS = {
       },
       
       // Security section
+      maintenance: {
+        title: "Maintenance",
+        categories: "Maintenance Categories",
+        items: "Maintenance Items"
+      },
+      
       security: {
         title: "Security",
         currentPassword: "Current Password",
@@ -720,6 +767,37 @@ const enUS = {
       signOutSuccess: "Successfully signed out",
       signOutError: "Error signing out",
       signingOut: "Signing out..."
+    },
+
+    // Companies Page
+    companies: {
+      title: "My Companies",
+      subtitle: "Manage and expand your aviation business portfolio.",
+      companiesOwned: "Companies Owned",
+      availableForPurchase: "Available for Purchase",
+      pendingQualifications: "Pending Qualifications",
+      eligibleCompanies: "Eligible Companies",
+      qualificationsPending: "Qualifications Pending",
+      owned: "Owned",
+      available: "Available",
+      locked: "Locked",
+      purchase: "Purchase",
+      viewDetails: "View Details",
+      unlockRequirements: "Unlock Requirements",
+      specialization: "Specialization",
+      aircraft: "Aircraft",
+      // Company Types
+      touristFlight: "Tourist Flight",
+      parachuting: "Parachuting Aviation",
+      cargoTransport: "Cargo Transport",
+      passengerTransport: "Passenger Transport",
+      charterService: "Charter Service",
+      medevac: "Medevac",
+      agriculturalAviation: "Agricultural Aviation",
+      aerialAdvertising: "Aerial Advertising",
+      firefighting: "Aerial Firefighting",
+      searchRescue: "Search & Rescue",
+      aerialConstruction: "Aerial Construction"
     }
   }
 };

@@ -159,13 +159,17 @@ export const AddExpenseModal = forwardRef<AddExpenseModalRef, AddExpenseModalPro
     };
 
     try {
-      if (expense) {
+      // Only update if we have an expense AND no initialValues (not a clone)
+      const isEditing = expense && !initialValues;
+      
+      if (isEditing) {
         await updateExpense(expense.id, expenseData);
         toast({
           title: "Sucesso!",
           description: "Despesa atualizada com sucesso",
         });
       } else {
+        // Always create new expense for clones or new entries
         await addExpense(expenseData);
         toast({
           title: "Sucesso!",

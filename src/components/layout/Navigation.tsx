@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ChevronRight,
   MoreHorizontal,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
@@ -49,6 +50,13 @@ const menuStructure = {
         { to: "/financial", icon: DollarSign, labelKey: "navigation.financial" },
         { to: "/compras", icon: ShoppingCart, labelKey: "navigation.purchases" },
         { to: "/relatorios-financeiros", icon: BarChart3, labelKey: "navigation.financialReports" },
+      ],
+    },
+    {
+      key: "business",
+      labelKey: "navigation.business",
+      items: [
+        { to: "/companies", icon: Building2, labelKey: "navigation.companies" },
       ],
     },
     {
