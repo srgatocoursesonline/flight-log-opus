@@ -25,8 +25,10 @@ const ptBR = {
       operational: "Operacional",
       financialSection: "Financeiro",
       business: "Negócios",
+      tools: "Ferramentas Úteis",
       administrative: "Administrativo",
-      companies: "Minhas Empresas"
+      companies: "Minhas Empresas",
+      todCalculator: "Calculadora TOD"
     },
     
     // Dashboard
@@ -431,8 +433,10 @@ const enUS = {
       operational: "Operational",
       financialSection: "Financial",
       business: "Business",
+      tools: "Useful Tools",
       administrative: "Administrative",
-      companies: "My Companies"
+      companies: "My Companies",
+      todCalculator: "TOD Calculator"
     },
     
     // Dashboard

@@ -26,6 +26,7 @@ import Maintenance from "./pages/Maintenance";
 import Purchases from "./pages/Purchases";
 import FinancialReports from "./pages/FinancialReports";
 import Companies from "./pages/Companies";
+import TodCalculatorPage from "./pages/TodCalculator";
 
 
 const queryClient = new QueryClient();
@@ -89,6 +90,7 @@ const AppContent = () => {
           <Route path="compras" element={<Purchases />} />
           <Route path="relatorios-financeiros" element={<FinancialReports />} />
           <Route path="companies" element={<Companies />} />
+          <Route path="tod-calculator" element={<TodCalculatorPage />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>

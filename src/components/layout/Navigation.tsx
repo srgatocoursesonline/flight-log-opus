@@ -21,6 +21,7 @@ import {
   ChevronRight,
   MoreHorizontal,
   Building2,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
@@ -57,6 +58,13 @@ const menuStructure = {
       labelKey: "navigation.business",
       items: [
         { to: "/companies", icon: Building2, labelKey: "navigation.companies" },
+      ],
+    },
+    {
+      key: "tools",
+      labelKey: "navigation.tools",
+      items: [
+        { to: "/tod-calculator", icon: Calculator, labelKey: "navigation.todCalculator" },
       ],
     },
     {
