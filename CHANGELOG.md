@@ -4,6 +4,94 @@
 
 ---
 
+## 🚀 [v2.2.0] - 2025-01-28
+
+### ✨ **Novas Funcionalidades Principais**
+
+#### 🛠️ **Sistema de Manutenção de Aeronaves**
+- **Gestão Completa**: CRUD de itens de manutenção com categorias personalizáveis
+- **Agendamento**: Sistema de agendamento com prioridades e status
+- **Histórico**: Rastreamento completo de manutenções realizadas
+- **Estatísticas**: Dashboard com métricas de manutenção e custos
+- **Alertas**: Notificações de manutenções vencidas ou próximas
+
+#### 🎮 **Integração MSFS 2024**
+- **Companion App**: Aplicação companion para captura de dados em tempo real
+- **SimConnect**: Integração nativa com Microsoft Flight Simulator
+- **Sincronização Automática**: Importação automática de voos do MSFS
+- **Dashboard MSFS**: Página dedicada com estatísticas e histórico
+- **Tracking em Tempo Real**: Monitoramento de voo ao vivo
+
+#### 🗺️ **Sistema de Mapas e Rotas**
+- **Visualização de Rotas**: Mapas interativos com Leaflet
+- **Tracking ao Vivo**: Acompanhamento de voo em tempo real
+- **Histórico de Rotas**: Visualização de voos anteriores no mapa
+- **Waypoints**: Marcação de pontos de interesse e aeroportos
+- **Layers Customizáveis**: Diferentes camadas de visualização
+
+#### 🏢 **Sistema de Companhias**
+- **Gestão de Companhias**: CRUD completo para companhias aéreas
+- **Associação de Voos**: Vinculação de voos a companhias específicas
+- **Estatísticas por Companhia**: Métricas individuais de performance
+- **Ranking de Companhias**: Sistema de classificação e comparação
+
+#### 📊 **Sistema de Ranking e Conquistas**
+- **Ranking Global**: Classificação de pilotos por diferentes métricas
+- **Conquistas**: Sistema de badges e achievements
+- **Progressão de Carreira**: Níveis e classificações automáticas
+- **Comparações**: Análise comparativa entre pilotos
+
+### 🔧 **Melhorias Técnicas Avançadas**
+
+#### 🗄️ **Backend e Dados**
+- **Supabase Completo**: Migração completa para Supabase como backend
+- **Funções RPC**: Implementação de funções complexas no banco
+- **Políticas de Segurança**: RLS completo para todos os recursos
+- **Triggers Avançados**: Automação de cálculos e atualizações
+- **Views Otimizadas**: Consultas pré-processadas para performance
+
+#### 🔄 **Gerenciamento de Estado**
+- **TanStack Query**: Implementação completa para cache e sincronização
+- **Hooks Especializados**: Hooks de negócio para cada domínio
+- **Estado Global**: Contextos otimizados para dados compartilhados
+- **Invalidação Inteligente**: Cache invalidation automático
+
+#### 📈 **Sistema de Relatórios**
+- **Relatórios Financeiros**: Análises detalhadas de receitas e despesas
+- **Relatórios de Voo**: Estatísticas avançadas de performance
+- **Exportação**: Capacidade de exportar dados em diferentes formatos
+- **Dashboards Dinâmicos**: Visualizações interativas com Recharts
+
+#### 🔧 **Ferramentas de Debug**
+- **Diagnostic Page**: Página completa de diagnóstico do sistema
+- **Debug Components**: Componentes para teste de funcionalidades
+- **Environment Check**: Verificação de configurações e conexões
+- **Performance Monitor**: Monitoramento de performance em tempo real
+
+### 🌐 **Expansão de Funcionalidades**
+
+#### 📱 **Interface Aprimorada**
+- **22 Páginas Funcionais**: Expansão significativa da aplicação
+- **Componentes Especializados**: +50 novos componentes organizados por domínio
+- **Navegação Avançada**: Sistema de roteamento completo
+- **Responsividade Total**: Otimização para todos os dispositivos
+
+#### 🌍 **Internacionalização Expandida**
+- **Novos Termos**: +500 novas traduções PT/EN
+- **Contextos Específicos**: Traduções especializadas por funcionalidade
+- **Formatação Regional**: Suporte completo a diferentes locales
+
+### 📊 **Estatísticas da Versão v2.2.0**
+- **+50 Componentes** novos especializados
+- **+25 Hooks** de negócio e UI
+- **+10 Páginas** funcionais adicionais
+- **+500 Traduções** expandidas
+- **+15 Tabelas** no banco de dados
+- **+30 Funções RPC** implementadas
+- **100% Integração** MSFS 2024 funcional
+
+---
+
 ## 🚀 [v2.1.0] - 2025-01-27
 
 ### ✨ **Novas Funcionalidades**

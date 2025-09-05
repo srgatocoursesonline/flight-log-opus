@@ -57,13 +57,17 @@ npm run dev
 | Tecnologia | Versão | Propósito | Status |
 |------------|--------|-----------|--------|
 | **React** | 18.3.1 | 🚀 Biblioteca principal | ✅ Estável |
-| **TypeScript** | 5.6.2 | 🎯 Tipagem estática | ✅ Estável |
-| **Vite** | 6.0.1 | ⚡ Build tool ultra-rápido | ✅ Estável |
-| **Tailwind CSS** | 3.4.14 | 🎨 Framework CSS utilitário | ✅ Estável |
-| **Recharts** | 2.13.3 | 📊 Gráficos interativos | ✅ Estável |
-| **TanStack Query** | 5.62.2 | 🔄 Gerenciamento de estado | ✅ Estável |
-| **React Hook Form** | 7.54.0 | 📝 Formulários performáticos | ✅ Estável |
-| **Zod** | 3.24.1 | ✅ Validação de schemas | ✅ Estável |
+| **TypeScript** | 5.8.3 | 🎯 Tipagem estática | ✅ Estável |
+| **Vite** | 5.4.19 | ⚡ Build tool ultra-rápido | ✅ Estável |
+| **Tailwind CSS** | 3.4.17 | 🎨 Framework CSS utilitário | ✅ Estável |
+| **Recharts** | 2.15.4 | 📊 Gráficos interativos | ✅ Estável |
+| **TanStack Query** | 5.83.0 | 🔄 Gerenciamento de estado | ✅ Estável |
+| **React Hook Form** | 7.61.1 | 📝 Formulários performáticos | ✅ Estável |
+| **Zod** | 3.25.76 | ✅ Validação de schemas | ✅ Estável |
+| **Supabase** | 2.56.0 | 🗄️ Backend como serviço | ✅ Estável |
+| **React Router** | 6.30.1 | 🛣️ Roteamento SPA | ✅ Estável |
+| **Leaflet** | 1.9.4 | 🗺️ Mapas interativos | ✅ Estável |
+| **i18next** | 25.4.2 | 🌍 Internacionalização | ✅ Estável |
 
 ### 🎨 Design System
 
@@ -134,25 +138,88 @@ npm run dev
 - 🔔 **Notificações Inteligentes** - Alertas personalizáveis
 - 💼 **Categorias Financeiras** - Gerenciamento completo de receitas/despesas
 - ☁️ **Sincronização** - Backup automático e restauração de dados
+- ✈️ **Aeronaves Customizadas** - Cadastro de aeronaves com taxas horárias
+- 📊 **Status de Voo** - Status personalizados com multiplicadores de CR
+
+### 🛠️ Sistema de Manutenção
+
+> **Gestão completa de manutenção de aeronaves**
+
+- 🔧 **Registros Detalhados** - Histórico completo de manutenções
+- 📋 **Categorias Organizadas** - Motor, avionics, estrutura, sistemas
+- 👨‍🔧 **Controle de Mecânicos** - Registro de profissionais e licenças
+- 💰 **Custos de Manutenção** - Controle financeiro integrado
+- 📅 **Agendamento** - Próximas manutenções e intervalos
+- 🏷️ **Status e Prioridades** - Organização por urgência
+
+### 🎮 Integração MSFS 2024
+
+> **Conexão direta com Microsoft Flight Simulator**
+
+- 🔄 **Tracking Automático** - Voos detectados automaticamente
+- 📊 **Telemetria Completa** - Dados de voo em tempo real
+- 🗺️ **Resolução de Aeroportos** - Identificação automática de ICAOs
+- 📈 **Estatísticas Avançadas** - Métricas detalhadas de performance
+- 🛩️ **Histórico Integrado** - Voos MSFS no dashboard principal
+
+### 🏢 Sistema de Companhias
+
+> **Gestão de empresas de aviação**
+
+- 🏭 **Portfólio de Empresas** - Múltiplas companhias aéreas
+- 💼 **Qualificações** - Sistema de requisitos e certificações
+- 📊 **Performance Empresarial** - Métricas por companhia
+- 💰 **Gestão Financeira** - Receitas e custos por empresa
+
+### 🗺️ Mapas e Rotas
+
+> **Visualização geográfica avançada**
+
+- 🌍 **Mapas Interativos** - Visualização de rotas com Leaflet
+- ✈️ **Tracking em Tempo Real** - Acompanhamento de voos ativos
+- 📍 **Aeroportos Globais** - Base de dados completa de aeroportos
+- 🛣️ **Histórico de Rotas** - Visualização de voos anteriores
 
 ## 🚀 Funcionalidades Implementadas
 
-### 🌍 Internacionalização
+### 🌍 Internacionalização Completa
 - **Bilingual**: Português (PT-BR) e Inglês (EN-US)
 - **Toggle de Idioma**: Com bandeiras e persistência
-- **Cobertura 99%**: Exceto termos técnicos de aviação
+- **Cobertura 100%**: Todas as interfaces traduzidas
+- **Formatação Regional**: Números, datas e moedas localizadas
 
-### 🎨 Tema e UX
-- **Dark/Light Mode**: Com persistência e transições
-- **Animações CSS**: Hover effects e transições suaves
-- **Design HUD**: Inspirado em cockpits modernos
-- **Responsivo**: Mobile-first design
+### 🎨 Interface e Experiência
+- **Dark/Light Mode**: Com persistência e transições suaves
+- **Animações CSS**: Hover effects e micro-interações
+- **Design HUD Aviônico**: Inspirado em cockpits modernos
+- **Responsivo Total**: Mobile-first com breakpoints inteligentes
+- **Componentes Modulares**: Sistema de design consistente
+
+### 🗄️ Backend e Dados
+- **Supabase Integration**: Backend completo como serviço
+- **Row Level Security**: Segurança por usuário
+- **Real-time Updates**: Sincronização automática
+- **Triggers Automáticos**: Criação de dados padrão
+- **Views Otimizadas**: Consultas pré-calculadas
 
 ### 🔄 Gerenciamento de Estado
-- **localStorage**: Persistência local completa
+- **TanStack Query**: Cache inteligente e sincronização
+- **Persistência Local**: localStorage para dados offline
 - **Auto Refresh**: Atualização automática de componentes
-- **Validação**: Zod + React Hook Form
+- **Validação Robusta**: Zod + React Hook Form
 - **Notificações**: Toast feedback instantâneo
+
+### 📊 Sistema de Relatórios
+- **Relatórios Financeiros**: Análises detalhadas de receitas/despesas
+- **Estatísticas de Voo**: Métricas avançadas de performance
+- **Gráficos Interativos**: Visualizações com Recharts
+- **Exportação de Dados**: Relatórios em múltiplos formatos
+
+### 🔧 Ferramentas de Debug
+- **Diagnóstico Completo**: Verificação de sistema
+- **Testes de Conexão**: Supabase e APIs
+- **Debug Financeiro**: Análise de transações
+- **Logs Detalhados**: Rastreamento de erros
 
 ## 🏗️ Estrutura do Projeto
 
@@ -169,11 +236,36 @@ npm run dev
 │   │   ├── ✈️ flights/        # Gerenciamento de voos e histórico
 │   │   ├── 💰 financial/      # Sistema financeiro completo
 │   │   ├── 🎯 career/         # Metas e conquistas
+│   │   ├── 🛠️ maintenance/    # Sistema de manutenção de aeronaves
+│   │   ├── 🗺️ maps/           # Mapas e visualização de rotas
+│   │   ├── 👤 profile/        # Gerenciamento de perfil
+│   │   ├── 🔧 debug/          # Ferramentas de diagnóstico
+│   │   ├── 🛩️ flight/         # Configurações e tracking de voo
 │   │   └── 🧭 layout/         # Layout, navegação e header
-│   ├── 📄 pages/              # Páginas da aplicação (roteamento)
+│   ├── 📄 pages/              # Páginas da aplicação (22 páginas)
+│   │   ├── Index.tsx          # Dashboard principal
+│   │   ├── Flights.tsx        # Gerenciamento de voos
+│   │   ├── MSFSFlights.tsx    # Voos do MSFS 2024
+│   │   ├── Financial.tsx      # Sistema financeiro
+│   │   ├── FinancialReports.tsx # Relatórios financeiros
+│   │   ├── Maintenance.tsx    # Sistema de manutenção
+│   │   ├── Companies.tsx      # Gestão de companhias
+│   │   ├── FlightMaps.tsx     # Mapas e rotas
+│   │   ├── RealTimeTracking.tsx # Tracking em tempo real
+│   │   ├── Goals.tsx          # Metas e conquistas
+│   │   ├── Ranking.tsx        # Sistema de ranking
+│   │   ├── Profile.tsx        # Perfil do usuário
+│   │   ├── Settings.tsx       # Configurações avançadas
+│   │   └── ...               # Outras páginas especializadas
 │   ├── 🎣 hooks/              # Custom hooks organizados
+│   │   ├── business/          # Hooks de lógica de negócio
+│   │   ├── supabase/          # Hooks do Supabase
+│   │   └── ui/               # Hooks de interface
 │   ├── 📚 lib/                # Utilitários e configurações
-│   │   └── 🌍 i18n.ts         # Sistema de internacionalização
+│   │   ├── 🌍 i18n.ts         # Sistema de internacionalização
+│   │   ├── supabase.ts        # Cliente Supabase
+│   │   ├── services/          # Serviços de API
+│   │   └── config/           # Configurações
 │   ├── 🔄 contexts/           # Contextos React (Auth, Theme)
 │   ├── 🗄️ db/                # Arquivos relacionados ao banco de dados
 │   │   ├── supabase/          # Supabase específicos
@@ -183,10 +275,26 @@ npm run dev
 │   │   ├── docs/              # Documentação do banco de dados
 │   │   └── README.md          # Documentação da estrutura do BD
 │   ├── 🛠️ utils/              # Funções utilitárias
+│   ├── 🎨 styles/             # Estilos globais
+│   ├── 📝 types/              # Definições de tipos TypeScript
 │   ├── App.tsx                # Componente raiz
 │   └── main.tsx               # Ponto de entrada da aplicação
+├── 🎮 companion/               # Companion MSFS 2024
+│   ├── companion-msfs.ts      # Integração SimConnect
+│   └── package.json          # Dependências do companion
+├── 🖥️ backend/                # Servidor backend
+│   ├── src/                  # Código fonte do backend
+│   ├── routes/               # Rotas da API
+│   └── services/             # Serviços backend
+├── 🗄️ database/               # Scripts SQL e migrações
+│   ├── *_schema.sql          # Schemas das tabelas
+│   ├── *_functions.sql       # Funções do banco
+│   └── migrations/           # Migrações
 ├── 🌐 public/                 # Assets estáticos
-├── 📖 docs/                   # Documentação
+├── 📖 docs/                   # Documentação completa
+│   ├── MSFS_INTEGRATION_GUIDE.md # Guia de integração MSFS
+│   ├── FLIGHT_CONFIGURATION_SYSTEM.md # Sistema de configuração
+│   └── ...                   # Outras documentações
 ├── CHANGELOG.md               # Registro de mudanças
 └── PROJECT_STRUCTURE.md       # Documentação da estrutura
 ```
@@ -339,6 +447,33 @@ interface Pilot {
   <img src="https://img.shields.io/badge/Deploy-Cloudflare_Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Pages" />
   <img src="https://img.shields.io/badge/Status-Online-brightgreen?style=for-the-badge" alt="Status Online" />
 </div>
+
+### 🎯 **Funcionalidades Implementadas (v2.2.0)**
+- ✅ **Sistema de Autenticação** - Login/Registro com Supabase
+- ✅ **Dashboard Inteligente** - Estatísticas e métricas em tempo real
+- ✅ **Gerenciamento de Voos** - CRUD completo com validações
+- ✅ **Sistema Financeiro** - Receitas, despesas e relatórios avançados
+- ✅ **Sistema de Manutenção** - Gestão completa de manutenção de aeronaves
+- ✅ **Integração MSFS 2024** - Companion app com SimConnect
+- ✅ **Mapas e Rotas** - Visualização interativa com Leaflet
+- ✅ **Sistema de Companhias** - Gestão e ranking de companhias
+- ✅ **Perfil de Usuário** - Edição completa com upload de avatar
+- ✅ **Sistema de Metas** - Definição e acompanhamento de objetivos
+- ✅ **Sistema de Ranking** - Classificação e conquistas
+- ✅ **Configurações Avançadas** - Aeronaves, status e preferências
+- ✅ **Ferramentas de Debug** - Diagnóstico completo do sistema
+- ✅ **Internacionalização** - Suporte completo PT/EN expandido
+- ✅ **Interface Responsiva** - Design otimizado para todos os dispositivos
+- ✅ **Backend Completo** - Supabase com RLS, triggers e funções RPC
+
+### 📈 **Estatísticas Atuais (v2.2.0)**
+- **65+ Componentes** especializados organizados por domínio
+- **33+ Hooks** de negócio, UI e Supabase
+- **22+ Páginas** funcionais completas
+- **700+ Traduções** PT/EN em múltiplos contextos
+- **15+ Tabelas** no banco de dados
+- **30+ Funções RPC** implementadas
+- **100% Funcional** - Todas as features principais + avançadas implementadas
 
 **Ambiente**: ✅ Configurado e funcionando
 **Servidor Local**: ✅ http://localhost:8080
