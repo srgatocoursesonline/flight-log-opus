@@ -28,9 +28,22 @@ const ptBR = {
       tools: "Ferramentas Úteis",
       administrative: "Administrativo",
       companies: "Minhas Empresas",
-      todCalculator: "Calculadora TOD"
+      todCalculator: "Calculadora TOD",
+      flightPlanner: "Planejador de Voo"
     },
     
+    // Flight Planner
+    flightPlanner: {
+      title: "Planejador de Voo",
+      subtitle: "Planeje suas rotas de voo com ferramentas profissionais integradas.",
+      loading: "Carregando planejador...",
+      refresh: "Atualizar",
+      maximize: "Maximizar",
+      minimize: "Minimizar",
+      openExternal: "Abrir Externamente",
+      poweredBy: "Powered by Flight Simulator Planner"
+    },
+
     // Dashboard
     dashboard: {
       title: "Centro de Operações de Voo",
@@ -436,7 +449,20 @@ const enUS = {
       tools: "Useful Tools",
       administrative: "Administrative",
       companies: "My Companies",
-      todCalculator: "TOD Calculator"
+      todCalculator: "TOD Calculator",
+      flightPlanner: "Flight Planner"
+    },
+    
+    // Flight Planner
+    flightPlanner: {
+      title: "Flight Planner",
+      subtitle: "Plan your flight routes with integrated professional tools.",
+      loading: "Loading planner...",
+      refresh: "Refresh",
+      maximize: "Maximize",
+      minimize: "Minimize",
+      openExternal: "Open Externally",
+      poweredBy: "Powered by Flight Simulator Planner"
     },
     
     // Dashboard

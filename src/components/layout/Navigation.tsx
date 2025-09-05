@@ -22,6 +22,7 @@ import {
   MoreHorizontal,
   Building2,
   Calculator,
+  Map,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
@@ -65,6 +66,7 @@ const menuStructure = {
       labelKey: "navigation.tools",
       items: [
         { to: "/tod-calculator", icon: Calculator, labelKey: "navigation.todCalculator" },
+        { to: "/flight-planner", icon: Map, labelKey: "navigation.flightPlanner" },
       ],
     },
     {

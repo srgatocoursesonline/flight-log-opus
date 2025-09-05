@@ -27,6 +27,7 @@ import Purchases from "./pages/Purchases";
 import FinancialReports from "./pages/FinancialReports";
 import Companies from "./pages/Companies";
 import TodCalculatorPage from "./pages/TodCalculator";
+import FlightPlannerPage from "./pages/FlightPlanner";
 
 
 const queryClient = new QueryClient();
@@ -91,6 +92,7 @@ const AppContent = () => {
           <Route path="relatorios-financeiros" element={<FinancialReports />} />
           <Route path="companies" element={<Companies />} />
           <Route path="tod-calculator" element={<TodCalculatorPage />} />
+          <Route path="flight-planner" element={<FlightPlannerPage />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>
