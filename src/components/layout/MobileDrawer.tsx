@@ -25,6 +25,7 @@ import {
   Menu,
   ChevronDown,
   ChevronRight,
+  Building2, Calculator, Map
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
@@ -40,7 +41,7 @@ const drawerMenuStructure = {
       items: [
         { id: "voos", to: "/flights", icon: Plane, labelKey: "navigation.flights" },
         { id: "historico", to: "/history", icon: History, labelKey: "navigation.history" },
-        { id: "manutencao", to: "/maintenance", icon: Wrench, labelKey: "navigation.maintenance" },
+        { id: "manutencao", to: "/manutencao", icon: Wrench, labelKey: "navigation.maintenance" },
         { id: "tempo-real", to: "/realtime", icon: Activity, labelKey: "navigation.realtime" },
         { id: "ranking", to: "/ranking", icon: Trophy, labelKey: "navigation.ranking" },
         { id: "metas", to: "/goals", icon: Target, labelKey: "navigation.goals" },
@@ -52,8 +53,25 @@ const drawerMenuStructure = {
       label: "Financeiro",
       items: [
         { id: "financeiro", to: "/financial", icon: DollarSign, labelKey: "navigation.financial" },
-        { id: "compras", to: "/purchases", icon: ShoppingCart, labelKey: "navigation.purchases" },
-        { id: "relatorios", to: "/financial/reports", icon: BarChart3, labelKey: "navigation.reports" },
+        { id: "compras", to: "/compras", icon: ShoppingCart, labelKey: "navigation.purchases" },
+        { id: "relatorios", to: "/relatorios-financeiros", icon: BarChart3, labelKey: "navigation.financialReports" },
+      ],
+    },
+    {
+      type: "section",
+      id: "negocios",
+      label: "Negócios",
+      items: [
+        { id: "empresas", to: "/companies", icon: Building2, labelKey: "navigation.companies" },
+      ],
+    },
+    {
+      type: "section",
+      id: "ferramentas",
+      label: "Ferramentas Úteis",
+      items: [
+        { id: "calculadora-tod", to: "/tod-calculator", icon: Calculator, labelKey: "navigation.todCalculator" },
+        { id: "planejador-voo", to: "/flight-planner", icon: Map, labelKey: "navigation.flightPlanner" },
       ],
     },
     {
@@ -104,12 +122,18 @@ export const MobileDrawer = ({ open, onOpenChange }: MobileDrawerProps) => {
   // Determinar seção ativa baseada no path
   const getActiveSectionFromPath = (pathname: string): string | null => {
     if (pathname.startsWith('/flights') || pathname.startsWith('/history') || 
-        pathname.startsWith('/maintenance') || pathname.startsWith('/realtime') ||
+        pathname.startsWith('/manutencao') || pathname.startsWith('/realtime') ||
         pathname.startsWith('/ranking') || pathname.startsWith('/goals')) {
       return 'operacional';
     }
-    if (pathname.startsWith('/financial') || pathname.startsWith('/purchases')) {
+    if (pathname.startsWith('/financial') || pathname.startsWith('/compras') || pathname.startsWith('/relatorios-financeiros')) {
       return 'financeiro';
+    }
+    if (pathname.startsWith('/companies')) {
+      return 'negocios';
+    }
+    if (pathname.startsWith('/tod-calculator') || pathname.startsWith('/flight-planner')) {
+      return 'ferramentas';
     }
     if (pathname.startsWith('/profile') || pathname.startsWith('/settings')) {
       return 'adm';
