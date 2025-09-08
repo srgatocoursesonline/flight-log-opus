@@ -237,6 +237,8 @@ export const CareerRatingManager = () => {
                 onChange={(e) => setFormData({ ...formData, totalRating: e.target.value !== '' ? parseInt(e.target.value) : 0 })}
                 className="mt-1"
                 required
+                min="0"
+                max="9999999"
               />
             </div>
             <div>

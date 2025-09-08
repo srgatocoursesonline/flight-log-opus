@@ -19,7 +19,7 @@ export const FinancialSettingsManager = () => {
   }, [settings.initialBalance]);
 
   const formatCR = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR').format(amount);
+    return amount.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const handleSave = async () => {

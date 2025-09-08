@@ -47,7 +47,7 @@ const Index = () => {
           <div className="mobile-slide-up" style={{animationDelay: '100ms'}}>
             <StatsCard
               title={t('dashboard.totalFlights')}
-              value={stats.totalFlights.toString()}
+              value={stats.totalFlights}
               subtitle={t('dashboard.thisMonth', { count: Math.floor(stats.totalFlights * 0.15) })}
               icon={<Plane className="h-6 w-6" />}
               trend={{ value: 12.3, isPositive: true }}
@@ -57,7 +57,7 @@ const Index = () => {
           <div className="mobile-slide-up" style={{animationDelay: '200ms'}}>
             <StatsCard
               title={t('dashboard.flightHours')}
-              value={stats.totalFlightTime.toString()}
+              value={stats.totalFlightTime}
               subtitle={t('dashboard.last30Days')}
               icon={<Clock className="h-6 w-6 text-blue-600" />}
               trend={{ value: 8.1, isPositive: true }}
@@ -67,7 +67,7 @@ const Index = () => {
           <div className="mobile-slide-up" style={{animationDelay: '300ms'}}>
             <StatsCard
               title={t('dashboard.totalCR')}
-              value={stats.totalCR.toString()}
+              value={stats.totalCR}
               subtitle={t('dashboard.accumulatedPoints')}
               icon={<Trophy className="h-6 w-6 text-blue-600" />}
               trend={{ value: 15.4, isPositive: true }}

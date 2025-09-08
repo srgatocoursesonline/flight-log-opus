@@ -1,11 +1,18 @@
-import { ShoppingCart, Package, TrendingUp, DollarSign } from "lucide-react";
+import { ShoppingCart, Package, TrendingUp, DollarSign, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { NewPurchaseModal, NewPurchaseModalRef } from "@/components/financial/NewPurchaseModal";
+import { useRef } from "react";
 
 const Purchases = () => {
   const { t } = useTranslation();
+  const newPurchaseModalRef = useRef<NewPurchaseModalRef>(null);
+
+  const handleNewPurchase = () => {
+    newPurchaseModalRef.current?.openModal();
+  };
 
   return (
     <div className="container mx-auto px-6 pt-8 pb-6 space-y-6">
@@ -21,7 +28,7 @@ const Purchases = () => {
           </p>
         </div>
         
-        <Button>
+        <Button onClick={handleNewPurchase}>
           <ShoppingCart className="h-4 w-4 mr-2" />
           Nova Compra
         </Button>
@@ -37,9 +44,9 @@ const Purchases = () => {
             <DollarSign className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 45.230</div>
+            <div className="text-2xl font-bold">R$ 0,00</div>
             <p className="text-xs text-readable-muted">
-              +12% vs mês anterior
+              Sem gastos registrados
             </p>
           </CardContent>
         </Card>
@@ -52,9 +59,9 @@ const Purchases = () => {
             <Package className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
+            <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">
-              Aguardando entrega
+              Nenhum pedido pendente
             </p>
           </CardContent>
         </Card>
@@ -67,34 +74,42 @@ const Purchases = () => {
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 3.450</div>
+            <div className="text-2xl font-bold">R$ 0,00</div>
             <p className="text-xs text-muted-foreground">
-              Através de negociações
+              Aguardando primeiras compras
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Placeholder Content */}
+      {/* Lista de Compras Recentes */}
       <Card>
         <CardHeader>
-          <CardTitle>Sistema de Compras</CardTitle>
+          <CardTitle>Compras Recentes</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-12">
-            <ShoppingCart className="h-16 w-16 mx-auto text-readable-muted mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Em Desenvolvimento</h3>
-            <p className="text-readable-muted max-w-md mx-auto">
-              O sistema completo de compras está sendo desenvolvido. 
-              Em breve você poderá gerenciar todas as compras de combustível, 
+          <div className="text-center py-8">
+            <ShoppingCart className="h-12 w-12 mx-auto text-readable-muted mb-3" />
+            <h3 className="text-lg font-semibold mb-2">Sistema de Compras Ativo</h3>
+            <p className="text-readable-muted max-w-md mx-auto mb-4">
+              Clique em "Nova Compra" para registrar compras de combustível, 
               equipamentos e suprimentos para suas operações.
             </p>
-            <Badge variant="outline" className="mt-4">
-              Disponível em breve
-            </Badge>
+            <Button onClick={handleNewPurchase} variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Primeira Compra
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de Nova Compra */}
+      <NewPurchaseModal 
+        ref={newPurchaseModalRef}
+        onSuccess={() => {
+          // Recarregar dados ou atualizar lista
+        }}
+      />
     </div>
   );
 };

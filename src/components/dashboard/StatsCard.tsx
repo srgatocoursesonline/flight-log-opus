@@ -1,6 +1,11 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+const formatNumber = (value: string | number): string => {
+  if (typeof value === 'string') return value;
+  return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+};
+
 interface StatsCardProps {
   title: string;
   value: string | number;
@@ -32,7 +37,7 @@ export const StatsCard = ({
           </p>
           <div className="mt-1 flex items-baseline gap-2">
             <p className={cn("mobile-value font-mono", valueColor || "text-green-600 dark:text-green-400")}>
-              {value}
+              {formatNumber(value)}
             </p>
             {trend && (
               <span className={cn(

@@ -116,16 +116,16 @@ export function CareerRatingCard() {
   // Se não há dados de carreira, exibir um lembrete para configurar
   if (!careerData && !isLoading) {
     return (
-      <div className="hud-display stats-card p-6 relative overflow-hidden">
+      <div className="hud-display stats-card p-4 relative overflow-hidden">
         <Alert className="bg-primary/10 border-primary/20">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Dados de Carreira não Encontrados</AlertTitle>
-          <AlertDescription>
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertTitle className="text-sm">Dados de Carreira não Encontrados</AlertTitle>
+          <AlertDescription className="text-xs">
             Configure seus dados de carreira do Microsoft Flight Simulator para visualizar seu progresso.
             <Button 
               variant="hud" 
               size="sm" 
-              className="mt-2"
+              className="mt-1 h-7 text-xs"
               onClick={navigateToSettings}
             >
               Configurar Agora
@@ -140,8 +140,8 @@ export function CareerRatingCard() {
     <div className="mobile-card hud-display stats-card relative overflow-hidden">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-2">
-            <p className="mobile-card-title text-readable-muted uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs font-medium text-readable-muted uppercase tracking-wider">
               Rating de Carreira
             </p>
             {!isEditing && (
@@ -149,88 +149,90 @@ export function CareerRatingCard() {
                 variant="ghost"
                 size="sm"
                 onClick={startEditing}
-                className="h-6 w-6 p-0 hover:bg-primary/10"
+                className="h-5 w-5 p-0 hover:bg-primary/10"
                 title="Editar CR, Nível e Classe"
               >
-                <Edit3 className="h-3 w-3" />
+                <Edit3 className="h-2.5 w-2.5" />
               </Button>
             )}
           </div>
           
           {isEditing ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
+            <div>
+              <label className="text-xs text-readable-muted mb-0.5 block">Rating Total</label>
+              <Input
+                type="number"
+                value={editData.totalRating}
+                onChange={(e) => setEditData(prev => ({ ...prev, totalRating: parseInt(e.target.value) || 0 }))}
+                className="h-7 text-xs"
+                min="0"
+                max="9999999"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-xs text-readable-muted mb-1 block">Rating Total</label>
+                <label className="text-xs text-readable-muted mb-0.5 block">Nível</label>
                 <Input
                   type="number"
-                  value={editData.totalRating}
-                  onChange={(e) => setEditData(prev => ({ ...prev, totalRating: parseInt(e.target.value) || 0 }))}
-                  className="h-8 text-sm"
+                  value={editData.level}
+                  onChange={(e) => setEditData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
+                  className="h-7 text-xs"
+                  min="1"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-readable-muted mb-1 block">Nível</label>
-                  <Input
-                    type="number"
-                    value={editData.level}
-                    onChange={(e) => setEditData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
-                    className="h-8 text-sm"
-                    min="1"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-readable-muted mb-1 block">Classe</label>
-                  <Select
-                    value={editData.careerClass}
-                    onValueChange={(value: 'S' | 'A' | 'B' | 'C' | 'D') => setEditData(prev => ({ ...prev, careerClass: value }))}
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="S">Classe S (Elite)</SelectItem>
-                      <SelectItem value="A">Classe A (Especialista)</SelectItem>
-                      <SelectItem value="B">Classe B (Profissional)</SelectItem>
-                      <SelectItem value="C">Classe C (Experiente)</SelectItem>
-                      <SelectItem value="D">Classe D (Iniciante)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex gap-2 pt-2">
-                <Button
-                  size="sm"
-                  onClick={saveChanges}
-                  className="h-7 px-3 text-xs"
-                  disabled={isLoading}
+              <div>
+                <label className="text-xs text-readable-muted mb-0.5 block">Classe</label>
+                <Select
+                  value={editData.careerClass}
+                  onValueChange={(value: 'S' | 'A' | 'B' | 'C' | 'D') => setEditData(prev => ({ ...prev, careerClass: value }))}
                 >
-                  <Save className="h-3 w-3 mr-1" />
-                  Salvar
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={cancelEditing}
-                  className="h-7 px-3 text-xs"
-                >
-                  <X className="h-3 w-3 mr-1" />
-                  Cancelar
-                </Button>
+                  <SelectTrigger className="h-7 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="S">Classe S (Elite)</SelectItem>
+                    <SelectItem value="A">Classe A (Especialista)</SelectItem>
+                    <SelectItem value="B">Classe B (Profissional)</SelectItem>
+                    <SelectItem value="C">Classe C (Experiente)</SelectItem>
+                    <SelectItem value="D">Classe D (Iniciante)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+            <div className="flex gap-1.5 pt-1">
+              <Button
+                size="sm"
+                onClick={saveChanges}
+                className="h-6 px-2 text-xs"
+                disabled={isLoading}
+              >
+                <Save className="h-2.5 w-2.5 mr-1" />
+                Salvar
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={cancelEditing}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="h-2.5 w-2.5 mr-1" />
+                Cancelar
+              </Button>
+            </div>
+          </div>
           ) : (
             <>
-              <div className="mt-1 flex items-baseline gap-2">
-                <p className="mobile-value text-yellow-700 dark:text-yellow-400 font-mono">
-                  {isLoading ? '...' : (careerData?.totalRating?.toLocaleString() || '0')}
+              <div className="mt-1 flex items-baseline gap-1">
+                <p className="mobile-value text-2xl font-bold text-foreground font-mono">
+                  {isLoading ? '...' : (careerData?.totalRating?.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) || '0')}
                 </p>
-                <span className="mobile-trend text-success">
+                <span className="mobile-trend text-success text-xs">
                   +5.2%
                 </span>
               </div>
               {careerData && (
-                <p className="mobile-card-subtitle text-readable-muted mt-1">
+                <p className="mobile-card-subtitle text-readable-muted mt-0.5 text-xs">
                   Classe {careerData.careerClass} • Nível {careerData.level}
                 </p>
               )}
@@ -241,7 +243,7 @@ export function CareerRatingCard() {
         {!isEditing && (
           <div className="mobile-icon-container rounded-lg bg-primary/10 icon-hover flex-shrink-0">
             <div className="text-primary">
-              <Trophy className="h-6 w-6" />
+              <Trophy className="h-5 w-5" />
             </div>
           </div>
         )}

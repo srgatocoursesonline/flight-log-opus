@@ -707,8 +707,8 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
                   required: isCompleted,
                   custom: (value: string) => {
                     const num = parseInt(value);
-                    if (value && (isNaN(num) || num < 0 || num > 100)) {
-                      return 'CR deve ser entre 0 e 100';
+                    if (value && (isNaN(num) || num < 0)) {
+                      return 'CR deve ser um número positivo';
                     }
                     return null;
                   }

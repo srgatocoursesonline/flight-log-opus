@@ -12,7 +12,7 @@ import type { MaintenanceRecord } from '../types/maintenance';
 
 const Maintenance = () => {
   const { t } = useTranslation();
-  const { records: maintenanceRecords, loading } = useMaintenanceManager();
+  const { records: maintenanceRecords, loading, loadRecords, calculateStats } = useMaintenanceManager();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -20,6 +20,9 @@ const Maintenance = () => {
 
   const handleAddSuccess = () => {
     setShowAddModal(false);
+    // Forçar recarregamento dos dados após adicionar nova manutenção
+    loadRecords();
+    calculateStats();
   };
 
   const handleEdit = (record: MaintenanceRecord) => {
@@ -35,6 +38,9 @@ const Maintenance = () => {
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setSelectedRecord(null);
+    // Forçar recarregamento dos dados após editar manutenção
+    loadRecords();
+    calculateStats();
   };
 
   const handleViewClose = () => {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plane, Clock, Route, Star } from 'lucide-react';
+import { Plane, Clock, Route, Star, DollarSign } from 'lucide-react';
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 
 export const FlightStats = () => {
@@ -11,7 +11,7 @@ export const FlightStats = () => {
   const statCards = [
     {
       title: 'Total de Voos',
-      value: stats.totalFlights,
+      value: stats.totalFlights.toLocaleString('pt-BR', { useGrouping: true }).replace(',', '.'),
       icon: Plane,
       color: 'text-blue-600',
       bgColor: 'bg-blue-600/20'
@@ -25,17 +25,17 @@ export const FlightStats = () => {
     },
     {
       title: 'Distância Total',
-      value: `${stats.totalDistance.toLocaleString()} nm`,
+      value: `${stats.totalDistance.toLocaleString('pt-BR', { useGrouping: true }).replace(',', '.')} nm`,
       icon: Route,
       color: 'text-blue-600',
       bgColor: 'bg-blue-600/20'
     },
     {
-      title: 'CR Médio',
-      value: stats.averageRating,
+      title: "CR Médio",
+      value: stats.averageRating.toLocaleString('pt-BR', { useGrouping: true }).replace(',', '.'),
       icon: Star,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-600/20'
+      color: "text-blue-600",
+      bgColor: "bg-blue-600/20"
     }
   ];
 
@@ -50,7 +50,9 @@ export const FlightStats = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-lg font-bold font-mono text-foreground">{stat.value}</p>
+                <p className={`text-lg font-bold font-mono ${stat.title === "CR Médio" ? "text-green-600" : "text-foreground"}`}>
+                  {stat.value}
+                </p>
               </div>
             </div>
           </CardContent>

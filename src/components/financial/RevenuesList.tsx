@@ -39,10 +39,7 @@ export const RevenuesList = ({ onTransactionSuccess }: RevenuesListProps) => {
   const [endDate, setEndDate] = useState<string>('');
 
   const formatCR = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
+    return amount.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const formatDate = (dateString: string) => {

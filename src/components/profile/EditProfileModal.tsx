@@ -101,7 +101,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
 
   // Função para formatar CR
   const formatCR = (cr: number) => {
-    return cr.toLocaleString('pt-BR');
+    return cr.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const handleAvatarUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {

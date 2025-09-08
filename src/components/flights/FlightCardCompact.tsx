@@ -47,8 +47,8 @@ export const FlightCardCompact = ({ flight }: FlightCardCompactProps) => {
   const editModalRef = useRef<AddFlightModalRef>(null);
 
   const getStatusBadge = (status: Flight['status']) => {
-    // Tentar encontrar status customizado primeiro
-    const customStatus = statusManager.getStatusByName(status);
+    // Tentar encontrar status customizado usando o valor/ID
+    const customStatus = statusManager.getStatusByValue(status);
     
     if (customStatus) {
       return (
