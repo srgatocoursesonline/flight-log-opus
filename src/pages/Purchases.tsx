@@ -28,7 +28,7 @@ const formatCurrency = (value: number) => {
 };
 
 // Componente StatusBadge clicável
-const StatusBadge = ({ status, purchaseId }: { status: string; purchaseId: string }) => {
+const StatusBadge = ({ status, purchaseId, onStatusChange }: { status: string; purchaseId: string; onStatusChange?: () => void }) => {
   const { updatePurchase } = useSupabasePurchases();
   const [isUpdating, setIsUpdating] = useState(false);
   
@@ -52,14 +52,14 @@ const StatusBadge = ({ status, purchaseId }: { status: string; purchaseId: strin
     }
   };
 
-  const handleStatusChange = async () => {
+  const handleStatusChange = useCallback(async () => {
     if (isUpdating) return;
     
     const statusOrder: string[] = ['pending', 'approved', 'completed', 'cancelled'];
     const currentIndex = statusOrder.indexOf(status);
     let nextStatus: string;
     
-    // Ciclo: pending -> approved -> completed -> pending
+    // Ciclo: pending -> approved -> completed -> cancelled -> pending
     if (status === 'pending') {
       nextStatus = 'approved';
     } else if (status === 'approved') {
@@ -76,18 +76,15 @@ const StatusBadge = ({ status, purchaseId }: { status: string; purchaseId: strin
       setIsUpdating(true);
       const success = await updatePurchase(purchaseId, { status: nextStatus });
       
-      if (success) {
-        // Atualização automática da página após mudança de status
-        setTimeout(() => {
-          window.location.reload();
-        }, 300); // Pequeno delay para melhor UX
+      if (success && onStatusChange) {
+        onStatusChange();
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
     } finally {
       setIsUpdating(false);
     }
-  };
+  }, [status, purchaseId, onStatusChange, isUpdating, updatePurchase]);
 
   return (
     <Badge 
@@ -287,7 +284,7 @@ const Purchases = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium text-foreground">{purchase.title}</h4>
                       <Badge variant="outline" className="text-muted-foreground">{purchase.purchaseCode}</Badge>
-                      <StatusBadge status={purchase.status} purchaseId={purchase.id} />
+                      <StatusBadge status={purchase.status} purchaseId={purchase.id} onStatusChange={fetchPurchases} />
                     </div>
                     <p className="text-sm text-readable-muted">
                       {purchase.category} • {purchase.subcategory}
