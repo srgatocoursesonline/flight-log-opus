@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Airport Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #f5f5f5;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Airport Search</h1>
+    
+    <div class="input-group">
+        <label for="icao">Código ICAO:</label>
+        <input type="text" id="icao" maxlength="4" placeholder="Digite um ICAO" />
+    </div>
+    
+    <div class="result" id="result">
+        Digite um código ICAO para testar
+    </div>
+
+    <script type="module">
+        import { fetchAirportByIcao } from './src/lib/airportService.js';
+        
+        const icaoInput = document.getElementById('icao');
+        const resultDiv = document.getElementById('result');
+        
+        icaoInput.addEventListener('input', async (e) => {
+            const icao = e.target.value.trim().toUpperCase();
+            
+            if (icao.length === 4) {
+                resultDiv.innerHTML = 'Buscando...';
+                
+                try {
+                    const result = await fetchAirportByIcao(icao);
+                    console.log('Resultado da busca:', result);
+                    
+                    if (result.success) {
+                        resultDiv.className = 'result success';
+                        resultDiv.innerHTML = `
+                            <strong>Aeroporto encontrado!</strong><br>
+                            Nome: ${result.data.name}<br>
+                            País: ${result.data.country_code}<br>
+                            Fonte: ${result.source}
+                        `;
+                    } else {
+                        resultDiv.className = 'result error';
+                        resultDiv.innerHTML = `
+                            <strong>Aeroporto não encontrado</strong><br>
+                            Sucesso: ${result.success}<br>
+                            Fonte: ${result.source}<br>
+                            Erro: ${result.error || 'Nenhum erro específico'}
+                        `;
+                        
+                        // Simular abertura do popup
+                        setTimeout(() => {
+                            alert(`Popup deveria abrir para: ${icao}`);
+                        }, 1000);
+                    }
+                } catch (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `Erro na busca: ${error.message}`;
+                }
+            } else {
+                resultDiv.className = 'result';
+                resultDiv.innerHTML = 'Digite um código ICAO para testar';
+            }
+        });
+    </script>
+</body>
+</html>

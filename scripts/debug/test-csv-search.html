@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Busca CSV</title>
+</head>
+<body>
+    <h1>Teste de Busca de Aeroportos no CSV</h1>
+    <div>
+        <label>Código ICAO: </label>
+        <input type="text" id="icaoInput" placeholder="Ex: KCDA" value="KCDA">
+        <button onclick="testSearch()">Buscar</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        async function testSearch() {
+            const icao = document.getElementById('icaoInput').value.toUpperCase();
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('🔍 Buscando:', icao);
+                
+                // Buscar diretamente no CSV
+                const response = await fetch('/airports.csv');
+                const text = await response.text();
+                const lines = text.split('\n').slice(1);
+                
+                let found = null;
+                for (const line of lines) {
+                    // Usar regex para lidar com aspas no CSV
+                    const parts = line.match(/"([^"]*)"/g);
+                    if (parts && parts.length >= 5) {
+                        const iata = parts[0].replace(/"/g, '').trim();
+                        const icaoCode = parts[1].replace(/"/g, '').trim();
+                        const name = parts[2].replace(/"/g, '').trim();
+                        const country = parts[3].replace(/"/g, '').trim();
+                        const city = parts[4].replace(/"/g, '').trim();
+                        
+                        if (icaoCode.toUpperCase() === icao) {
+                            found = {
+                                icao: icaoCode,
+                                iata: iata,
+                                name: name,
+                                city: city,
+                                country: country
+                            };
+                            break;
+                        }
+                    }
+                }
+                
+                if (found) {
+                    resultDiv.innerHTML = `
+                        <h3>Aeroporto encontrado:</h3>
+                        <p><strong>ICAO:</strong> ${found.icao}</p>
+                        <p><strong>IATA:</strong> ${found.iata}</p>
+                        <p><strong>Nome:</strong> ${found.name}</p>
+                        <p><strong>Cidade:</strong> ${found.city}</p>
+                        <p><strong>País:</strong> ${found.country}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Aeroporto ${icao} não encontrado no CSV</p>`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+            }
+        }
+        
+        // Testar automaticamente KCDA ao carregar
+        window.onload = () => testSearch();
+    </script>
+</body>
+</html>

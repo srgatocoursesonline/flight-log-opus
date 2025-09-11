@@ -29,7 +29,8 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { useFlightDraft, type FlightFormData } from '@/hooks/business/useFlightDraft';
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { countries } from '@/lib/data/countries';
-import { fetchAirportByIcao } from '@/lib/services/airportService';
+import { fetchAirportByIcao, saveManualAirport, type AirportInfo } from '@/lib/airportService';
+import { AirportManualInputDialog } from './AirportManualInputDialog';
 
 interface AddFlightModalProps {
   trigger?: React.ReactNode;
@@ -149,37 +150,98 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
     }
   }, [formData, flight, open, saveDraftData]);
 
-  // Buscar informações do aeroporto de origem quando o código ICAO mudar
-  useEffect(() => {
-    const icaoCode = formData.departure.trim();
-    if (icaoCode.length === 4) {
-      fetchAirportByIcao(icaoCode).then(airportInfo => {
-        if (airportInfo) {
-          setFormData(prev => ({
-            ...prev,
-            originAirportName: airportInfo.name || '',
-            originCountry: prev.originCountry || airportInfo.country_code || ''
-          }));
-        }
-      });
-    }
-  }, [formData.departure]);
+  // Estado para controle do diálogo de entrada manual
+const [showManualInputDialog, setShowManualInputDialog] = useState(false);
+const [manualInputIcao, setManualInputIcao] = useState('');
+const [manualInputType, setManualInputType] = useState<'departure' | 'arrival'>('departure');
+const [lastCheckedDeparture, setLastCheckedDeparture] = useState('');
+const [lastCheckedArrival, setLastCheckedArrival] = useState('');
 
-  // Buscar informações do aeroporto de destino quando o código ICAO mudar
-  useEffect(() => {
-    const icaoCode = formData.arrival.trim();
-    if (icaoCode.length === 4) {
-      fetchAirportByIcao(icaoCode).then(airportInfo => {
-        if (airportInfo) {
-          setFormData(prev => ({
-            ...prev,
-            destinationAirportName: airportInfo.name || '',
-            destinationCountry: prev.destinationCountry || airportInfo.country_code || ''
-          }));
-        }
-      });
+// Buscar informações do aeroporto de origem quando o código ICAO mudar
+useEffect(() => {
+  const icaoCode = formData.departure.trim();
+  if (icaoCode.length === 4) {
+    console.log('Buscando aeroporto de origem:', icaoCode);
+    fetchAirportByIcao(icaoCode).then(result => {
+      console.log('Resultado da busca de origem:', result);
+      if (result.success && result.data) {
+        setFormData(prev => ({
+          ...prev,
+          originAirportName: result.data.name || '',
+          originCountry: prev.originCountry || result.data.country_code || ''
+        }));
+      } else if (!result.success) {
+        console.log('Aeroporto não encontrado, abrindo popup para:', icaoCode);
+        // Abrir diálogo manual quando o aeroporto não for encontrado
+        setManualInputIcao(icaoCode);
+        setManualInputType('departure');
+        setShowManualInputDialog(true);
+      }
+    }).catch(error => {
+      console.error('Erro ao buscar aeroporto de origem:', error);
+    });
+  }
+}, [formData.departure]);
+
+// Buscar informações do aeroporto de destino quando o código ICAO mudar
+useEffect(() => {
+  const icaoCode = formData.arrival.trim();
+  if (icaoCode.length === 4) {
+    console.log('Buscando aeroporto de destino:', icaoCode);
+    fetchAirportByIcao(icaoCode).then(result => {
+      console.log('Resultado da busca de destino:', result);
+      if (result.success && result.data) {
+        setFormData(prev => ({
+          ...prev,
+          destinationAirportName: result.data.name || '',
+          destinationCountry: prev.destinationCountry || result.data.country_code || ''
+        }));
+      } else if (!result.success) {
+        console.log('Aeroporto não encontrado, abrindo popup para:', icaoCode);
+        // Abrir diálogo manual quando o aeroporto não for encontrado
+        setManualInputIcao(icaoCode);
+        setManualInputType('arrival');
+        setShowManualInputDialog(true);
+      }
+    }).catch(error => {
+      console.error('Erro ao buscar aeroporto de destino:', error);
+    });
+  }
+}, [formData.arrival]);
+
+// Manipulador para salvar aeroporto manual
+const handleManualAirportSave = async (airportInfo: AirportInfo) => {
+  try {
+    await saveManualAirport(airportInfo);
+    
+    if (manualInputType === 'departure') {
+      setFormData(prev => ({
+        ...prev,
+        originAirportName: airportInfo.name,
+        originCountry: airportInfo.country_code || prev.originCountry
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        destinationAirportName: airportInfo.name,
+        destinationCountry: airportInfo.country_code || prev.destinationCountry
+      }));
     }
-  }, [formData.arrival]);
+
+    toast({
+      title: "Sucesso",
+      description: "Aeroporto salvo com sucesso!",
+      variant: "default",
+    });
+  } catch (error) {
+    console.error('Erro ao salvar aeroporto:', error);
+    toast({
+      title: "Erro",
+      description: "Erro ao salvar aeroporto. Tente novamente.",
+      variant: "destructive",
+    });
+  }
+};
 
   // Gerenciar eventos de foco da janela para manter modal aberto
   useEffect(() => {
@@ -889,9 +951,17 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
             </Button>
           </div>
         </form>
+        <AirportManualInputDialog
+          icaoCode={manualInputIcao}
+          open={showManualInputDialog}
+          onOpenChange={setShowManualInputDialog}
+          onSave={handleManualAirportSave}
+        />
       </DialogContent>
     </Dialog>
   );
 });
 
 AddFlightModal.displayName = 'AddFlightModal';
+
+export default AddFlightModal;

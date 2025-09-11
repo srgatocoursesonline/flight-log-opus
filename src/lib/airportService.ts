@@ -1,11 +1,69 @@
 /**
  * Serviço para buscar informações de aeroportos pelo código ICAO
- * Utiliza a API AirLabs (https://airlabs.co/api)
+ * Implementa busca em camadas: Cache -> CSV local -> APIs externas -> Supabase -> Input manual
  */
+
+import { supabase } from './supabase';
 
 const AIRLABS_API_KEY = ''; // Adicione sua chave API aqui
 
-interface AirportInfo {
+/**
+ * Busca informações de aeroporto no arquivo CSV local
+ * @param icaoCode Código ICAO do aeroporto
+ * @returns Informações do aeroporto ou null se não encontrado
+ */
+async function fetchFromCsvFile(icaoCode: string): Promise<AirportInfo | null> {
+  try {
+    const response = await fetch('/airports.csv');
+    if (!response.ok) {
+      throw new Error(`Erro ao carregar CSV: ${response.status}`);
+    }
+    
+    const csvText = await response.text();
+    const lines = csvText.split('\n');
+    
+    // Pular cabeçalho e processar linhas
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Lidar com CSV com aspas: "IATA","ICAO","Airport name","Country","City"
+      const columns = line.match(/"([^"]*)"/g);
+      if (columns && columns.length >= 5) {
+        const iata_code = columns[0].replace(/"/g, '').trim();
+        const icao_code = columns[1].replace(/"/g, '').trim();
+        const name = columns[2].replace(/"/g, '').trim();
+        const country = columns[3].replace(/"/g, '').trim();
+        const city = columns[4].replace(/"/g, '').trim();
+        
+        if (icao_code.toUpperCase() === icaoCode.toUpperCase()) {
+          return {
+            name: name,
+            iata_code: iata_code,
+            icao_code: icao_code,
+            city: city || undefined,
+            country_code: country || undefined,
+            last_updated: Date.now()
+          };
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Erro ao buscar no CSV:', error);
+    return null;
+  }
+}
+
+export interface AirportSearchResult {
+  success: boolean;
+  source: 'csv' | 'api' | 'manual' | 'cache';
+  data?: AirportInfo;
+  error?: string;
+}
+
+export interface AirportInfo {
   name: string;
   iata_code: string;
   icao_code: string;
@@ -14,172 +72,237 @@ interface AirportInfo {
   country_code?: string;
   lat?: number;
   lng?: number;
-  error?: string;
+  manually_added?: boolean;
+  last_updated?: number;
 }
+
+// Cache em memória para aeroportos buscados
+const airportCache = new Map<string, AirportInfo>();
 
 /**
  * Busca informações de um aeroporto pelo código ICAO
  * @param icaoCode Código ICAO do aeroporto (ex: SBGR)
- * @returns Informações do aeroporto ou null se não encontrado
+ * @returns Resultado da busca com informações do aeroporto
  */
-export async function fetchAirportByIcao(icaoCode: string): Promise<AirportInfo | null> {
+export async function fetchAirportByIcao(icaoCode: string): Promise<AirportSearchResult> {
   if (!icaoCode || icaoCode.length !== 4) {
-    console.error('Código ICAO inválido:', icaoCode);
     return {
-      name: 'Código ICAO inválido',
-      iata_code: '',
-      icao_code: icaoCode,
+      success: false,
+      source: 'cache',
       error: 'Código ICAO inválido'
     };
   }
 
-  try {
-    // Verificar primeiro no cache local para economia de API
-    const cachedData = localStorage.getItem(`airport_${icaoCode}`);
-    if (cachedData) {
-      return JSON.parse(cachedData);
-    }
+  const upperIcaoCode = icaoCode.toUpperCase();
 
-    // Sem chave API, usar dados mockados temporariamente para não depender de API externa
-    if (!AIRLABS_API_KEY) {
-      return getMockAirportData(icaoCode);
-    }
-
-    // Buscar dados reais da API
-    const response = await fetch(
-      `https://airlabs.co/api/v9/airports?icao_code=${icaoCode}&api_key=${AIRLABS_API_KEY}`
-    );
-    
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.response && data.response.length > 0) {
-      const airport = data.response[0];
-      const airportInfo: AirportInfo = {
-        name: airport.name,
-        iata_code: airport.iata_code || '',
-        icao_code: airport.icao_code,
-        city: airport.city,
-        state: airport.state,
-        country_code: airport.country_code,
-        lat: airport.lat,
-        lng: airport.lng
-      };
-      
-      // Salvar no cache para uso futuro
-      localStorage.setItem(`airport_${icaoCode}`, JSON.stringify(airportInfo));
-      return airportInfo;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Erro ao buscar informações do aeroporto:', error);
+  // 1. Verificar cache local
+  const cachedData = airportCache.get(upperIcaoCode);
+  if (cachedData) {
     return {
-      name: 'Erro ao buscar informações',
-      iata_code: '',
-      icao_code: icaoCode,
-      error: 'Erro na API'
+      success: true,
+      source: 'cache',
+      data: cachedData
     };
+  }
+
+  // 2. Buscar no arquivo CSV local
+  try {
+    const csvResult = await fetchFromCsvFile(upperIcaoCode);
+    if (csvResult) {
+      airportCache.set(upperIcaoCode, csvResult);
+      return {
+        success: true,
+        source: 'csv',
+        data: csvResult
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao buscar no CSV:', error);
+  }
+
+  // 3. Buscar aeroportos manuais do Supabase
+  try {
+    const supabaseResult = await fetchFromSupabase(upperIcaoCode);
+    if (supabaseResult) {
+      airportCache.set(upperIcaoCode, supabaseResult);
+      return {
+        success: true,
+        source: 'supabase',
+        data: supabaseResult
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao buscar no Supabase:', error);
+  }
+
+  // 4. Tentar APIs externas se disponíveis
+  if (AIRLABS_API_KEY) {
+    try {
+      const response = await fetch(
+        `https://airlabs.co/api/v9/airports?icao_code=${upperIcaoCode}&api_key=${AIRLABS_API_KEY}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.response && data.response.length > 0) {
+        const airport = data.response[0];
+        const airportInfo: AirportInfo = {
+          name: airport.name,
+          iata_code: airport.iata_code || '',
+          icao_code: airport.icao_code,
+          city: airport.city,
+          state: airport.state,
+          country_code: airport.country_code,
+          lat: airport.lat,
+          lng: airport.lng,
+          last_updated: Date.now()
+        };
+        
+        airportCache.set(upperIcaoCode, airportInfo);
+        return {
+          success: true,
+          source: 'api',
+          data: airportInfo
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API:', error);
+    }
+  }
+
+  // 4. Retornar erro específico para entrada manual (último recurso)
+  return {
+    success: false,
+    source: 'manual',
+    error: 'Aeroporto não encontrado nas fontes disponíveis'
+  };
+}
+
+/**
+ * Salva informações de um aeroporto informado manualmente no Supabase
+ * @param airportInfo Informações do aeroporto
+ */
+export async function saveManualAirport(airportInfo: AirportInfo): Promise<boolean> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.error('Usuário não autenticado');
+      return false;
+    }
+
+    const icaoCode = airportInfo.icao_code.toUpperCase();
+    airportInfo.manually_added = true;
+    airportInfo.last_updated = Date.now();
+    
+    // Atualizar cache local
+    airportCache.set(icaoCode, airportInfo);
+    
+    // Salvar no Supabase
+    const { error } = await supabase
+      .from('manual_airports')
+      .upsert({
+        user_id: user.id,
+        icao_code: icaoCode,
+        name: airportInfo.name,
+        city: airportInfo.city,
+        country: airportInfo.country_code,
+        latitude: airportInfo.lat,
+        longitude: airportInfo.lng,
+        iata_code: airportInfo.iata_code
+      }, {
+        onConflict: 'user_id,icao_code'
+      });
+
+    if (error) {
+      console.error('Erro ao salvar no Supabase:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erro ao salvar aeroporto manual:', error);
+    return false;
   }
 }
 
 /**
- * Dados mockados de aeroportos para uso quando não tiver API key
- * @param icaoCode Código ICAO do aeroporto
- * @returns Dados mockados do aeroporto
+ * Carrega aeroportos salvos manualmente do Supabase
  */
-function getMockAirportData(icaoCode: string): AirportInfo | null {
-  const mockData: Record<string, AirportInfo> = {
-    'SBGR': {
-      name: 'Aeroporto Internacional de São Paulo/Guarulhos',
-      iata_code: 'GRU',
-      icao_code: 'SBGR',
-      city: 'Guarulhos',
-      state: 'SP',
-      country_code: 'BR',
-      lat: -23.435556,
-      lng: -46.473056
-    },
-    'SBRJ': {
-      name: 'Aeroporto Santos Dumont',
-      iata_code: 'SDU',
-      icao_code: 'SBRJ',
-      city: 'Rio de Janeiro',
-      state: 'RJ',
-      country_code: 'BR',
-      lat: -22.910556,
-      lng: -43.163333
-    },
-    'SBSP': {
-      name: 'Aeroporto de Congonhas',
-      iata_code: 'CGH',
-      icao_code: 'SBSP',
-      city: 'São Paulo',
-      state: 'SP',
-      country_code: 'BR',
-      lat: -23.626111,
-      lng: -46.656389
-    },
-    'SBCF': {
-      name: 'Aeroporto Internacional de Belo Horizonte/Confins',
-      iata_code: 'CNF',
-      icao_code: 'SBCF',
-      city: 'Confins',
-      state: 'MG',
-      country_code: 'BR',
-      lat: -19.624444,
-      lng: -43.971944
-    },
-    'SBBR': {
-      name: 'Aeroporto Internacional de Brasília',
-      iata_code: 'BSB',
-      icao_code: 'SBBR',
-      city: 'Brasília',
-      state: 'DF',
-      country_code: 'BR',
-      lat: -15.871111,
-      lng: -47.918889
-    },
-    'SBKP': {
-      name: 'Aeroporto Internacional de Campinas/Viracopos',
-      iata_code: 'VCP',
-      icao_code: 'SBKP',
-      city: 'Campinas',
-      state: 'SP',
-      country_code: 'BR',
-      lat: -23.007222,
-      lng: -47.134444
-    },
-    'SBPA': {
-      name: 'Aeroporto Internacional de Porto Alegre',
-      iata_code: 'POA',
-      icao_code: 'SBPA',
-      city: 'Porto Alegre',
-      state: 'RS',
-      country_code: 'BR',
-      lat: -29.994444,
-      lng: -51.171111
+export async function loadManualAirports(): Promise<void> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('manual_airports')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Erro ao carregar aeroportos manuais:', error);
+      return;
     }
-  };
-  
-  // Retornar dados mockados se existir, ou null
-  return mockData[icaoCode.toUpperCase()] || null;
+
+    if (data) {
+      data.forEach(airport => {
+        const airportInfo: AirportInfo = {
+          name: airport.name,
+          iata_code: airport.iata_code || '',
+          icao_code: airport.icao_code,
+          city: airport.city,
+          country_code: airport.country,
+          lat: airport.latitude,
+          lng: airport.longitude,
+          manually_added: true,
+          last_updated: Date.now()
+        };
+        airportCache.set(airport.icao_code.toUpperCase(), airportInfo);
+      });
+    }
+  } catch (error) {
+    console.error('Erro ao carregar aeroportos manuais:', error);
+  }
 }
+
+// Inicializar o serviço
+loadManualAirports().catch(console.error);
 
 /**
- * Busca o país de um aeroporto pelo código ICAO
+ * Busca aeroportos manuais do Supabase para o usuário atual
  * @param icaoCode Código ICAO do aeroporto
- * @returns Código do país do aeroporto, ou string vazia se não encontrado
+ * @returns Informações do aeroporto ou null se não encontrado
  */
-export async function getCountryCodeByIcao(icaoCode: string): Promise<string> {
-  const airportInfo = await fetchAirportByIcao(icaoCode);
-  return airportInfo?.country_code || '';
-}
+async function fetchFromSupabase(icaoCode: string): Promise<AirportInfo | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
 
-export default {
-  fetchAirportByIcao,
-  getCountryCodeByIcao
-};
+    const { data, error } = await supabase
+      .from('manual_airports')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('icao_code', icaoCode.toUpperCase())
+      .single();
+
+    if (error || !data) return null;
+
+    return {
+      name: data.name,
+      iata_code: data.iata_code || '',
+      icao_code: data.icao_code,
+      city: data.city,
+      country_code: data.country,
+      lat: data.latitude,
+      lng: data.longitude,
+      manually_added: true,
+      last_updated: Date.now()
+    };
+  } catch (error) {
+    console.error('Erro ao buscar no Supabase:', error);
+    return null;
+  }
+}

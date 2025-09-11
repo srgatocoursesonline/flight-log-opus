@@ -1,9 +1,15 @@
 {
-  "extends": "./config/tsconfig.app.json",
+  "extends": "./config/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/entities/*": ["./src/entities/*"],
+      "@/widgets/*": ["./src/widgets/*"],
+      "@/processes/*": ["./src/processes/*"],
+      "@/app/*": ["./src/app/*"]
     }
   }
 }
