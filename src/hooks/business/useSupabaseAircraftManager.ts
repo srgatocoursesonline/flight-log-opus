@@ -327,8 +327,9 @@ export const useSupabaseAircraftManager = () => {
     const activeCustomNames = customAircraft
       .filter(aircraft => aircraft.isActive)
       .map(aircraft => aircraft.name);
-    
-    return [...activeCustomNames, ...defaultAircraft].sort();
+    // Junta e remove duplicados
+    const allNames = [...activeCustomNames, ...defaultAircraft];
+    return Array.from(new Set(allNames)).sort();
   };
 
   return {

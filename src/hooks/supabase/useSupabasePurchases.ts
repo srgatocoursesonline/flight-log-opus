@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { Purchase } from "@/entities/purchase";
 import { toast } from 'sonner';
 
 export interface Purchase {
@@ -110,7 +112,7 @@ export const useSupabasePurchases = () => {
   }, [user]);
 
   // Adicionar nova compra
-  const addPurchase = useCallback(async (purchaseData: PurchaseFormData): Promise<boolean> => {
+  const addPurchase = useCallback(async (purchaseData: PurchaseFormData) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return false;
@@ -118,7 +120,8 @@ export const useSupabasePurchases = () => {
 
     try {
       const purchaseCode = await generatePurchaseCode();
-
+      
+      // Inserir compra
       const { data, error } = await supabase
         .from('purchases')
         .insert({
@@ -139,11 +142,42 @@ export const useSupabasePurchases = () => {
         .single();
 
       if (error) {
+        console.error('Erro ao adicionar compra:', error);
         toast.error('Erro ao adicionar compra');
         return false;
       }
 
-      // Adicionar também como despesa no financeiro
+      // Buscar categoria de despesa correspondente
+      let categoryId = null;
+      
+      // Mapear categorias de compra para categorias de despesa
+      const categoryMapping = {
+        'Aeronave': 'Compra de Nova Aeronave',
+        'Combustível': 'Combustível',
+        'Equipamentos': 'Manutenção',
+        'Suprimentos': 'Manutenção'
+      };
+
+      const expenseCategoryName = categoryMapping[purchaseData.category];
+      
+      if (expenseCategoryName) {
+        const { data: categoryData } = await supabase
+          .from('expense_categories')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('name', expenseCategoryName)
+          .single();
+          
+        if (categoryData) {
+          categoryId = categoryData.id;
+        } else {
+          console.warn(`Categoria de despesa '${expenseCategoryName}' não encontrada para o usuário`);
+        }
+      } else {
+        console.warn(`Categoria de compra '${purchaseData.category}' não mapeada para despesa`);
+      }
+      
+      // Adicionar como despesa no financeiro
       const { error: expenseError } = await supabase
         .from('financial_transactions')
         .insert({
@@ -151,7 +185,7 @@ export const useSupabasePurchases = () => {
           transaction_type: 'expense',
           description: `${purchaseData.title} - ${purchaseData.category}`,
           amount: purchaseData.finalValue,
-          category_id: purchaseData.category.toLowerCase(),
+          category_id: categoryId,
           transaction_date: purchaseData.purchaseDate
         });
 
@@ -164,6 +198,7 @@ export const useSupabasePurchases = () => {
       toast.success(`Compra ${purchaseCode} adicionada com sucesso!`);
       return true;
     } catch (error) {
+      console.error('Erro ao adicionar compra:', error);
       toast.error('Erro ao adicionar compra');
       return false;
     }
@@ -209,29 +244,49 @@ export const useSupabasePurchases = () => {
   }, [user, fetchPurchases]);
 
   // Deletar compra
-  const deletePurchase = useCallback(async (id: string): Promise<boolean> => {
+  const deletePurchase = useCallback(async (purchaseId: string) => {
     if (!user) {
       toast.error('Usuário não autenticado');
       return false;
     }
 
     try {
+      // Primeiro, buscar a transação financeira associada
+      const { data: purchaseData } = await supabase
+        .from('purchases')
+        .select('financial_transaction_id')
+        .eq('id', purchaseId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (purchaseData?.financial_transaction_id) {
+        // Excluir a transação financeira
+        await supabase
+          .from('financial_transactions')
+          .delete()
+          .eq('id', purchaseData.financial_transaction_id)
+          .eq('user_id', user.id);
+      }
+
+      // Excluir a compra
       const { error } = await supabase
         .from('purchases')
         .delete()
-        .eq('id', id)
+        .eq('id', purchaseId)
         .eq('user_id', user.id);
 
       if (error) {
-        toast.error('Erro ao deletar compra');
+        console.error('Erro ao excluir compra:', error);
+        toast.error('Erro ao excluir compra');
         return false;
       }
 
+      toast.success('Compra excluída com sucesso!');
       await fetchPurchases();
-      toast.success('Compra deletada com sucesso!');
       return true;
     } catch (error) {
-      toast.error('Erro ao deletar compra');
+      console.error('Erro ao excluir compra:', error);
+      toast.error('Erro ao excluir compra');
       return false;
     }
   }, [user, fetchPurchases]);

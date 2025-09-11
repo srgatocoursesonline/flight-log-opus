@@ -48,7 +48,7 @@ BEGIN
   SELECT COALESCE(MAX(CAST(SUBSTRING(purchase_code FROM 3) AS INTEGER)), 0) + 1
   INTO next_number
   FROM purchases 
-  WHERE user_id = $1;
+  WHERE purchases.user_id = $1;
   
   -- Gerar o novo código no formato C-XXX
   new_code := 'C-' || LPAD(next_number::TEXT, 3, '0');

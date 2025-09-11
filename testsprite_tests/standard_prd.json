@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "project": "Flight Log Opus",
+    "date": "2025-09-10",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "Flight Log Opus is a comprehensive flight management system designed for professional pilots. It offers a modern, cockpit-inspired HUD-themed interface to provide seamless management of flight logs, financial tracking, maintenance schedules, career progression, and integration with Microsoft Flight Simulator 2024.",
+  "core_goals": [
+    "Provide pilots with an all-in-one platform to track and manage their flight logs with accuracy and ease.",
+    "Enable detailed financial management and reporting tailored for aviation professionals.",
+    "Offer maintenance tracking capabilities for aircraft with scheduling and cost control.",
+    "Integrate gamification elements including career goals and achievements to motivate pilots.",
+    "Support real-time flight tracking and mapping with a user-friendly dashboard.",
+    "Ensure data synchronization and backup with cloud support and multilingual accessibility.",
+    "Seamlessly integrate with Microsoft Flight Simulator 2024 for automated flight data capture."
+  ],
+  "key_features": [
+    "Intelligent Dashboard showing real-time flight statistics, career summaries, goals, and achievements.",
+    "Comprehensive Flight Management with detailed logging, validation, route mapping, and statistics.",
+    "Advanced Financial System for managing revenue, expenses, customizable categories, and financial analytics.",
+    "Maintenance Tracking system including detailed records, scheduling, costs, and mechanic management.",
+    "Robust Authentication and User Profile Management ensuring security and personalization.",
+    "Multilanguage support with theme customization and notifications in advanced settings.",
+    "Real-time Maps and Flight Tracking with interactive geospatial views.",
+    "Career Progression module with rating systems and milestone tracking for pilots.",
+    "Integration with Microsoft Flight Simulator 2024 for automatic flight detection, telemetry, and enhanced statistics.",
+    "Backend services implemented in Express.js with WebSocket support for real-time data updates."
+  ],
+  "user_flow_summary": [
+    "User registers or logs in via a secure Supabase authentication system.",
+    "Upon login, user accesses the Dashboard featuring personalized greetings and key flight statistics.",
+    "User navigates to Flight Management to add, edit, or review flight logs with automatic data validation.",
+    "Financial Management allows the user to track income, expenses, and generate financial reports.",
+    "Maintenance module lets users input maintenance events, assign mechanics, and schedule upcoming services.",
+    "The user can view real-time flight routes and tracking maps for active or past flights.",
+    "Career Progression dashboard displays rating cards and milestone progress.",
+    "Settings enable theme switching, language selection, notification preferences, and data backup options.",
+    "Integration with Microsoft Flight Simulator automates flight log entries based on telemetry data.",
+    "All user actions synchronize with backend services to maintain data integrity and real-time updates."
+  ],
+  "validation_criteria": [
+    "All authentication and authorization flows must secure user data and maintain session integrity.",
+    "Flight logs must validate key parameters such as airports, aircraft details, flight duration, and routes before saving.",
+    "Financial entries should correctly categorize expenses and revenues, with reports matching backend database queries.",
+    "Maintenance records must reflect accurate scheduling and cost calculations, linked to corresponding aircraft.",
+    "Dashboard statistics and graphical data (charts, progress bars) update in real time with user data changes.",
+    "The integration with Microsoft Flight Simulator must detect and log flights automatically with accurate telemetry.",
+    "Multi-language support must render all UI text in selected languages without layout issues.",
+    "The backend WebSocket service should push real-time updates reliably to connected clients.",
+    "UI components must meet accessibility and responsiveness standards across devices and screen sizes."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React",
+      "Vite",
+      "Supabase",
+      "TanStack Query",
+      "React Router",
+      "i18n",
+      "Shadcn/UI",
+      "Tailwind CSS",
+      "Express.js",
+      "WebSocket"
+    ],
+    "features": [
+      {
+        "name": "Authentication",
+        "description": "User authentication and authorization system using Supabase Auth",
+        "files": [
+          "src/contexts/AuthContext.tsx",
+          "src/pages/Login.tsx",
+          "src/pages/Signup.tsx",
+          "src/pages/EmailConfirmation.tsx"
+        ]
+      },
+      {
+        "name": "Flight Management",
+        "description": "Core functionality for tracking and managing flight logs",
+        "files": [
+          "src/pages/Flights.tsx",
+          "src/components/flights",
+          "src/hooks/supabase/useSupabaseFlights.ts",
+          "src/hooks/business/useFlightNavigation.ts"
+        ]
+      },
+      {
+        "name": "Financial Management",
+        "description": "Tools for tracking expenses, revenues and financial reports",
+        "files": [
+          "src/pages/Financial.tsx",
+          "src/pages/FinancialReports.tsx",
+          "src/components/financial",
+          "src/hooks/supabase/useSupabaseFinancial.ts",
+          "src/hooks/supabase/useSupabaseExpenseCategories.ts",
+          "src/hooks/supabase/useSupabaseRevenueCategories.ts"
+        ]
+      },
+      {
+        "name": "Maintenance Tracking",
+        "description": "System for tracking aircraft maintenance records and schedules",
+        "files": [
+          "src/pages/Maintenance.tsx",
+          "src/components/maintenance",
+          "src/hooks/business/useMaintenanceManager.ts",
+          "src/hooks/supabase/useMaintenanceSettings.ts",
+          "src/types/maintenance.ts"
+        ]
+      },
+      {
+        "name": "Dashboard",
+        "description": "Main dashboard with flight statistics and summaries",
+        "files": [
+          "src/pages/Index.tsx",
+          "src/components/dashboard",
+          "src/hooks/useGreeting.ts"
+        ]
+      },
+      {
+        "name": "Profile Management",
+        "description": "User profile management and settings",
+        "files": [
+          "src/pages/Profile.tsx",
+          "src/components/profile",
+          "src/hooks/useProfile.ts",
+          "src/hooks/useProfileBaseline.ts"
+        ]
+      },
+      {
+        "name": "Maps and Tracking",
+        "description": "Flight maps and real-time tracking features",
+        "files": [
+          "src/pages/FlightMaps.tsx",
+          "src/pages/RealTimeTracking.tsx",
+          "src/components/maps",
+          "src/lib/services/airportService.ts"
+        ]
+      },
+      {
+        "name": "Career Progression",
+        "description": "Career tracking and rating system for pilots",
+        "files": [
+          "src/components/career",
+          "src/components/dashboard/CareerRatingCard.tsx",
+          "src/components/career/CareerRatingManager.tsx"
+        ]
+      },
+      {
+        "name": "Settings",
+        "description": "Application settings and configuration",
+        "files": [
+          "src/pages/Settings.tsx",
+          "src/components/ui/theme-toggle.tsx",
+          "src/components/ui/language-switcher.tsx"
+        ]
+      },
+      {
+        "name": "UI Components",
+        "description": "Reusable UI components based on shadcn/ui",
+        "files": [
+          "src/components/ui",
+          "components.json"
+        ]
+      },
+      {
+        "name": "Backend Services",
+        "description": "Backend server with Express.js and WebSocket for real-time data",
+        "files": [
+          "backend/src/server.ts",
+          "backend/src/controllers",
+          "backend/src/routes",
+          "backend/src/services"
+        ]
+      },
+      {
+        "name": "MSFS Integration",
+        "description": "Microsoft Flight Simulator integration for automatic flight logging",
+        "files": [
+          "companion/companion-msfs.ts",
+          "src/components/dashboard/MSFSFlights.tsx",
+          "src/pages/MSFSFlights.tsx"
+        ]
+      }
+    ]
+  }
+}

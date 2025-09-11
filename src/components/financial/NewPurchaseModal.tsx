@@ -57,12 +57,30 @@ const PURCHASE_CATEGORIES = [
   { id: 'supplies', name: 'Suprimentos', icon: '📦' }
 ];
 
-
+// Aeronaves padrão caso não haja aeronaves cadastradas
+const defaultAircraft = [
+  'Cessna 172',
+  'Cessna 182',
+  'Piper Archer',
+  'Piper Warrior',
+  'Beechcraft Bonanza',
+  'Diamond DA40',
+  'Cirrus SR22',
+  'Pilatus PC-12',
+  'King Air C90',
+  'Citation CJ3'
+];
 
 // Subcategorias para outras categorias
 const SUBCATEGORIES: Record<string, string[]> = {
   aircraft: [], // Será preenchido dinamicamente
-  fuel: [], // Combustível não tem subcategoria
+  fuel: [
+    'AVGAS 100LL',
+    'JET A-1',
+    'MOGAS',
+    'Óleo para Motor',
+    'Aditivos de Combustível'
+  ],
   equipment: [
     'GPS Garmin',
     'Rádio COM',
@@ -101,11 +119,6 @@ export const NewPurchaseModal = forwardRef<NewPurchaseModalRef, NewPurchaseModal
   const { profile } = useProfile();
   const { toast } = useToast();
 
-  // Obter aeronaves do sistema de voos
-  const getAircraftOptions = () => {
-    const aircraft = aircraftManager.getAllAircraftNames();
-    return aircraft;
-  };
   const [open, setOpen] = useState(false);
 
   const [formData, setFormData] = useState<PurchaseFormData>({
@@ -130,6 +143,12 @@ export const NewPurchaseModal = forwardRef<NewPurchaseModalRef, NewPurchaseModal
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     return `C-${String(timestamp + random).slice(-3)}`;
+  };
+
+  // Obter aeronaves do sistema de voos
+  const getAircraftOptions = () => {
+    const aircraft = aircraftManager.getAllAircraftNames();
+    return aircraft.length > 0 ? aircraft : defaultAircraft;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,14 +182,29 @@ export const NewPurchaseModal = forwardRef<NewPurchaseModalRef, NewPurchaseModal
         ? `${categoryName} - ${subcategoryName}`
         : categoryName;
 
+      // Função para formatar valor numérico (tratar vírgula como decimal)
+      const formatCurrencyValue = (value: string): number => {
+        if (!value) return 0;
+        // Substituir vírgula por ponto para tratamento decimal
+        const normalizedValue = value.toString().replace(',', '.');
+        return parseFloat(normalizedValue) || 0;
+      };
+
       // Criar compra no sistema de compras
+      const categoryMap: Record<string, 'Aeronave' | 'Combustível' | 'Equipamentos' | 'Suprimentos'> = {
+        aircraft: 'Aeronave',
+        fuel: 'Combustível',
+        equipment: 'Equipamentos',
+        supplies: 'Suprimentos'
+      };
+
       const purchaseData = {
         title: description,
-        category: formData.category as 'Aeronave' | 'Combustível' | 'Equipamentos' | 'Suprimentos',
+        category: categoryMap[formData.category],
         subcategory: formData.subcategory,
-        budgetedValue: parseFloat(formData.budgetedAmount) || 0,
-        negotiatedValue: parseFloat(formData.negotiatedAmount) || 0,
-        finalValue: parseFloat(formData.finalAmount),
+        budgetedValue: formatCurrencyValue(formData.budgetedAmount),
+        negotiatedValue: formatCurrencyValue(formData.negotiatedAmount),
+        finalValue: formatCurrencyValue(formData.finalAmount),
         purchaseDate: formData.purchaseDate,
         buyer: formData.buyer,
         notes: formData.notes
@@ -182,7 +216,7 @@ export const NewPurchaseModal = forwardRef<NewPurchaseModalRef, NewPurchaseModal
         // Criar expense no financeiro
         const expenseData = {
           description,
-          amount: parseFloat(formData.finalAmount),
+          amount: formatCurrencyValue(formData.finalAmount),
           date: formData.purchaseDate,
           category: formData.category,
           notes: `Compra ID: ${purchaseId}\n${formData.notes || ''}`
@@ -267,8 +301,11 @@ export const NewPurchaseModal = forwardRef<NewPurchaseModalRef, NewPurchaseModal
           {/* Subcategoria - Aeronaves ou outras */}
           {formData.category === 'aircraft' && (
             <div>
-              <Label htmlFor="subcategory" className="label-text">Aeronave</Label>
-              <Select value={formData.subcategory} onValueChange={(value) => setFormData({ ...formData, subcategory: value })}>
+              <Label htmlFor="subcategory" className="label-text">Modelo da Aeronave *</Label>
+              <Select 
+                value={formData.subcategory} 
+                onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Selecione a aeronave" />
                 </SelectTrigger>
