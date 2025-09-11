@@ -1,38 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
-import { Purchase } from "@/entities/purchase";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../contexts/AuthContext";
 import { toast } from 'sonner';
-
-export interface Purchase {
-  id?: string;
-  purchaseCode: string;
-  title: string;
-  category: 'Aeronave' | 'Combustível' | 'Equipamentos' | 'Suprimentos';
-  subcategory: string;
-  budgetedValue: number;
-  negotiatedValue: number;
-  finalValue: number;
-  purchaseDate: string;
-  buyer: string;
-  notes?: string;
-  status: 'pending' | 'approved' | 'completed' | 'cancelled';
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface PurchaseFormData {
-  title: string;
-  category: 'Aeronave' | 'Combustível' | 'Equipamentos' | 'Suprimentos';
-  subcategory: string;
-  budgetedValue: number;
-  negotiatedValue: number;
-  finalValue: number;
-  purchaseDate: string;
-  buyer: string;
-  notes?: string;
-}
+import { Purchase, PurchaseFormData } from "../../entities/purchase";
 
 export const useSupabasePurchases = () => {
   const { user } = useAuth();
@@ -222,6 +192,7 @@ export const useSupabasePurchases = () => {
       if (updates.purchaseDate !== undefined) dbUpdates.purchase_date = updates.purchaseDate;
       if (updates.buyer !== undefined) dbUpdates.buyer = updates.buyer;
       if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+      if (updates.status !== undefined) dbUpdates.status = updates.status;
 
       const { error } = await supabase
         .from('purchases')

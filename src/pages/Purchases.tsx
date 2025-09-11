@@ -27,6 +27,80 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+// Componente StatusBadge clicável
+const StatusBadge = ({ status, purchaseId }: { status: string; purchaseId: string }) => {
+  const { updatePurchase } = useSupabasePurchases();
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50';
+      case 'approved': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50';
+      case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50';
+      case 'cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-900/50';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Pendente';
+      case 'approved': return 'Aprovado';
+      case 'completed': return 'Concluído';
+      case 'cancelled': return 'Cancelado';
+      default: return status;
+    }
+  };
+
+  const handleStatusChange = async () => {
+    if (isUpdating) return;
+    
+    const statusOrder: string[] = ['pending', 'approved', 'completed', 'cancelled'];
+    const currentIndex = statusOrder.indexOf(status);
+    let nextStatus: string;
+    
+    // Ciclo: pending -> approved -> completed -> pending
+    if (status === 'pending') {
+      nextStatus = 'approved';
+    } else if (status === 'approved') {
+      nextStatus = 'completed';
+    } else if (status === 'completed') {
+      nextStatus = 'cancelled';
+    } else if (status === 'cancelled') {
+      nextStatus = 'pending';
+    } else {
+      nextStatus = 'pending';
+    }
+    
+    try {
+      setIsUpdating(true);
+      const success = await updatePurchase(purchaseId, { status: nextStatus });
+      
+      if (success) {
+        // Atualização automática da página após mudança de status
+        setTimeout(() => {
+          window.location.reload();
+        }, 300); // Pequeno delay para melhor UX
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <Badge 
+      className={`${getStatusColor(status)} cursor-pointer transition-colors ${isUpdating ? 'opacity-50 animate-pulse' : ''}`}
+      onClick={handleStatusChange}
+      title="Clique para alterar o status"
+    >
+      {getStatusText(status)}
+      {isUpdating && <span className="ml-1">↻</span>}
+    </Badge>
+  );
+};
+
 const Purchases = () => {
   const { t } = useTranslation();
   const newPurchaseModalRef = useRef<NewPurchaseModalRef>(null);
@@ -67,27 +141,6 @@ const Purchases = () => {
         setEditingPurchase(null);
         await fetchPurchases();
       }
-    }
-  };
-
-  // Funções para cores de status adaptadas ao modo escuro
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'approved': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      case 'cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Pendente';
-      case 'approved': return 'Aprovado';
-      case 'completed': return 'Concluído';
-      case 'cancelled': return 'Cancelado';
-      default: return status;
     }
   };
 
@@ -142,7 +195,7 @@ const Purchases = () => {
             <ShoppingCart className="h-8 w-8 mr-3 text-primary" />
             {t('navigation.purchases')}
           </h1>
-          <p className="text-readable-muted mt-1">
+          <p className="text-readable-muted mt-1 whitespace-nowrap overflow-hidden">
             Gerencie compras de combustível, equipamentos e suprimentos
           </p>
         </div>
@@ -234,9 +287,7 @@ const Purchases = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium text-foreground">{purchase.title}</h4>
                       <Badge variant="outline" className="text-muted-foreground">{purchase.purchaseCode}</Badge>
-                      <Badge className={getStatusColor(purchase.status)}>
-                        {getStatusText(purchase.status)}
-                      </Badge>
+                      <StatusBadge status={purchase.status} purchaseId={purchase.id} />
                     </div>
                     <p className="text-sm text-readable-muted">
                       {purchase.category} • {purchase.subcategory}
@@ -248,11 +299,9 @@ const Purchases = () => {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="font-semibold text-foreground">{formatCurrency(purchase.finalValue)}</p>
-                      {purchase.notes && (
-                        <p className="text-xs text-readable-muted max-w-xs truncate">
-                          {purchase.notes}
-                        </p>
-                      )}
+                      <p className="text-xs text-readable-muted whitespace-nowrap">
+                        {purchase.notes}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Button
