@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NewPurchaseModal, NewPurchaseModalRef } from "@/components/financial/NewPurchaseModal";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useSupabasePurchases } from "@/hooks/supabase/useSupabasePurchases";
 import { useSupabaseAircraftManager } from "@/hooks/supabase/useSupabaseAircraftManager";
 import { format } from "date-fns";
@@ -170,6 +170,13 @@ const Purchases = () => {
 
   const stats = calculateStats();
 
+  // Função auxiliar para verificar se a compra é do mês atual
+  const isCurrentMonth = (purchaseDate: string) => {
+    const purchase = new Date(purchaseDate);
+    const now = new Date();
+    return purchase.getMonth() === now.getMonth() && purchase.getFullYear() === now.getFullYear();
+  };
+
   if (error) {
     return (
       <div className="container mx-auto px-6 pt-8 pb-6">
@@ -213,7 +220,7 @@ const Purchases = () => {
             <DollarSign className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.totalMonth)}</div>
+            <div className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalMonth)}</div>
             <p className="text-xs text-readable-muted">
               {stats.monthCount} {stats.monthCount === 1 ? 'compra' : 'compras'} este mês
             </p>
@@ -294,8 +301,10 @@ const Purchases = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">{formatCurrency(purchase.finalValue)}</p>
+                    <div className={`text-right ${isCurrentMonth(purchase.purchaseDate) ? 'text-red-600 font-bold' : ''}`}>
+                      <p className={`font-semibold ${isCurrentMonth(purchase.purchaseDate) ? 'text-red-600' : 'text-foreground'}`}>
+                        {formatCurrency(purchase.finalValue)}
+                      </p>
                       <p className="text-xs text-readable-muted whitespace-nowrap">
                         {purchase.notes}
                       </p>
