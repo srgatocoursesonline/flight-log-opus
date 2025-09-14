@@ -40,7 +40,8 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
 
   const getStatusBadge = (status: Flight['status']) => {
     // Tentar encontrar status customizado primeiro
-    const customStatus = statusManager.getStatusByName(status);
+    // Usar getStatusByValue que pode buscar tanto por ID quanto por nome
+    const customStatus = statusManager.getStatusByValue(status);
     
     if (customStatus) {
       return (
