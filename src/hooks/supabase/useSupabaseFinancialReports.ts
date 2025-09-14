@@ -5,6 +5,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFinancialSettings } from '@/hooks/business/useFinancialSettings';
+import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths } from 'date-fns';
 
@@ -70,10 +72,12 @@ export interface FinancialFilters {
 
 export const useSupabaseFinancialReports = () => {
   const { user } = useAuth();
+  const { getInitialBalance } = useFinancialSettings();
+  const { getFlightStats } = useSupabaseFlights();
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [dreData, setDreData] = useState<DREData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
   // Função para verificar conexão
@@ -186,8 +190,16 @@ export const useSupabaseFinancialReports = () => {
     const revenues = transactions.filter(t => t.type === 'revenue');
     const expenses = transactions.filter(t => t.type === 'expense');
 
-    // Calcular totais
-    const totalRevenue = revenues.reduce((sum, r) => sum + r.amount, 0);
+    // Obter estatísticas de voos
+    const flightStats = getFlightStats();
+    
+    // Calcular componentes da receita
+    const baseInitial = getInitialBalance();
+    const realFlightsCR = flightStats.totalCR || 0;
+    const additionalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0);
+    
+    // Calcular totais incluindo base inicial + receitas dos voos + receitas adicionais
+    const totalRevenue = baseInitial + realFlightsCR + additionalRevenues;
     const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
 
     // Agrupar por categoria
@@ -231,11 +243,15 @@ export const useSupabaseFinancialReports = () => {
         .filter(t => t.type === 'expense')
         .reduce((sum, e) => sum + e.amount, 0);
 
+      // Distribuir proporcionalmente a base inicial e receitas dos voos
+      const baseInitialMonthly = baseInitial / 12;
+      const realFlightsCRMonthly = realFlightsCR / 12;
+
       monthlyTrend.push({
         month: format(month, 'MMM yyyy'),
-        revenue: monthRevenue,
+        revenue: monthRevenue + baseInitialMonthly + realFlightsCRMonthly,
         expenses: monthExpenses,
-        profit: monthRevenue - monthExpenses
+        profit: (monthRevenue + baseInitialMonthly + realFlightsCRMonthly) - monthExpenses
       });
     }
 

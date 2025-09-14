@@ -322,6 +322,8 @@ export const useSupabaseFinancial = () => {
     const additionalRevenues = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
     const totalRevenue = baseRevenue + realFlightsCR + additionalRevenues;
     
+
+    
     // Expenses from database
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     

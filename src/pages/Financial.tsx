@@ -16,7 +16,7 @@ const Financial = () => {
     window.location.reload();
   }, []);
   
-  // Receita baseada APENAS no CR dos voos reais que você lançar
+  // Receita total incluindo base inicial configurável + CR dos voos reais + receitas extras
   const currentRevenue = financialStats.totalRevenue;
   const currentExpenses = financialStats.totalExpenses;
   const currentProfit = financialStats.netProfit;

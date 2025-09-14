@@ -28,14 +28,14 @@ export const FinancialReports: React.FC = () => {
     dreData,
     isLoading,
     error,
-    refetchData,
+    refresh,
     lastUpdated
   } = useSupabaseFinancialReports();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await refetchData();
+      await refresh();
     } finally {
       setIsRefreshing(false);
     }
