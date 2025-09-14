@@ -186,7 +186,7 @@ export const useSupabaseFinancialReports = () => {
   }, [user]);
 
   // Calcular DRE completo
-  const calculateDRE = useCallback((transactions: FinancialTransaction[]): DREData => {
+  const calculateDRE = (transactions: FinancialTransaction[]): DREData => {
     const revenues = transactions.filter(t => t.type === 'revenue');
     const expenses = transactions.filter(t => t.type === 'expense');
 
@@ -291,15 +291,13 @@ export const useSupabaseFinancialReports = () => {
         net: netProfit
       }
     };
-  }, []);
+  };
 
   // Atualizar DRE quando transações mudam
   useEffect(() => {
-    if (transactions.length > 0) {
-      const dre = calculateDRE(transactions);
-      setDreData(dre);
-    }
-  }, [transactions, calculateDRE]);
+    const dre = calculateDRE(transactions);
+    setDreData(dre);
+  }, [transactions]);
 
   // Buscar DRE para período específico
   const getDREForPeriod = useCallback(async (startDate: Date, endDate: Date) => {
@@ -338,7 +336,7 @@ export const useSupabaseFinancialReports = () => {
       toast.error('Erro ao calcular DRE');
       return null;
     }
-  }, [user, calculateDRE]);
+  }, [user]);
 
   // Configurar sincronização automática
   useEffect(() => {
