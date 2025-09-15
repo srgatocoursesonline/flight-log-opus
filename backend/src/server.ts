@@ -23,7 +23,7 @@ dotenv.config();
 // ============================================
 
 const CONFIG = {
-  PORT: process.env.PORT || 3000,
+  PORT: process.env.PORT || 8080,
   WS_PORT: process.env.WS_PORT || 3003,
   NODE_ENV: process.env.NODE_ENV || 'development',
   
@@ -45,8 +45,8 @@ const CONFIG = {
 
 class FlightLogServer {
   private app: express.Application;
-  private wsServer: WebSocketServer;
-  private supabase: SupabaseClient;
+  private wsServer!: WebSocketServer;
+  private supabase!: SupabaseClient;
   private clients: Set<WebSocket> = new Set();
 
   constructor() {
@@ -63,15 +63,31 @@ class FlightLogServer {
   // ============================================
 
   private setupSupabase() {
-    this.supabase = createClient(
-      CONFIG.SUPABASE_URL,
-      CONFIG.SUPABASE_SERVICE_KEY
-    );
-    
-    // Disponibilizar para as rotas
-    this.app.locals.supabase = this.supabase;
-    
-    console.log('✅ Supabase client inicializado');
+    try {
+      // Verificar se as credenciais do Supabase estão configuradas
+      if (!CONFIG.SUPABASE_URL || CONFIG.SUPABASE_URL.includes('placeholder') ||
+          !CONFIG.SUPABASE_SERVICE_KEY || CONFIG.SUPABASE_SERVICE_KEY.includes('placeholder')) {
+        console.warn('⚠️  Credenciais do Supabase não configuradas. Servidor iniciando em modo mock.');
+        this.supabase = null;
+        this.app.locals.supabase = null;
+        return;
+      }
+
+      this.supabase = createClient(
+        CONFIG.SUPABASE_URL,
+        CONFIG.SUPABASE_SERVICE_KEY
+      );
+      
+      // Disponibilizar para as rotas
+      this.app.locals.supabase = this.supabase;
+      
+      console.log('✅ Supabase client inicializado');
+    } catch (error) {
+      console.error('❌ Erro ao inicializar Supabase:', error);
+      console.warn('⚠️  Servidor iniciando sem conexão com Supabase');
+      this.supabase = null;
+      this.app.locals.supabase = null;
+    }
   }
 
   // ============================================
@@ -103,7 +119,7 @@ class FlightLogServer {
     
     // Logging
     if (CONFIG.NODE_ENV === 'development') {
-      this.app.use((req, res, next) => {
+      this.app.use((req, _res, next) => {
         console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
         next();
       });
@@ -116,7 +132,7 @@ class FlightLogServer {
 
   private setupRoutes() {
     // Health check
-    this.app.get('/health', (req, res) => {
+    this.app.get('/health', (_req, res) => {
       res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
@@ -142,7 +158,7 @@ class FlightLogServer {
   // ============================================
 
   private setupWebSocket() {
-    this.wsServer = new WebSocketServer({ port: CONFIG.WS_PORT });
+    this.wsServer = new WebSocketServer({ port: Number(CONFIG.WS_PORT) });
     
     this.wsServer.on('connection', (ws, req) => {
       console.log('📡 Cliente WebSocket conectado:', req.socket.remoteAddress);
@@ -178,7 +194,7 @@ class FlightLogServer {
 
   private setupErrorHandling() {
     // Error handler
-    this.app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    this.app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
       console.error('❌ Erro no servidor:', error);
       
       res.status(error.status || 500).json({
@@ -186,7 +202,7 @@ class FlightLogServer {
           ? 'Erro interno do servidor' 
           : error.message,
         timestamp: new Date().toISOString(),
-        path: req.path,
+        path: _req.path,
       });
     });
 
@@ -240,15 +256,13 @@ class FlightLogServer {
 // ============================================
 
 // Iniciar servidor se executado diretamente
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const server = new FlightLogServer();
-  server.start();
+const server = new FlightLogServer();
+server.start();
 
-  // Graceful shutdown
-  process.on('SIGINT', () => {
-    console.log('\n🛑 Encerrando servidor...');
-    process.exit(0);
-  });
-}
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Encerrando servidor...');
+  process.exit(0);
+});
 
 export default FlightLogServer;

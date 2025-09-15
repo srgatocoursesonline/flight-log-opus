@@ -134,7 +134,7 @@ export class FlightTrackingService {
         const deviceId = crypto.randomUUID();
         const deviceToken = this.generateDeviceToken(deviceId, userId);
         
-        const { data, error } = await this.supabase
+        const { error } = await this.supabase
           .from('authorized_devices')
           .insert({
             user_id: userId,
@@ -513,7 +513,8 @@ export class FlightTrackingService {
     }
     
     try {
-      const { sessionId, ...flightData }: { sessionId: string } & FlightData = message.data;
+      const data = message.data || { sessionId: '', flightNumber: '', origin: '', destination: '' };
+      const { sessionId, ...flightData } = data as unknown as { sessionId: string } & FlightData;
       
       // Verificar se a sessão existe e pertence ao dispositivo
       const session = this.activeSessions.get(sessionId);
@@ -591,7 +592,7 @@ export class FlightTrackingService {
     });
     
     // Enviar para todos os clientes autenticados
-    this.authenticatedClients.forEach((device, ws) => {
+    this.authenticatedClients.forEach((_, ws) => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(message);
       }

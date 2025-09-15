@@ -1,8 +1,9 @@
 import { useState, useMemo, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, Calendar, Filter, Plane, Search, CalendarIcon } from "lucide-react";
+import { Download, Calendar, Filter, Plane, Search, CalendarIcon, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { AddFlightModal, AddFlightModalRef } from '@/components/flights/AddFlightModal';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import {
   Table,
@@ -43,6 +44,7 @@ const History = () => {
   const { t } = useTranslation();
   const { flights, isLoading } = useSupabaseFlights();
   const statusManager = useSupabaseFlightStatusManager();
+  const addFlightModalRef = useRef<AddFlightModalRef>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date-desc');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -248,7 +250,7 @@ const History = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20 lg:pb-6">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
         <div>
           <h1 className="mobile-title gradient-title">
@@ -536,6 +538,8 @@ const History = () => {
           </div>
         </div>
       )}
+      
+      <AddFlightModal ref={addFlightModalRef} />
     </div>
   );
 };

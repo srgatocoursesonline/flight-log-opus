@@ -531,7 +531,7 @@ const handleManualAirportSave = async (airportInfo: AirportInfo) => {
 
   return (
     <Dialog open={open} onOpenChange={handleModalClose}>
-      {trigger !== null && (
+      {trigger !== null && trigger !== undefined && (
         <DialogTrigger asChild>
           {trigger || defaultTrigger}
         </DialogTrigger>

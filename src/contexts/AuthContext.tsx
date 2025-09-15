@@ -13,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: AuthError }>;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error?: AuthError }>;
+  signInWithGoogle: () => Promise<{ error?: AuthError }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error?: AuthError }>;
 }
@@ -151,13 +152,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async (forceSelectAccount = false) => {
+    try {
+      setLoading(true);
+      
+      const queryParams: Record<string, string> = {
+        access_type: 'offline',
+      };
+
+      // Apenas pedir para selecionar conta se forçado
+      if (forceSelectAccount) {
+        queryParams.prompt = 'select_account';
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams,
+        },
+      });
+      
+      if (error) {
+        toast.error('Erro ao conectar com Google: ' + error.message);
+      }
+      
+      return { error };
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      return { error: error as AuthError };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-        toast.error('Erro ao fazer logout');
+      // Limpar cache de autenticação local
+      await supabase.auth.signOut({ scope: 'global' });
+      // Limpar possíveis cookies corrompidos
+      if (typeof window !== 'undefined') {
+        document.cookie = 'sb-access-token=; Max-Age=0; path=/';
+        document.cookie = 'sb-refresh-token=; Max-Age=0; path=/';
       }
     } catch (error) {
       console.error('Sign out error:', error);
@@ -185,6 +222,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     resetPassword,
   };

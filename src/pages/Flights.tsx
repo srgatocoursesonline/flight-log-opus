@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
+import { List as FixedSizeList } from 'react-window';
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Plane, LayoutGrid, List, Wifi } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import { FlightCard } from '@/components/flights/FlightCard';
 import { FlightCardCompact } from '@/components/flights/FlightCardCompact';
 import { FlightSessionCard } from '@/components/flights/FlightSessionCard';
 import { FlightStats } from '@/components/flights/FlightStats';
+import VirtualizedFlightList from '@/components/flights/VirtualizedFlightList';
 import {
   Select,
   SelectContent,
@@ -18,6 +20,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+// Componente memoizado para lista de voos compactos
+const CompactFlightList = memo(({ flights }: { flights: any[] }) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {flights.map((flight) => (
+        <FlightCardCompact key={flight.id} flight={flight} />
+      ))}
+    </div>
+  );
+});
+
+CompactFlightList.displayName = 'CompactFlightList';
+
+// Componente memoizado para lista de voos detalhados
+const DetailedFlightList = memo(({ flights }: { flights: any[] }) => {
+  return (
+    <>
+      {flights.map((flight) => (
+        <FlightCard key={flight.id} flight={flight} />
+      ))}
+    </>
+  );
+});
+
+DetailedFlightList.displayName = 'DetailedFlightList';
+
+// Componente memoizado para lista de sessões
+const SessionList = memo(({ 
+  sessions, 
+  compact, 
+  onViewDetails, 
+  onCancelSession 
+}: { 
+  sessions: any[]; 
+  compact: boolean; 
+  onViewDetails: (id: string) => void; 
+  onCancelSession: (id: string) => void; 
+}) => {
+  return (
+    <>
+      {sessions.map((session) => (
+        <FlightSessionCard 
+          key={session.id} 
+          session={session} 
+          compact={compact}
+          onViewDetails={onViewDetails}
+          onCancelSession={onCancelSession}
+        />
+      ))}
+    </>
+  );
+});
+
+SessionList.displayName = 'SessionList';
 
 const Flights = () => {
   const { t } = useTranslation();
@@ -31,6 +88,8 @@ const Flights = () => {
   const [sortBy, setSortBy] = useState('date-desc');
   const [viewMode, setViewMode] = useState<'compact' | 'detailed'>('detailed');
   const [showSessions, setShowSessions] = useState(true);
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   const addFlightModalRef = useRef<AddFlightModalRef>(null);
 
   // Escutar evento para abrir modal automaticamente ou verificar URL params
@@ -63,39 +122,44 @@ const Flights = () => {
     };
   }, [searchParams, setSearchParams]);
 
-  // Filtrar e ordenar voos manuais
-  const filteredAndSortedFlights = useMemo(() => {
-    const filtered = flights.filter(flight => {
-      const matchesSearch = 
-        flight.callsign.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        flight.aircraft.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        flight.departure.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        flight.arrival.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || flight.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
+  // Memoizar filtros para evitar re-renderizações desnecessárias
+  const filterCriteria = useMemo(() => ({
+    searchTerm: searchTerm.toLowerCase(),
+    statusFilter,
+    sortBy
+  }), [searchTerm, statusFilter, sortBy]);
 
-    // Ordenar
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'date-desc':
-          // Create date objects from the date strings (which are in YYYY-MM-DD format)
-          // Using Date.UTC to avoid timezone conversion issues
-          const [aYearDesc, aMonthDesc, aDayDesc] = a.date.split('-').map(Number);
-          const [bYearDesc, bMonthDesc, bDayDesc] = b.date.split('-').map(Number);
-          const dateA = new Date(Date.UTC(aYearDesc, aMonthDesc - 1, aDayDesc));
-          const dateB = new Date(Date.UTC(bYearDesc, bMonthDesc - 1, bDayDesc));
-          return dateB.getTime() - dateA.getTime();
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [filterCriteria]);
+
+  // Memoizar voos filtrados e ordenados
+  const filteredAndSortedFlights = useMemo(() => {
+    let filtered = [...flights];
+
+    // Filtro de busca
+    if (filterCriteria.searchTerm) {
+      filtered = filtered.filter(flight =>
+        flight.callsign.toLowerCase().includes(filterCriteria.searchTerm) ||
+        flight.departure.toLowerCase().includes(filterCriteria.searchTerm) ||
+        flight.arrival.toLowerCase().includes(filterCriteria.searchTerm) ||
+        flight.aircraft.toLowerCase().includes(filterCriteria.searchTerm)
+      );
+    }
+
+    // Filtro de status
+    if (filterCriteria.statusFilter !== 'all') {
+      filtered = filtered.filter(flight => flight.status === filterCriteria.statusFilter);
+    }
+
+    // Ordenação otimizada
+    const sorted = [...filtered].sort((a, b) => {
+      switch (filterCriteria.sortBy) {
         case 'date-asc':
-          // Create date objects from the date strings (which are in YYYY-MM-DD format)
-          // Using Date.UTC to avoid timezone conversion issues
-          const [aYearAsc, aMonthAsc, aDayAsc] = a.date.split('-').map(Number);
-          const [bYearAsc, bMonthAsc, bDayAsc] = b.date.split('-').map(Number);
-          const dateAAsc = new Date(Date.UTC(aYearAsc, aMonthAsc - 1, aDayAsc));
-          const dateBAsc = new Date(Date.UTC(bYearAsc, bMonthAsc - 1, bDayAsc));
-          return dateAAsc.getTime() - dateBAsc.getTime();
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case 'date-desc':
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         case 'rating-desc':
           return b.careerRating - a.careerRating;
         case 'rating-asc':
@@ -103,59 +167,47 @@ const Flights = () => {
         case 'callsign':
           return a.callsign.localeCompare(b.callsign);
         case 'duration-desc':
-          const aDuration = parseInt(a.flightTime.replace(/\D/g, ''));
-          const bDuration = parseInt(b.flightTime.replace(/\D/g, ''));
+          const aDuration = parseInt(a.flightTime.replace(/\D/g, '')) || 0;
+          const bDuration = parseInt(b.flightTime.replace(/\D/g, '')) || 0;
           return bDuration - aDuration;
         default:
-          return 0;
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
       }
     });
 
-    return filtered;
-  }, [flights, searchTerm, statusFilter, sortBy]);
+    return sorted;
+  }, [flights, filterCriteria]);
 
-  // Filtrar e ordenar sessões de voo rastreadas
+  // Paginar os voos
+  const paginatedFlights = useMemo(() => {
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedFlights.slice(0, endIndex);
+  }, [filteredAndSortedFlights, page, ITEMS_PER_PAGE]);
+
+  const totalPages = Math.ceil(filteredAndSortedFlights.length / ITEMS_PER_PAGE);
+  const hasMore = page < totalPages;
+
+  // Memoizar sessões filtradas
   const filteredAndSortedSessions = useMemo(() => {
     if (!showSessions) return [];
     
-    const filtered = sessions.filter(session => {
-      const matchesSearch = 
-        session.aircraftTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        session.deviceId.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // Mapear status das sessões para os filtros de voo
-      const sessionStatusMap: { [key: string]: string } = {
-        'active': 'active',
-        'completed': 'completed',
-        'cancelled': 'cancelled'
-      };
-      
-      const mappedStatus = sessionStatusMap[session.status] || session.status;
-      const matchesStatus = statusFilter === 'all' || mappedStatus === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
+    let filtered = [...sessions];
 
-    // Ordenar sessões
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'date-desc':
-          return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
-        case 'date-asc':
-          return new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime();
-        case 'duration-desc':
-          const aDuration = a.flightTime || 0;
-          const bDuration = b.flightTime || 0;
-          return bDuration - aDuration;
-        case 'callsign':
-          return a.aircraftTitle.localeCompare(b.aircraftTitle);
-        default:
-          return 0;
-      }
-    });
+    if (filterCriteria.searchTerm) {
+      filtered = filtered.filter(session =>
+        session.callsign.toLowerCase().includes(filterCriteria.searchTerm) ||
+        session.departure.toLowerCase().includes(filterCriteria.searchTerm) ||
+        session.arrival.toLowerCase().includes(filterCriteria.searchTerm)
+      );
+    }
 
-    return filtered;
-  }, [sessions, searchTerm, statusFilter, sortBy, showSessions]);
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.startTime || a.date).getTime();
+      const dateB = new Date(b.startTime || b.date).getTime();
+      return dateB - dateA;
+    });
+  }, [sessions, showSessions, filterCriteria.searchTerm]);
 
   if (isLoading || isLoadingSessions) {
     return (
@@ -178,6 +230,15 @@ const Flights = () => {
           <p className="text-muted-foreground">
             {t('flights.subtitle')}
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => addFlightModalRef.current?.openModal()}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {t('flights.addNewFlight')}
+          </Button>
         </div>
         <AddFlightModal 
           ref={addFlightModalRef} 
@@ -335,19 +396,28 @@ const Flights = () => {
                 </div>
               )}
               {viewMode === 'compact' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {filteredAndSortedFlights.map((flight, index) => (
-                    <div 
-                      key={`flight-${flight.id}`} 
-                      className="fade-in" 
-                      style={{ animationDelay: `${0.1 + ((filteredAndSortedSessions.length + index) * 0.05)}s` }}
-                    >
-                      <FlightCardCompact flight={flight} />
-                    </div>
-                  ))}
-                </div>
+                paginatedFlights.length > 50 ? (
+                  <VirtualizedFlightList
+                    flights={paginatedFlights}
+                    height={600}
+                    itemSize={120}
+                    width="100%"
+                  />
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {paginatedFlights.map((flight, index) => (
+                      <div 
+                        key={`flight-${flight.id}`} 
+                        className="fade-in" 
+                        style={{ animationDelay: `${0.1 + ((filteredAndSortedSessions.length + index) * 0.05)}s` }}
+                      >
+                        <FlightCardCompact flight={flight} />
+                      </div>
+                    ))}
+                  </div>
+                )
               ) : (
-                filteredAndSortedFlights.map((flight, index) => (
+                paginatedFlights.map((flight, index) => (
                   <div 
                     key={`flight-${flight.id}`} 
                     className="fade-in" 
@@ -356,6 +426,18 @@ const Flights = () => {
                     <FlightCard flight={flight} />
                   </div>
                 ))
+              )}
+              
+              {/* Botão de carregar mais */}
+              {hasMore && (
+                <div className="text-center pt-4">
+                  <button
+                    onClick={() => setPage(prev => prev + 1)}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Carregar mais voos ({page * ITEMS_PER_PAGE} de {filteredAndSortedFlights.length})
+                  </button>
+                </div>
               )}
             </div>
           )}

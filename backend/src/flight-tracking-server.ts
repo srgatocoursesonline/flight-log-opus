@@ -10,7 +10,7 @@ import { flightTrackingService } from './services/flightTrackingService';
 dotenv.config();
 
 // Configurações
-const PORT = process.env.FLIGHT_TRACKING_PORT ? parseInt(process.env.FLIGHT_TRACKING_PORT) : 3001;
+const PORT = process.env.FLIGHT_TRACKING_PORT ? parseInt(process.env.FLIGHT_TRACKING_PORT) : 8081;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Validar variáveis de ambiente obrigatórias

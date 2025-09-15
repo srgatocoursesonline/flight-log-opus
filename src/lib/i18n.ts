@@ -63,6 +63,7 @@ const ptBR = {
       title: "Gerenciamento de Voos",
       subtitle: "Gerencie suas operações de voo e registre novas missões.",
       logNewFlight: "Registrar Novo Voo",
+      addNewFlight: "Adicionar Novo Voo",
       searchPlaceholder: "Buscar voos...",
       filter: "Filtrar",
       noFlights: "Nenhum voo registrado ainda",

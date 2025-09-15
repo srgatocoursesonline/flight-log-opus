@@ -24,7 +24,7 @@ interface Coordinates {
 // ============================================
 
 const EARTH_RADIUS_KM = 6371;
-const NAUTICAL_MILE_TO_KM = 1.852;
+// const NAUTICAL_MILE_TO_KM = 1.852; // Comentado pois não está sendo usado
 const KNOTS_TO_KMH = 1.852;
 
 // Estimativas de consumo por tipo de aeronave (litros/hora)
@@ -251,7 +251,7 @@ export function estimateFuelConsumption(
     consumptionPerHour = FUEL_CONSUMPTION_ESTIMATES.default;
   }
   
-  const totalConsumption = consumptionPerHour * durationHours;
+  const totalConsumption = ((consumptionPerHour || FUEL_CONSUMPTION_ESTIMATES.default) || 0) * durationHours;
   return Math.round(totalConsumption);
 }
 

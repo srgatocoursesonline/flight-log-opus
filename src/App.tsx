@@ -28,6 +28,7 @@ import FinancialReports from "./pages/FinancialReports";
 import Companies from "./pages/Companies";
 import TodCalculatorPage from "./pages/TodCalculator";
 import FlightPlannerPage from "./pages/FlightPlanner";
+import { AuthCallback } from "./pages/AuthCallback";
 
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const AppContent = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/confirm-email" element={<EmailConfirmationPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/diagnostic" element={<Diagnostic />} />
         <Route path="/super-diagnostic" element={<SuperDiagnostic />} />
 
