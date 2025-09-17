@@ -21,6 +21,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { ChartCRFlights } from '@/components/flights/ChartCRFlights';
+
+import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/contexts/AuthContext';
+
 // Componente memoizado para lista de voos compactos
 const CompactFlightList = memo(({ flights }: { flights: any[] }) => {
   return (
@@ -77,6 +82,8 @@ const SessionList = memo(({
 SessionList.displayName = 'SessionList';
 
 const Flights = () => {
+  const { user } = useAuth();
+  const { profile } = useProfile();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -251,6 +258,19 @@ const Flights = () => {
 
       {/* Estatísticas */}
       <FlightStats />
+
+      {/* Gráfico de Evolução CR x Quantidade de Voos */}
+      <div className="hud-display stats-card fade-in w-full" style={{ animationDelay: '0.1s' }}>
+        <div className="p-4 sm:p-6">
+          <h2 className="text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <Plane className="h-4 w-4" />
+            Evolução do Career Rating
+          </h2>
+          <div className="w-full">
+            <ChartCRFlights userId={user?.id || profile?.id} />
+          </div>
+        </div>
+      </div>
 
       {/* Filtros e Busca */}
       <div className="flex flex-col lg:flex-row gap-2 fade-in" style={{ animationDelay: '0.1s' }}>
