@@ -77,9 +77,9 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
     const activeFilters: MaintenanceFilters = {};
     
     if (filters.status) activeFilters.status = filters.status;
-    if (filters.aircraft_registration) activeFilters.aircraft_registration = filters.aircraft_registration;
-    if (filters.date_from) activeFilters.date_from = filters.date_from;
-    if (filters.date_to) activeFilters.date_to = filters.date_to;
+    if (filters.aircraft) activeFilters.aircraft = filters.aircraft;
+    if (filters.dateFrom) activeFilters.dateFrom = filters.dateFrom;
+    if (filters.dateTo) activeFilters.dateTo = filters.dateTo;
 
     loadRecords(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
   }, [filters, loadRecords]);
@@ -91,9 +91,9 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
   const clearFilters = () => {
     setFilters({
       status: undefined,
-      aircraft_registration: '',
-      date_from: '',
-      date_to: ''
+      aircraft: '',
+      dateFrom: '',
+      dateTo: ''
     });
     setSearchTerm('');
   };
@@ -119,10 +119,8 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
     
     const searchLower = searchTerm.toLowerCase();
     return (
-      record.aircraft_registration.toLowerCase().includes(searchLower) ||
-      record.aircraft_model?.toLowerCase().includes(searchLower) ||
-      record.mechanic_name?.toLowerCase().includes(searchLower) ||
-      record.location?.toLowerCase().includes(searchLower) ||
+      record.aircraft_registration?.toLowerCase().includes(searchLower) ||
+      record.description?.toLowerCase().includes(searchLower) ||
       record.notes?.toLowerCase().includes(searchLower)
     );
   });
@@ -240,8 +238,8 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
               <input
                 type="text"
                 placeholder="Ex: PT-ABC"
-                value={filters.aircraft_registration || ''}
-                onChange={(e) => handleFilterChange('aircraft_registration', e.target.value)}
+                value={filters.aircraft || ''}
+                onChange={(e) => handleFilterChange('aircraft', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -252,8 +250,8 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
               </label>
               <input
                 type="date"
-                value={filters.date_from || ''}
-                onChange={(e) => handleFilterChange('date_from', e.target.value)}
+                value={filters.dateFrom || ''}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -264,8 +262,8 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
               </label>
               <input
                 type="date"
-                value={filters.date_to || ''}
-                onChange={(e) => handleFilterChange('date_to', e.target.value)}
+                value={filters.dateTo || ''}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -316,13 +314,8 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {record.aircraft_registration}
-                    </h3>
-                    {record.aircraft_model && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {record.aircraft_model}
-                      </p>
-                    )}
+                    {record.aircraft_registration}
+                  </h3>
                   </div>
                 </div>
                 <StatusBadge status={record.status} recordId={record.id} />
@@ -331,34 +324,26 @@ export function MaintenanceList({ onEdit, onView }: MaintenanceListProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(record.maintenance_date).toLocaleDateString('pt-BR')}</span>
+                  <span>{new Date(Date.UTC(
+                    new Date(record.date).getFullYear(),
+                    new Date(record.date).getMonth(),
+                    new Date(record.date).getDate()
+                  )).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
                 </div>
 
-                {record.mechanic_name && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                    <User className="h-4 w-4" />
-                    <span>{record.mechanic_name}</span>
-                  </div>
-                )}
 
-                {record.location && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="h-4 w-4" />
-                    <span>{record.location}</span>
-                  </div>
-                )}
 
                 <div className="flex items-center space-x-4">
-                  {record.total_hours > 0 && (
+                  {record.actual_hours > 0 && (
                     <div className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
                       <Clock className="h-4 w-4" />
-                      <span>{record.total_hours}h</span>
+                      <span>{record.actual_hours}h</span>
                     </div>
                   )}
-                  {record.total_cost > 0 && (
+                  {record.actual_cost > 0 && (
                     <div className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
                       <DollarSign className="h-4 w-4" />
-                      <span>R$ {record.total_cost.toFixed(2)}</span>
+                      <span>R$ {record.actual_cost.toFixed(2)}</span>
                     </div>
                   )}
                 </div>

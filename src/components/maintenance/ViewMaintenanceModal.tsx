@@ -104,10 +104,17 @@ export function ViewMaintenanceModal({
   if (!record) return null;
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
+    const d = new Date(date);
+    const utcDate = new Date(Date.UTC(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate()
+    ));
+    return utcDate.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'UTC'
     });
   };
 
@@ -154,13 +161,8 @@ export function ViewMaintenanceModal({
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {record.aircraft_registration}
+                    {record.aircraft}
                   </h2>
-                  {record.aircraft_model && (
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {record.aircraft_model}
-                    </p>
-                  )}
                 </div>
               </div>
               <StatusBadge status={record.status} />
@@ -170,20 +172,16 @@ export function ViewMaintenanceModal({
               <InfoItem
                 icon={Calendar}
                 label="Data da Manutenção"
-                value={formatDate(record.maintenance_date)}
+                value={formatDate(record.date)}
               />
               
-              <InfoItem
-                icon={User}
-                label="Mecânico"
-                value={record.mechanic_name}
-              />
-              
-              <InfoItem
-                icon={MapPin}
-                label="Local"
-                value={record.location}
-              />
+              {record.description && (
+                <InfoItem
+                  icon={FileText}
+                  label="Descrição"
+                  value={record.description}
+                />
+              )}
               
               {record.mechanic_license && (
                 <InfoItem
@@ -193,21 +191,7 @@ export function ViewMaintenanceModal({
                 />
               )}
               
-              {record.next_maintenance_date && (
-                <InfoItem
-                  icon={Calendar}
-                  label="Próxima Manutenção"
-                  value={formatDate(record.next_maintenance_date)}
-                />
-              )}
-              
-              {record.next_maintenance_hours && record.next_maintenance_hours > 0 && (
-                <InfoItem
-                  icon={Clock}
-                  label="Próxima em (horas)"
-                  value={`${record.next_maintenance_hours}h`}
-                />
-              )}
+
             </div>
           </div>
 

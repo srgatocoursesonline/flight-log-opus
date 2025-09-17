@@ -132,7 +132,7 @@ export default function RealTimeTracking() {
       </Card>
 
       {/* Componente Principal de Tracking */}
-      <LiveTrackingMap />
+      <LiveTrackingMap autoConnect={true} />
 
       {/* Links Úteis */}
       <Card className="chart-container">

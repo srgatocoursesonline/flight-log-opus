@@ -208,7 +208,11 @@ const Profile = () => {
                 <Calendar className="h-5 w-5 text-primary" />
                 <h4 className="font-medium text-foreground">{t('profile.careerStarted')}</h4>
               </div>
-              <p className="text-sm text-muted-foreground">{profile?.career_started ? new Date(profile.career_started).toLocaleDateString('pt-BR') : 'January 15, 2024'}</p>
+              <p className="text-sm text-muted-foreground">{profile?.career_started ? new Date(Date.UTC(
+                new Date(profile.career_started).getFullYear(),
+                new Date(profile.career_started).getMonth(),
+                new Date(profile.career_started).getDate()
+              )).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'January 15, 2024'}</p>
               <p className="text-xs text-muted-foreground mt-1">{stats?.careerDuration || t('profile.monthsAgo', { count: 8 })}</p>
             </div>
             

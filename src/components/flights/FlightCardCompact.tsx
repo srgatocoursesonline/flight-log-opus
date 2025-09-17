@@ -52,10 +52,17 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
 
   // Memoize formatted date
   const formattedDate = useMemo(() => {
-    return new Date(flight.date).toLocaleDateString('pt-BR', {
+    // Create date object from the date string (which is in YYYY-MM-DD format)
+    // Using Date.UTC to avoid timezone conversion issues
+    const [year, month, day] = flight.date.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    
+    // Format to Brazilian date format without timezone conversion
+    return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'UTC' // Ensure we use UTC to avoid timezone shifts
     });
   }, [flight.date]);
 

@@ -15,11 +15,14 @@ export interface MaintenanceItem {
   description?: string;
   estimated_hours?: number;
   estimated_cost?: number;
+  category_id?: string;
+  priority?: MaintenancePriority;
 }
 
 export interface MaintenanceRecord {
   id: string;
   aircraft: string;
+  aircraft_model?: string;
   date: string;
   description: string;
   items: MaintenanceRecordItem[];

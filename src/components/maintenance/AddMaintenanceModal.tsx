@@ -131,7 +131,14 @@ export function AddMaintenanceModal({ open, onOpenChange, onSuccess }: AddMainte
       setSubmitting(true);
       
       await createMaintenanceRecord({
-        ...formData,
+        aircraft_registration: formData.aircraft_registration,
+        aircraft_model: formData.aircraft_model,
+        maintenance_date: formData.maintenance_date,
+        mechanic_name: formData.mechanic_name,
+        mechanic_license: formData.mechanic_license || undefined,
+        location: formData.location,
+        notes: formData.notes || undefined,
+        next_maintenance_date: formData.next_maintenance_date,
         next_maintenance_hours: formData.next_maintenance_hours || undefined,
         items: selectedItems.map(item => ({
           maintenance_item_id: item.maintenance_item_id,

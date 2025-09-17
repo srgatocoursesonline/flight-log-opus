@@ -165,7 +165,11 @@ export const FlightSessionCard: React.FC<FlightSessionCardProps> = ({
           {session.status === 'active' ? (
             <span>Iniciado {formatDistanceToNow(new Date(session.startedAt), { locale: ptBR, addSuffix: true })}</span>
           ) : (
-            <span>Voo realizado em {new Date(session.startedAt).toLocaleDateString('pt-BR')}</span>
+            <span>Voo realizado em {new Date(Date.UTC(
+              new Date(session.startedAt).getFullYear(),
+              new Date(session.startedAt).getMonth(),
+              new Date(session.startedAt).getDate()
+            )).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
           )}
         </div>
       </CardHeader>

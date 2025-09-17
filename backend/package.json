@@ -7,10 +7,12 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "dev:tracking": "tsx watch src/flight-tracking-server.ts",
+    "dev:tracking:simple": "tsx watch src/flight-tracking-server-dev.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "start:dev": "tsx src/server.ts",
     "start:tracking": "tsx src/flight-tracking-server.ts",
+    "start:tracking:simple": "tsx src/flight-tracking-server-dev.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "test": "jest",

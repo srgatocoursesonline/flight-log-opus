@@ -57,6 +57,7 @@ interface WebSocketMessage {
 
 interface LiveTrackingMapProps {
   className?: string;
+  autoConnect?: boolean;
 }
 
 // ============================================
@@ -93,7 +94,7 @@ const createAircraftIcon = (heading: number) => {
 // COMPONENTE PRINCIPAL
 // ============================================
 
-const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
+const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className, autoConnect = false }) => {
   const mapRef = useRef<L.Map | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -184,7 +185,9 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
 
   const connectWebSocket = useCallback(() => {
     try {
-      const ws = new WebSocket('ws://localhost:3001/flight-tracking');
+      // Usar porta correta baseada no ambiente (Vite env vars)
+      const port = import.meta.env.DEV ? 8081 : 3001;
+      const ws = new WebSocket(`ws://localhost:${port}/flight-tracking`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -211,29 +214,40 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
         }
       };
 
-      ws.onclose = () => {
-        console.log('❌ Desconectado do Flight Tracking Service');
+      ws.onclose = (event) => {
+        console.log('❌ Desconectado do Flight Tracking Service', {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean
+        });
         setIsConnected(false);
         setCurrentPosition(null);
         setCurrentSession(null);
         
         // Tentar reconectar após 3 segundos apenas se não foi desconectado intencionalmente
         if (connectionAttempts < 5 && wsRef.current) {
+          console.log(`🔄 Tentando reconectar... (tentativa ${connectionAttempts + 1}/5)`);
           setTimeout(() => {
             setConnectionAttempts(prev => prev + 1);
             connectWebSocket();
           }, 3000);
+        } else if (connectionAttempts >= 5) {
+          console.log('❌ Máximo de tentativas de reconexão atingido');
+          toast.error('Não foi possível conectar ao Flight Tracking Service. Verifique se o serviço está rodando.');
         }
       };
 
       ws.onerror = (error) => {
         console.error('Erro WebSocket:', error);
-        // Remover toast de erro para evitar spam
+        // Mostrar erro apenas na primeira tentativa para evitar spam
+        if (connectionAttempts === 0) {
+          toast.error('Erro ao conectar ao Flight Tracking Service. Verifique se o serviço está rodando na porta 3001.');
+        }
       };
 
     } catch (error) {
       console.error('Erro ao conectar WebSocket:', error);
-      // Remover toast de erro para evitar spam
+      toast.error('Erro ao conectar ao Flight Tracking Service');
     }
   }, [connectionAttempts, handleWebSocketMessage]);
 
@@ -300,12 +314,14 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({ className }) => {
   // ============================================
 
   useEffect(() => {
-    connectWebSocket();
+    if (autoConnect) {
+      connectWebSocket();
+    }
     
     return () => {
       disconnectWebSocket();
     };
-  }, []); // Remover dependência para evitar reconexões infinitas
+  }, [autoConnect]);
 
   // Componente para acessar a instância do mapa
   const MapInstance = () => {

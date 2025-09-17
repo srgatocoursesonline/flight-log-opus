@@ -59,16 +59,16 @@ export function EditMaintenanceModal({
   useEffect(() => {
     if (record) {
       setFormData({
-        aircraft_registration: record.aircraft_registration || '',
+        aircraft_registration: record.aircraft || '',
         aircraft_model: record.aircraft_model || '',
-        maintenance_date: record.maintenance_date ? new Date(record.maintenance_date).toISOString().split('T')[0] : '',
+        maintenance_date: record.date ? new Date(record.date).toISOString().split('T')[0] : '',
         mechanic_name: record.mechanic_name || '',
-        mechanic_license: record.mechanic_license || '',
+        mechanic_license: record.mechanicLicense || '',
         location: record.location || '',
         status: record.status || 'pending',
         notes: record.notes || '',
-        next_maintenance_date: record.next_maintenance_date ? new Date(record.next_maintenance_date).toISOString().split('T')[0] : '',
-        next_maintenance_hours: record.next_maintenance_hours || 0,
+        next_maintenance_date: record.next_maintenance_date || '',
+        next_maintenance_hours: record.nextMaintenanceHours || 0,
       });
     }
   }, [record]);
@@ -81,19 +81,26 @@ export function EditMaintenanceModal({
       setIsSubmitting(true);
       
       const updateData = {
-        aircraft_registration: formData.aircraft_registration,
-        aircraft_model: formData.aircraft_model || undefined,
-        maintenance_date: formData.maintenance_date,
-        mechanic_name: formData.mechanic_name || undefined,
-        mechanic_license: formData.mechanic_license || undefined,
-        location: formData.location || undefined,
+        aircraft: formData.aircraft_registration,
+        date: formData.maintenance_date,
+        mechanicLicense: formData.mechanic_license || undefined,
         status: formData.status,
         notes: formData.notes || undefined,
-        next_maintenance_date: formData.next_maintenance_date || undefined,
-        next_maintenance_hours: formData.next_maintenance_hours || undefined,
+        nextMaintenanceHours: formData.next_maintenance_hours || undefined,
       };
 
-      await updateMaintenanceRecord(record.id, updateData);
+      await updateMaintenanceRecord(record.id, {
+         aircraft_registration: formData.aircraft_registration,
+         aircraft_model: formData.aircraft_model,
+         maintenance_date: formData.maintenance_date,
+         mechanic_name: formData.mechanic_name,
+         mechanic_license: formData.mechanic_license || undefined,
+         location: formData.location,
+         status: formData.status,
+         notes: formData.notes || undefined,
+         next_maintenance_date: formData.next_maintenance_date,
+         next_maintenance_hours: formData.next_maintenance_hours || undefined,
+       });
       onSuccess?.();
     } catch (error) {
       console.error('Erro ao atualizar manutenção:', error);
