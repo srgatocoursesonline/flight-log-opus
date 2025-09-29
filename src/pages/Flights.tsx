@@ -227,7 +227,7 @@ const Flights = () => {
     );
   }
   return (
-    <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
+    <div className="mobile-page-layout mobile-section pb-20 lg:pb-6 pr-1">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 fade-in">
         <div>
@@ -260,7 +260,7 @@ const Flights = () => {
       <FlightStats />
 
       {/* Gráfico de Evolução CR x Quantidade de Voos */}
-      <div className="hud-display stats-card overflow-x-hidden min-w-0">
+      <div className="hud-display stats-card overflow-x-hidden min-w-0 -mr-1">
         <div className="p-3 sm:p-4">
           <h2 className="text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
             <Plane className="h-4 w-4" />

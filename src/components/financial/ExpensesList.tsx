@@ -136,6 +136,13 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
   // Verificar se há filtros ativos
   const hasActiveFilters = selectedCategory !== 'all' || startDate !== '' || endDate !== '';
 
+  // Subtotal do período filtrado (quando houver pelo menos uma data)
+  const isPeriodFilterActive = startDate !== '' || endDate !== '';
+  const periodSubtotal = useMemo(() => {
+    if (!isPeriodFilterActive) return 0;
+    return filteredExpenses.reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+  }, [filteredExpenses, isPeriodFilterActive]);
+
   // Limpar filtros
   const clearFilters = () => {
     setSelectedCategory('all');
@@ -230,6 +237,11 @@ export const ExpensesList = ({ onTransactionSuccess }: ExpensesListProps) => {
             <Receipt className="h-4 w-4 text-primary icon-hover" />
             Despesas Registradas ({filteredExpenses.length}{expenses.length !== filteredExpenses.length ? ` de ${expenses.length}` : ''})
           </CardTitle>
+          {isPeriodFilterActive && (
+            <div className="mt-1 text-[11px] text-muted-foreground">
+              Subtotal do período: <span className="font-semibold text-destructive">-{formatCR(periodSubtotal)} CR</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="p-0">
           <div className="max-h-96 overflow-y-auto">

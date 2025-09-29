@@ -37,7 +37,7 @@ const Financial = () => {
   };
 
   return (
-    <div className="mobile-container mobile-bottom-nav-padding mobile-page-layout">
+    <div className="mobile-container mobile-bottom-nav-padding mobile-page-layout pr-1">
       <div className="mobile-section mobile-fade-in">
         <h1 className="text-base font-bold gradient-title">
           Gestão Financeira

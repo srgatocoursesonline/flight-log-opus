@@ -10,7 +10,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Filter, X, Calendar } from 'lucide-react';
+import { Filter, X, Calendar as CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
 interface FilterControlsProps {
   categories: Array<{ id: string; name: string; icon: string }>;
@@ -35,6 +38,21 @@ export const FilterControls = ({
   onClearFilters,
   hasActiveFilters
 }: FilterControlsProps) => {
+  const parseISOToDate = (value?: string) => {
+    if (!value) return undefined;
+    const [y, m, d] = value.split('-').map(Number);
+    if (!y || !m || !d) return undefined;
+    return new Date(y, m - 1, d);
+  };
+
+  const formatDateISO = (date?: Date) => {
+    if (!date) return '';
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   return (
     <Card className="hud-display mb-4">
       <CardContent className="p-4">
@@ -80,36 +98,44 @@ export const FilterControls = ({
 
           {/* Filtro de Data Inicial */}
           <div className="space-y-1 min-w-0">
-            <Label htmlFor="start-date" className="text-xs description-text">
-          Data Inicial
-        </Label>
-            <div className="relative min-w-0">
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => onStartDateChange(e.target.value)}
-                className="h-8 pr-10 w-full min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs"
-              />
-              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
-            </div>
+            <Label htmlFor="start-date" className="text-xs description-text">Data Inicial</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-8 w-full justify-start text-left font-normal min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs">
+                  <CalendarIcon className="mr-2 h-3 w-3" />
+                  {startDate ? format(parseISOToDate(startDate) as Date, 'dd/MM/yyyy') : <span className="text-readable-muted">dd/mm/aaaa</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 glass-panel" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={parseISOToDate(startDate)}
+                  onSelect={(d) => onStartDateChange(formatDateISO(d || undefined as unknown as Date))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Filtro de Data Final */}
           <div className="space-y-1 min-w-0">
-            <Label htmlFor="end-date" className="text-xs description-text">
-          Data Final
-        </Label>
-            <div className="relative min-w-0">
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => onEndDateChange(e.target.value)}
-                className="h-8 pr-10 w-full min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs"
-              />
-              <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
-            </div>
+            <Label htmlFor="end-date" className="text-xs description-text">Data Final</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-8 w-full justify-start text-left font-normal min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs">
+                  <CalendarIcon className="mr-2 h-3 w-3" />
+                  {endDate ? format(parseISOToDate(endDate) as Date, 'dd/MM/yyyy') : <span className="text-readable-muted">dd/mm/aaaa</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 glass-panel" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={parseISOToDate(endDate)}
+                  onSelect={(d) => onEndDateChange(formatDateISO(d || undefined as unknown as Date))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </CardContent>
