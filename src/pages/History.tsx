@@ -278,17 +278,25 @@ const History = () => {
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Status</p>
+                  {/* Status filter using same value mapping used when saving flights */}
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos</SelectItem>
-                      {statusManager.getActiveStatuses().map((status) => (
-                        <SelectItem key={status.id} value={status.id}>
-                          {status.icon} {status.name}
-                        </SelectItem>
-                      ))}
+                      {statusManager.getActiveStatuses().map((status) => {
+                        let statusValue = status.id;
+                        if (status.name === 'Planejado') statusValue = 'planned';
+                        if (status.name === 'Em Voo') statusValue = 'active';
+                        if (status.name === 'Concluído') statusValue = 'Concluído';
+                        if (status.name === 'Cancelado') statusValue = 'cancelled';
+                        return (
+                          <SelectItem key={status.id} value={statusValue}>
+                            {status.icon} {status.name}
+                          </SelectItem>
+                        );
+                      })}
                       {/* Fallback para status padrão se não houver customizados */}
                       {statusManager.getActiveStatuses().length === 0 && (
                         <>

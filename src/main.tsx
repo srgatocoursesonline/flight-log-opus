@@ -3,6 +3,8 @@ import App from './App.tsx'
 import './index.css'
 import './lib/i18n'
 import { registerServiceWorker, installPWA } from './lib/pwa'
+// Aplicar patch para corrigir bug do react-window
+import './utils/reactWindowPatch'
 
 // Register service worker for PWA functionality
 if (import.meta.env.PROD) {

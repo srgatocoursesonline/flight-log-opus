@@ -12,7 +12,8 @@ import { FlightCard } from '@/components/flights/FlightCard';
 import { FlightCardCompact } from '@/components/flights/FlightCardCompact';
 import { FlightSessionCard } from '@/components/flights/FlightSessionCard';
 import { FlightStats } from '@/components/flights/FlightStats';
-import VirtualizedFlightList from '@/components/flights/VirtualizedFlightList';
+import SafeVirtualizedList from '@/components/flights/SafeVirtualizedList';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import {
   Select,
   SelectContent,
@@ -81,7 +82,7 @@ const SessionList = memo(({
 
 SessionList.displayName = 'SessionList';
 
-const Flights = () => {
+const FlightsContent = () => {
   const { user } = useAuth();
   const { profile } = useProfile();
   const { t } = useTranslation();
@@ -320,17 +321,25 @@ const Flights = () => {
             </Button>
           </div>
 
+          {/* Status filter using same value mapping used when saving flights */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
-              {statusManager.getActiveStatuses().map((status) => (
-                <SelectItem key={status.id} value={status.id}>
-                  {status.icon} {status.name}
-                </SelectItem>
-              ))}
+              {statusManager.getActiveStatuses().map((status) => {
+                let statusValue = status.id;
+                if (status.name === 'Planejado') statusValue = 'planned';
+                if (status.name === 'Em Voo') statusValue = 'active';
+                if (status.name === 'Concluído') statusValue = 'Concluído';
+                if (status.name === 'Cancelado') statusValue = 'cancelled';
+                return (
+                  <SelectItem key={status.id} value={statusValue}>
+                    {status.icon} {status.name}
+                  </SelectItem>
+                );
+              })}
               {/* Fallback para status padrão se não houver customizados */}
               {statusManager.getActiveStatuses().length === 0 && (
                 <>
@@ -417,11 +426,12 @@ const Flights = () => {
               )}
               {viewMode === 'compact' ? (
                 paginatedFlights.length > 50 ? (
-                  <VirtualizedFlightList
+                  <SafeVirtualizedList
                     flights={paginatedFlights}
                     height={600}
                     itemSize={120}
                     width="100%"
+                    layout="grid"
                   />
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -474,6 +484,15 @@ const Flights = () => {
         </div>
       )}
     </div>
+  );
+};
+
+// Componente principal com ErrorBoundary
+const Flights = () => {
+  return (
+    <ErrorBoundary>
+      <FlightsContent />
+    </ErrorBoundary>
   );
 };
 

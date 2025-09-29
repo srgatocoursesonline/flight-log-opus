@@ -127,7 +127,7 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportSearc
       airportCache.set(upperIcaoCode, supabaseResult);
       return {
         success: true,
-        source: 'supabase',
+        source: 'manual',
         data: supabaseResult
       };
     }
@@ -218,14 +218,18 @@ export async function saveManualAirport(airportInfo: AirportInfo): Promise<boole
       });
 
     if (error) {
-      console.error('Erro ao salvar no Supabase:', error);
-      return false;
+      // Se tabela não existe, apenas manter no cache local
+      if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        return true; // Sucesso local
+      }
+      console.warn('Erro ao salvar no Supabase:', error);
+      return true; // Ainda retorna true porque está no cache local
     }
 
     return true;
   } catch (error) {
-    console.error('Erro ao salvar aeroporto manual:', error);
-    return false;
+    // Erro geral, mas mantém no cache local
+    return true;
   }
 }
 
@@ -243,7 +247,11 @@ export async function loadManualAirports(): Promise<void> {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Erro ao carregar aeroportos manuais:', error);
+      // Se tabela não existe, ignorar silenciosamente
+      if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        return;
+      }
+      console.warn('Erro ao carregar aeroportos manuais:', error);
       return;
     }
 
@@ -264,12 +272,14 @@ export async function loadManualAirports(): Promise<void> {
       });
     }
   } catch (error) {
-    console.error('Erro ao carregar aeroportos manuais:', error);
+    // Não mostrar erro no console para evitar spam
   }
 }
 
-// Inicializar o serviço
-loadManualAirports().catch(console.error);
+// Inicializar o serviço silenciosamente
+loadManualAirports().catch(() => {
+  // Ignorar erros de inicialização se tabela não existir
+});
 
 /**
  * Busca aeroportos manuais do Supabase para o usuário atual
@@ -288,7 +298,17 @@ async function fetchFromSupabase(icaoCode: string): Promise<AirportInfo | null> 
       .eq('icao_code', icaoCode.toUpperCase())
       .single();
 
-    if (error || !data) return null;
+    // Se erro 406 ou erro de tabela não encontrada, retornar null silenciosamente
+    if (error) {
+      if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        // Tabela não existe, ignorar silenciosamente
+        return null;
+      }
+      console.warn('Erro ao buscar no Supabase:', error);
+      return null;
+    }
+
+    if (!data) return null;
 
     return {
       name: data.name,
@@ -302,7 +322,7 @@ async function fetchFromSupabase(icaoCode: string): Promise<AirportInfo | null> 
       last_updated: Date.now()
     };
   } catch (error) {
-    console.error('Erro ao buscar no Supabase:', error);
+    // Não mostrar erro no console para evitar spam
     return null;
   }
 }
