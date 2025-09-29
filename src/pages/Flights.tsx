@@ -260,13 +260,13 @@ const Flights = () => {
       <FlightStats />
 
       {/* Gráfico de Evolução CR x Quantidade de Voos */}
-      <div className="hud-display stats-card fade-in w-full" style={{ animationDelay: '0.1s' }}>
-        <div className="p-4 sm:p-6">
+      <div className="hud-display stats-card overflow-x-hidden min-w-0">
+        <div className="p-3 sm:p-4">
           <h2 className="text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
             <Plane className="h-4 w-4" />
             Evolução do Career Rating
           </h2>
-          <div className="w-full">
+          <div className="flex-1 min-w-0 w-full overflow-x-hidden" style={{ contain: 'layout paint' }}>
             <ChartCRFlights userId={user?.id || profile?.id} />
           </div>
         </div>

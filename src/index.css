@@ -71,6 +71,10 @@
   * {
     @apply border-border;
   }
+  html, body {
+    scrollbar-gutter: stable both-edges;
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-foreground;
   }

@@ -15,6 +15,36 @@ import { Line } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { supabase } from '@/lib/supabase';
 
+// Hook personalizado para lidar com o tamanho da tela com debounce
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setScreenSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }, 150); // Delay de 150ms para debounce
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  return screenSize;
+};
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,13 +57,37 @@ ChartJS.register(
   Filler,
 );
 
-const ChartCRFlights = ({ userId }) => {
+const ChartCRFlights = React.memo(({ userId }) => {
   console.log('ChartCRFlights component rendered with userId:', userId);
   const [filter, setFilter] = useState('month');
+  const nowRef = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(nowRef.getMonth() + 1); // 1-12
+  const [selectedYear, setSelectedYear] = useState(nowRef.getFullYear());
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
   const [chartKey, setChartKey] = useState(0); // Forçar re-renderização do gráfico
+  
+  // Usar o hook personalizado para obter o tamanho da tela
+  const { width } = useScreenSize();
+
+  // Determinar altura do gráfico baseada no tamanho da tela (mais compacto)
+  const getChartHeight = () => {
+    if (width < 400) return 160; // telefones pequenos
+    if (width < 640) return 180; // mobile
+    if (width < 1024) return 220; // tablet
+    return 240; // desktop
+  };
+
+  // Atualizar o gráfico quando a janela for redimensionada
+  useEffect(() => {
+    const handleResize = () => {
+      setChartKey(prev => prev + 1);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Função auxiliar para extrair apenas a data (sem horário) de uma string ISO
   const extractDateOnly = (dateString) => {
@@ -96,14 +150,14 @@ const ChartCRFlights = ({ userId }) => {
 
     switch (filter) {
       case 'day':
-        // Para visão dia, mostrar o mês completo
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); // Último dia do mês
+        // Para visão dia, mostrar o mês completo baseado em selectedMonth/selectedYear
+        startDate = new Date(selectedYear, selectedMonth - 1, 1, 0, 0, 0, 0);
+        endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999); // Último dia do mês
         break;
       case 'month':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(today);
-        endDate.setHours(23, 59, 59, 999); // Fim do dia
+        // Mês selecionado inteiro
+        startDate = new Date(selectedYear, selectedMonth - 1, 1, 0, 0, 0, 0);
+        endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999);
         break;
       case 'quarter':
         const quarter = Math.floor(now.getMonth() / 3);
@@ -227,9 +281,10 @@ const ChartCRFlights = ({ userId }) => {
       console.log('Date object:', date.toISOString());
       let label;
       if (filter === 'day' || filter === 'month') {
-        label = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+        // dd/M (mês sem zero à esquerda)
+        label = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'numeric', timeZone: 'America/Sao_Paulo' });
       } else if (filter === 'quarter') {
-        label = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+        label = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'numeric', timeZone: 'America/Sao_Paulo' });
       } else { // year
         label = date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit', timeZone: 'America/Sao_Paulo' });
       }
@@ -285,12 +340,24 @@ const ChartCRFlights = ({ userId }) => {
         },
       ],
     });
-  }, [filter, flights]);
+  }, [filter, flights, selectedMonth, selectedYear]);
+
+  const isDayView = filter === 'day';
+  const isMonthView = filter === 'month';
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     resizeDelay: 100,
+    normalized: true,
+    layout: {
+      padding: {
+        top: 4,
+        right: 8,
+        bottom: 0,
+        left: 8,
+      },
+    },
     interaction: {
       mode: 'index',
       intersect: false,
@@ -298,27 +365,23 @@ const ChartCRFlights = ({ userId }) => {
     plugins: {
       legend: {
         display: true,
-        position: 'top',
+        position: 'bottom',
         labels: {
           usePointStyle: true,
-          padding: 20,
+          padding: 12,
+          boxWidth: 8,
+          boxHeight: 8,
           color: (context) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#f8fafc' : '#334155';
           },
+          font: {
+            size: 11,
+          },
         },
       },
       title: {
-        display: true,
-        text: `Evolução do CR - Período: ${filter === 'day' ? 'Dia' : filter === 'month' ? 'Mês' : filter === 'quarter' ? 'Trimestre' : 'Ano'}`,
-        color: (context) => {
-          const isDarkMode = document.documentElement.classList.contains('dark');
-          return isDarkMode ? '#f8fafc' : '#334155';
-        },
-        font: {
-          size: 16,
-          weight: 'bold',
-        },
+        display: false,
       },
       tooltip: {
         backgroundColor: (context) => {
@@ -365,8 +428,7 @@ const ChartCRFlights = ({ userId }) => {
       x: {
         display: true,
         title: {
-          display: true,
-          text: 'Data',
+          display: false,
           color: (context) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#f8fafc' : '#334155';
@@ -377,7 +439,25 @@ const ChartCRFlights = ({ userId }) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#cbd5e1' : '#64748b';
           },
-          maxRotation: 45,
+          maxRotation: 0,
+          autoSkip: !(isDayView || isMonthView),
+          maxTicksLimit: (isDayView || isMonthView) ? undefined : (width < 640 ? 6 : 10),
+          font: {
+            size: width < 640 ? 10 : 11,
+          },
+          callback: function(value) {
+            const label = this.getLabelForValue(value as number) as string;
+            if (isDayView || isMonthView) {
+              // Converter "dd/mm" para "dd/m" removendo zero à esquerda do mês
+              const parts = label.split('/');
+              if (parts.length >= 2) {
+                const day = parts[0];
+                const month = String(Number(parts[1]));
+                return `${day}/${month}`;
+              }
+            }
+            return label;
+          },
         },
         grid: {
           color: (context) => {
@@ -391,8 +471,7 @@ const ChartCRFlights = ({ userId }) => {
         display: true,
         position: 'left',
         title: {
-          display: true,
-          text: 'Career Rating (R$)',
+          display: false,
           color: (context) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#f8fafc' : '#334155';
@@ -411,6 +490,10 @@ const ChartCRFlights = ({ userId }) => {
               maximumFractionDigits: 0,
             }).format(value);
           },
+          maxTicksLimit: width < 640 ? 4 : 6,
+          font: {
+            size: width < 640 ? 10 : 11,
+          },
         },
         grid: {
           color: (context) => {
@@ -424,8 +507,7 @@ const ChartCRFlights = ({ userId }) => {
         display: true,
         position: 'right',
         title: {
-          display: true,
-          text: 'Quantidade de Voos',
+          display: false,
           color: (context) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#f8fafc' : '#334155';
@@ -435,6 +517,10 @@ const ChartCRFlights = ({ userId }) => {
           color: (context) => {
             const isDarkMode = document.documentElement.classList.contains('dark');
             return isDarkMode ? '#cbd5e1' : '#64748b';
+          },
+          maxTicksLimit: width < 640 ? 4 : 6,
+          font: {
+            size: width < 640 ? 10 : 11,
           },
         },
         grid: {
@@ -455,7 +541,7 @@ const ChartCRFlights = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="w-full h-96 bg-card rounded-lg shadow-sm border">
+      <div className="w-full bg-card rounded-lg shadow-sm border" style={{ height: `${getChartHeight()}px` }}>
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-muted-foreground">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
@@ -467,21 +553,43 @@ const ChartCRFlights = ({ userId }) => {
   }
 
   return (
-    <div className="w-full h-96 bg-card rounded-lg shadow-sm border flex flex-col">
-      <div className="p-3 border-b border-border flex-shrink-0">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <h3 className="text-base font-semibold text-balance">
+    <div className="bg-card rounded-lg shadow-sm border overflow-hidden min-w-0">
+      <div className="p-2 border-b border-border flex-shrink-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <h3 className="text-sm font-semibold text-balance">
             Evolução do Career Rating
           </h3>
-          <div className="flex flex-wrap gap-1 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto justify-end items-center overflow-x-auto no-scrollbar flex-nowrap min-w-0">
+            {(filter === 'day' || filter === 'month') && (
+              <>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className={`px-2 py-1 rounded-md text-xs border bg-background ${isDarkMode ? 'text-muted-foreground' : 'text-foreground'}`}
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className={`px-2 py-1 rounded-md text-xs border bg-background ${isDarkMode ? 'text-muted-foreground' : 'text-foreground'}`}
+                >
+                  {Array.from({ length: 6 }, (_, idx) => nowRef.getFullYear() - 4 + idx).map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </>
+            )}
             {Object.entries(periodLabels).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => {
                   setFilter(key);
-                  setChartKey(prev => prev + 1); // Forçar re-renderização do gráfico
+                  setChartKey(prev => prev + 1);
                 }}
-                className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border flex-1 sm:flex-none ${
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border min-w-[64px] whitespace-nowrap shrink-0 ${
                   filter === key
                     ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                     : isDarkMode
@@ -495,27 +603,42 @@ const ChartCRFlights = ({ userId }) => {
           </div>
         </div>
       </div>
-      <div className="p-2 flex-1 min-h-0 relative">
-        <div className="w-full h-full">
+      <div className="p-2">
+        <div className="w-full overflow-x-hidden overflow-y-hidden" style={{ position: 'relative', height: `${getChartHeight()}px`, width: '100%', maxWidth: '100%' }}>
           {filter === 'day' ? (
             <Bar 
               key={`bar-${chartKey}`}
-              data={chartData} 
+              data={{
+                ...chartData,
+                datasets: chartData.datasets.map(ds => ({
+                  ...ds,
+                  barPercentage: 0.6,
+                  categoryPercentage: 0.5,
+                  maxBarThickness: 18,
+                  clip: 0,
+                })),
+              }} 
               options={options}
-              className="w-full h-full"
+              style={{ width: '100%', height: '100%', display: 'block' }}
             />
           ) : (
             <Line 
               key={`line-${chartKey}`}
-              data={chartData} 
+              data={{
+                ...chartData,
+                datasets: chartData.datasets.map(ds => ({
+                  ...ds,
+                  clip: 0,
+                })),
+              }}
               options={options}
-              className="w-full h-full"
+              style={{ width: '100%', height: '100%', display: 'block' }}
             />
           )}
         </div>
       </div>
     </div>
   );
-};
+});
 
 export { ChartCRFlights };
