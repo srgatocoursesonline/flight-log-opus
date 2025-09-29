@@ -28,6 +28,7 @@ import FinancialReports from "./pages/FinancialReports";
 import Companies from "./pages/Companies";
 import TodCalculatorPage from "./pages/TodCalculator";
 import FlightPlannerPage from "./pages/FlightPlanner";
+import AirportSearchTool from "./pages/AirportSearchTool";
 import { AuthCallback } from "./pages/AuthCallback";
 
 
@@ -95,6 +96,7 @@ const AppContent = () => {
           <Route path="companies" element={<Companies />} />
           <Route path="tod-calculator" element={<TodCalculatorPage />} />
           <Route path="flight-planner" element={<FlightPlannerPage />} />
+          <Route path="airport-search" element={<AirportSearchTool />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>

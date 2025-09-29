@@ -451,7 +451,8 @@ const enUS = {
       administrative: "Administrative",
       companies: "My Companies",
       todCalculator: "TOD Calculator",
-      flightPlanner: "Flight Planner"
+      flightPlanner: "Flight Planner",
+      airportSearch: "Airport Search"
     },
     
     // Flight Planner

@@ -72,6 +72,7 @@ const drawerMenuStructure = {
       items: [
         { id: "calculadora-tod", to: "/tod-calculator", icon: Calculator, labelKey: "navigation.todCalculator" },
         { id: "planejador-voo", to: "/flight-planner", icon: Map, labelKey: "navigation.flightPlanner" },
+        { id: "busca-aeroportos", to: "/airport-search", icon: Plane, labelKey: "navigation.airportSearch" },
       ],
     },
     {

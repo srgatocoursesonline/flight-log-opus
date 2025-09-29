@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AirportInfo } from '@/lib/airportService';
 
 interface AirportManualInputDialogProps {
@@ -24,9 +25,12 @@ export function AirportManualInputDialog({
     name: '',
     city: '',
     state: '',
+    region: '',
     country_code: '',
     lat: 0,
-    lng: 0
+    lng: 0,
+    elevation_ft: 0,
+    airport_type: 'small_airport'
   });
 
   // Reset form when dialog opens with new ICAO code
@@ -39,9 +43,12 @@ export function AirportManualInputDialog({
         name: '',
         city: '',
         state: '',
+        region: '',
         country_code: '',
         lat: 0,
-        lng: 0
+        lng: 0,
+        elevation_ft: 0,
+        airport_type: 'small_airport'
       });
     }
   }, [open, icaoCode]);
@@ -170,6 +177,41 @@ export function AirportManualInputDialog({
               className="col-span-3"
               placeholder="Ex: -46.6333"
             />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="elevation" className="text-right">
+              Elevação (ft)
+            </Label>
+            <Input
+              id="elevation"
+              type="number"
+              value={formData.elevation_ft}
+              onChange={(e) => setFormData({ ...formData, elevation_ft: parseInt(e.target.value) || 0 })}
+              className="col-span-3"
+              placeholder="Ex: 2461"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="type" className="text-right">
+              Tipo
+            </Label>
+            <Select
+              value={formData.airport_type}
+              onValueChange={(value) => setFormData({ ...formData, airport_type: value })}
+            >
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="small_airport">Aeroporto Pequeno</SelectItem>
+                <SelectItem value="medium_airport">Aeroporto Médio</SelectItem>
+                <SelectItem value="large_airport">Aeroporto Grande</SelectItem>
+                <SelectItem value="heliport">Heliporto</SelectItem>
+                <SelectItem value="seaplane_base">Base de Hidroaviões</SelectItem>
+                <SelectItem value="balloonport">Balonódromo</SelectItem>
+                <SelectItem value="closed">Aeroporto Fechado</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>

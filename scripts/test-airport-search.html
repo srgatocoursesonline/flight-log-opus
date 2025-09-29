@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛫 Buscador de Aeroportos - Flight Log Opus</title>
+  <style>
+    :root {
+      --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --bg-container: rgba(255, 255, 255, 0.95);
+      --text-primary: #333;
+      --text-secondary: #666;
+      --border-color: #ddd;
+      --input-bg: white;
+      --result-bg: #f8f9fa;
+      --success-bg: #d4edda;
+      --success-border: #28a745;
+      --error-bg: #f8d7da;
+      --error-border: #dc3545;
+      --info-bg: white;
+      --stats-bg: #e9ecef;
+      --examples-bg: #fff3cd;
+      --examples-border: #ffc107;
+      --examples-text: #856404;
+      --shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      --bg-container: rgba(30, 30, 40, 0.95);
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --border-color: #444;
+      --input-bg: #2a2a3a;
+      --result-bg: #2a2a3a;
+      --success-bg: #1a4d2e;
+      --success-border: #4ade80;
+      --error-bg: #4d1a1a;
+      --error-border: #f87171;
+      --info-bg: #2a2a3a;
+      --stats-bg: #252535;
+      --examples-bg: #3a3a2e;
+      --examples-border: #fbbf24;
+      --examples-text: #fde047;
+      --shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--bg-container);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      color: var(--text-primary);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin: 0;
+      flex: 1;
+    }
+
+    [data-theme="dark"] h1 {
+      color: #a78bfa;
+    }
+
+    .theme-toggle {
+      padding: 10px 15px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 16px;
+      text-transform: uppercase;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      padding: 12px 30px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--result-bg);
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .result.success {
+      border-left-color: var(--success-border);
+      background: var(--success-bg);
+    }
+
+    .result.error {
+      border-left-color: var(--error-border);
+      background: var(--error-bg);
+    }
+
+    .result h2 {
+      margin-top: 0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .info-item {
+      background: var(--info-bg);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #667eea;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    [data-theme="dark"] .info-label {
+      color: #a78bfa;
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+
+    .badge-source {
+      background: #667eea;
+      color: white;
+    }
+
+    .badge-type {
+      background: #764ba2;
+      color: white;
+    }
+
+    .stats {
+      margin-top: 30px;
+      padding: 15px;
+      background: var(--stats-bg);
+      border-radius: 8px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .loading {
+      color: #a78bfa;
+    }
+
+    .examples {
+      margin-top: 20px;
+      padding: 15px;
+      background: var(--examples-bg);
+      border-radius: 8px;
+      border-left: 4px solid var(--examples-border);
+    }
+
+    .examples h3 {
+      margin-top: 0;
+      color: var(--examples-text);
+    }
+
+    .example-code {
+      background: var(--result-bg);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      display: inline-block;
+      margin: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid var(--border-color);
+    }
+
+    .example-code:hover {
+      background: var(--border-color);
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="width: 50px;"></div>
+      <h1>🛫 Buscador de Aeroportos</h1>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+      </button>
+    </div>
+    <p class="subtitle">Base OurAirports: 76.000+ aeroportos | Atualização diária automática</p>
+    
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="icaoInput" 
+        placeholder="Digite o código ICAO (ex: SBGR, SNJR, KJFK)" 
+        maxlength="4"
+        autocomplete="off"
+      />
+      <button onclick="searchAirport()" id="searchBtn">🔍 Buscar</button>
+    </div>
+
+    <div class="examples">
+      <h3>💡 Exemplos para testar:</h3>
+      <div>
+        <span class="example-code" onclick="testIcao('SBGR')">SBGR</span> Guarulhos/SP
+        <span class="example-code" onclick="testIcao('SNJR')">SNJR</span> Fazenda Jaragua/MT
+        <span class="example-code" onclick="testIcao('KJFK')">KJFK</span> JFK New York
+        <span class="example-code" onclick="testIcao('EGLL')">EGLL</span> London Heathrow
+        <span class="example-code" onclick="testIcao('SSYA')">SSYA</span> Arapoti/PR
+        <span class="example-code" onclick="testIcao('SBSP')">SBSP</span> Congonhas/SP
+      </div>
+    </div>
+    
+    <div id="result"></div>
+    
+    <div class="stats" id="stats">
+      <strong>📊 Estatísticas do Cache:</strong> Carregando...
+    </div>
+  </div>
+
+  <script>
+    const OURAIRPORTS_URL = 'https://davidmegginson.github.io/ourairports-data/airports.csv';
+    let airportsCache = null;
+    let cacheTime = 0;
+
+    // Theme toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    // Load saved theme
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function testIcao(code) {
+      document.getElementById('icaoInput').value = code;
+      searchAirport();
+    }
+
+    async function loadOurAirports() {
+      if (airportsCache && (Date.now() - cacheTime < 24 * 60 * 60 * 1000)) {
+        return airportsCache;
+      }
+
+      console.log('📡 Baixando OurAirports...');
+      const response = await fetch(OURAIRPORTS_URL);
+      const text = await response.text();
+      const lines = text.split('\n');
+      
+      const airports = new Map();
+      
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const columns = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            columns.push(current);
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        columns.push(current);
+        
+        if (columns.length >= 14) {
+          const icao = columns[1]?.trim();
+          if (icao && icao.length === 4) {
+            airports.set(icao.toUpperCase(), {
+              icao: icao,
+              type: columns[2],
+              name: columns[3],
+              lat: parseFloat(columns[4]) || 0,
+              lng: parseFloat(columns[5]) || 0,
+              elevation: parseInt(columns[6]) || 0,
+              country: columns[8],
+              region: columns[9],
+              city: columns[10],
+              iata: columns[13]
+            });
+          }
+        }
+      }
+      
+      airportsCache = airports;
+      cacheTime = Date.now();
+      console.log(`✅ ${airports.size} aeroportos carregados`);
+      
+      return airports;
+    }
+
+    async function searchAirport() {
+      const icao = document.getElementById('icaoInput').value.toUpperCase().trim();
+      const btn = document.getElementById('searchBtn');
+      const resultDiv = document.getElementById('result');
+      
+      if (!icao || icao.length !== 4) {
+        resultDiv.innerHTML = '<div class="result error">❌ Código ICAO deve ter 4 letras!</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Buscando...';
+      resultDiv.innerHTML = '<div class="loading">🔍 Procurando aeroporto...</div>';
+      
+      try {
+        const startTime = performance.now();
+        const airports = await loadOurAirports();
+        const airport = airports.get(icao);
+        const endTime = performance.now();
+        const searchTime = (endTime - startTime).toFixed(2);
+        
+        if (airport) {
+          const state = airport.region?.includes('-') ? airport.region.split('-')[1] : '';
+          const typeLabels = {
+            'large_airport': '🏢 Grande',
+            'medium_airport': '🏛️ Médio',
+            'small_airport': '🏠 Pequeno',
+            'heliport': '🚁 Heliporto',
+            'seaplane_base': '🛥️ Hidroavião',
+            'balloonport': '🎈 Balão',
+            'closed': '🚫 Fechado'
+          };
+          
+          resultDiv.innerHTML = `
+            <div class="result success">
+              <h2 style="margin-top: 0; color: var(--success-border);">✅ Aeroporto Encontrado!</h2>
+              <p style="margin-bottom: 15px;">Tempo de busca: <strong>${searchTime}ms</strong></p>
+              
+              <div>
+                <span class="badge badge-source">🌍 OurAirports</span>
+                <span class="badge badge-type">${typeLabels[airport.type] || airport.type || 'N/A'}</span>
+              </div>
+              
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Nome</div>
+                  <div class="info-value">${airport.name || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">ICAO / IATA</div>
+                  <div class="info-value">${airport.icao} / ${airport.iata || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Cidade</div>
+                  <div class="info-value">${airport.city || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Estado</div>
+                  <div class="info-value">${state || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">País</div>
+                  <div class="info-value">${airport.country || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Região ISO</div>
+                  <div class="info-value">${airport.region || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Coordenadas</div>
+                  <div class="info-value">${airport.lat.toFixed(4)}, ${airport.lng.toFixed(4)}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Elevação</div>
+                  <div class="info-value">${airport.elevation || 0} ft</div>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div class="result error">
+              <h2 style="margin-top: 0; color: var(--error-border);">❌ Aeroporto Não Encontrado</h2>
+              <p>O código ICAO <strong>${icao}</strong> não foi encontrado na base OurAirports (76.000+ aeroportos).</p>
+              <p style="margin-top: 15px;">💡 Verifique se digitou corretamente ou tente outro código.</p>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
+                Tempo de busca: ${searchTime}ms
+              </p>
+            </div>
+          `;
+        }
+        
+        updateStats();
+        
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div class="result error">
+            <h2 style="margin-top: 0; color: var(--error-border);">❌ Erro na Busca</h2>
+            <p>${error.message}</p>
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔍 Buscar';
+      }
+    }
+
+    function updateStats() {
+      const stats = document.getElementById('stats');
+      if (airportsCache) {
+        const ageHours = Math.floor((Date.now() - cacheTime) / 1000 / 60 / 60);
+        stats.innerHTML = `
+          <strong>📊 Estatísticas do Cache:</strong><br>
+          • Total de aeroportos em cache: <strong>${airportsCache.size.toLocaleString('pt-BR')}</strong><br>
+          • Última atualização: <strong>${new Date(cacheTime).toLocaleString('pt-BR')}</strong><br>
+          • Idade do cache: <strong>${ageHours}h</strong>
+        `;
+      }
+    }
+
+    // Permitir busca com Enter
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTheme();
+      
+      document.getElementById('icaoInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          searchAirport();
+        }
+      });
+      
+      // Pré-carregar OurAirports
+      setTimeout(() => {
+        loadOurAirports().then(() => {
+          updateStats();
+        });
+      }, 500);
+    });
+  </script>
+</body>
+</html>

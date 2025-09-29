@@ -67,6 +67,7 @@ const menuStructure = {
       items: [
         { to: "/tod-calculator", icon: Calculator, labelKey: "navigation.todCalculator" },
         { to: "/flight-planner", icon: Map, labelKey: "navigation.flightPlanner" },
+        { to: "/airport-search", icon: Plane, labelKey: "navigation.airportSearch" },
       ],
     },
     {
