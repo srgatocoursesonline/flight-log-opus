@@ -10,6 +10,16 @@ import { Plus, Receipt, TrendingUp, DollarSign, TrendingDown, BarChart3 } from '
 const Financial = () => {
   const { financialStats, expenses, revenues } = useSupabaseFinancial();
   
+  // Aplicar zoom 90% ao entrar na página e restaurar ao sair
+  useEffect(() => {
+    const htmlEl = document.documentElement;
+    const previousZoom = htmlEl.style.zoom;
+    htmlEl.style.zoom = '0.9';
+    return () => {
+      htmlEl.style.zoom = previousZoom;
+    };
+  }, []);
+  
   // Função para atualizar dados após transação
   const handleTransactionSuccess = useCallback(() => {
     // Força reload da página para garantir dados atualizados
@@ -113,7 +123,7 @@ const Financial = () => {
       </div>
       
       <div className="mobile-section">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 lg:gap-3" style={{ scrollbarGutter: 'stable both-edges' }}>
           {/* Sistema de Lançamento de Receitas */}
           <div className="mobile-card mobile-fade-in stats-card">
             <div className="flex items-center justify-between mb-4">

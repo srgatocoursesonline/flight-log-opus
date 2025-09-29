@@ -54,14 +54,14 @@ export const FilterControls = ({
           )}
         </div>
         
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
           {/* Filtro de Categoria */}
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <Label htmlFor="category-filter" className="text-xs description-text">
           Categoria
         </Label>
             <Select value={selectedCategory} onValueChange={onCategoryChange}>
-              <SelectTrigger className="h-8">
+              <SelectTrigger className="h-8 w-full min-w-[140px] sm:min-w-[160px]">
                 <SelectValue placeholder="Todas as categorias" />
               </SelectTrigger>
               <SelectContent>
@@ -79,34 +79,34 @@ export const FilterControls = ({
           </div>
 
           {/* Filtro de Data Inicial */}
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <Label htmlFor="start-date" className="text-xs description-text">
           Data Inicial
         </Label>
-            <div className="relative">
+            <div className="relative min-w-0">
               <Input
                 id="start-date"
                 type="date"
                 value={startDate}
                 onChange={(e) => onStartDateChange(e.target.value)}
-                className="h-8 pr-8"
+                className="h-8 pr-10 w-full min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs"
               />
               <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
             </div>
           </div>
 
           {/* Filtro de Data Final */}
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <Label htmlFor="end-date" className="text-xs description-text">
           Data Final
         </Label>
-            <div className="relative">
+            <div className="relative min-w-0">
               <Input
                 id="end-date"
                 type="date"
                 value={endDate}
                 onChange={(e) => onEndDateChange(e.target.value)}
-                className="h-8 pr-8"
+                className="h-8 pr-10 w-full min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs"
               />
               <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-readable-subtle pointer-events-none" />
             </div>

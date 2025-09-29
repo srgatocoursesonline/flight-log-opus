@@ -75,6 +75,19 @@
     scrollbar-gutter: stable both-edges;
     overflow-x: hidden;
   }
+  /* remover largura mínima global para permitir quebra adequada em 100% */
+  #root, body {
+    min-width: 0;
+  }
+  /* corrigir recorte dos inputs de data do Chrome/Edge em zoom 100% */
+  input[type="date"] {
+    min-height: 2rem; /* 32px */
+  }
+  /* garantir que o popup do calendário não quebre o layout do container */
+  .date-input-wrap {
+    position: relative;
+    overflow: visible;
+  }
   body {
     @apply bg-background text-foreground;
   }
