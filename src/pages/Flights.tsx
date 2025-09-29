@@ -109,12 +109,18 @@ const FlightsContent = () => {
       newSearchParams.delete('openModal');
       setSearchParams(newSearchParams, { replace: true });
       
-      // Abrir modal após um pequeno delay para garantir que o componente foi renderizado
-      setTimeout(() => {
+      // Abrir modal com tentativas múltiplas para garantir que funcione
+      const tryOpenModal = (attempts = 0) => {
         if (addFlightModalRef.current) {
           addFlightModalRef.current.openModal();
+        } else if (attempts < 10) {
+          // Tentar novamente após um delay se a ref ainda não estiver disponível
+          setTimeout(() => tryOpenModal(attempts + 1), 100);
         }
-      }, 100);
+      };
+      
+      // Iniciar tentativas após um delay inicial
+      setTimeout(() => tryOpenModal(), 200);
     }
 
     // Manter suporte ao evento customizado como fallback

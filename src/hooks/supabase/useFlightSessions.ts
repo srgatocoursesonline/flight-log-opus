@@ -61,7 +61,6 @@ export const useFlightSessions = () => {
 
       // TEMPORÁRIO: Tabela flight_sessions ainda não existe no banco
       // Retornando array vazio para evitar erro 404
-      console.log('Flight sessions feature temporarily disabled - table not found');
       setSessions([]);
       
     } catch (error) {

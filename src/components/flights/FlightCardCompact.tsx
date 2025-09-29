@@ -45,7 +45,7 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
   
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [shouldRenderEditModal, setShouldRenderEditModal] = useState(false);
 
   // Memoize status lookup
   const status = useMemo(() => getStatusByValue(flight.status), [flight.status, getStatusByValue]);
@@ -93,11 +93,11 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
   }, []);
 
   const handleEdit = useCallback(() => {
-    setShowEditModal(true);
+    setShouldRenderEditModal(true);
   }, []);
 
   const handleCloseEditModal = useCallback(() => {
-    setShowEditModal(false);
+    setShouldRenderEditModal(false);
     window.location.reload();
   }, []);
 
@@ -176,12 +176,14 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
         </CardContent>
       </Card>
 
-      {/* Modal de Edição */}
-      <AddFlightModal 
-        flight={flight}
-        onClose={handleCloseEditModal}
-        trigger={null}
-      />
+      {/* Modal de Edição - Renderizado apenas quando necessário */}
+      {shouldRenderEditModal && (
+        <AddFlightModal 
+          flight={flight}
+          onClose={handleCloseEditModal}
+          trigger={null}
+        />
+      )}
       
       <FlightDetailModal 
         flight={flight} 

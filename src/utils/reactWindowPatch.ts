@@ -27,7 +27,7 @@ export function applyReactWindowPatch() {
     // Substituir Object.values por nossa versão segura
     (Object as any).values = safeObjectValues;
     patchApplied = true;
-    console.log('React Window patch aplicado com sucesso');
+    // Patch aplicado silenciosamente
   } catch (error) {
     console.warn('Falha ao aplicar patch do React Window:', error);
   }
@@ -42,7 +42,7 @@ export function removeReactWindowPatch() {
     // Restaurar a implementação original
     (Object as any).values = originalObjectValues;
     patchApplied = false;
-    console.log('React Window patch removido');
+    // Patch removido silenciosamente
   } catch (error) {
     console.warn('Falha ao remover patch do React Window:', error);
   }

@@ -50,6 +50,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   const statusManager = useSupabaseFlightStatusManager();
   const flightSettings = useFlightSettings();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [shouldRenderModal, setShouldRenderModal] = useState(false);
   const editModalRef = useRef<AddFlightModalRef>(null);
 
   const getStatusBadge = (status: Flight['status']) => {
@@ -148,7 +149,10 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
             {
               label: 'Editar',
               icon: <Edit className="h-4 w-4" />,
-              onClick: () => editModalRef.current?.openModal()
+              onClick: () => {
+                setShouldRenderModal(true);
+                setTimeout(() => editModalRef.current?.openModal(), 0);
+              }
             },
             {
               label: 'Excluir',
@@ -202,7 +206,10 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-panel">
-                  <DropdownMenuItem onClick={() => editModalRef.current?.openModal()}>
+                  <DropdownMenuItem onClick={() => {
+                    setShouldRenderModal(true);
+                    setTimeout(() => editModalRef.current?.openModal(), 0);
+                  }}>
                     <Edit className="h-4 w-4 mr-2" />
                     Editar
                   </DropdownMenuItem>
@@ -306,16 +313,18 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         </CardContent>
       </Card>
 
-      {/* Modal de Edição */}
-      <AddFlightModal
-        ref={editModalRef}
-        flight={flight}
-        trigger={null}
-        onClose={() => {
-          // Recarregar página após editar voo
-          window.location.reload();
-        }}
-      />
+      {/* Modal de Edição - Renderizado apenas quando necessário */}
+      {shouldRenderModal && (
+        <AddFlightModal
+          ref={editModalRef}
+          flight={flight}
+          trigger={null}
+          onClose={() => {
+            // Recarregar página após editar voo
+            window.location.reload();
+          }}
+        />
+      )}
 
       {/* Dialog de Confirmação de Exclusão */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

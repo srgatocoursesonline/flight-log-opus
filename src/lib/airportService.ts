@@ -76,8 +76,58 @@ export interface AirportInfo {
   last_updated?: number;
 }
 
-// Cache em memória para aeroportos buscados
-const airportCache = new Map<string, AirportInfo>();
+// Cache em memória para aeroportos buscados com persistência no localStorage
+const CACHE_KEY = 'airportCache';
+const CACHE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 dias
+const CACHE_MAX_SIZE = 500; // Máximo de aeroportos no cache
+
+// Inicializar cache do localStorage
+const initCache = (): Map<string, AirportInfo> => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const cache = new Map<string, AirportInfo>();
+      
+      // Carregar apenas itens não expirados
+      Object.entries(parsed).forEach(([key, value]) => {
+        const airport = value as AirportInfo;
+        if (airport.last_updated && (Date.now() - airport.last_updated) < CACHE_MAX_AGE) {
+          cache.set(key, airport);
+        }
+      });
+      
+      return cache;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar cache de aeroportos:', error);
+  }
+  return new Map<string, AirportInfo>();
+};
+
+const airportCache = initCache();
+
+// Salvar cache no localStorage periodicamente
+const saveCacheToStorage = () => {
+  try {
+    // Limitar tamanho do cache
+    if (airportCache.size > CACHE_MAX_SIZE) {
+      // Remover itens mais antigos
+      const sorted = Array.from(airportCache.entries())
+        .sort((a, b) => (b[1].last_updated || 0) - (a[1].last_updated || 0));
+      
+      airportCache.clear();
+      sorted.slice(0, CACHE_MAX_SIZE).forEach(([key, value]) => {
+        airportCache.set(key, value);
+      });
+    }
+    
+    const cacheObj = Object.fromEntries(airportCache);
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObj));
+  } catch (error) {
+    console.error('Erro ao salvar cache de aeroportos:', error);
+  }
+};
 
 /**
  * Busca informações de um aeroporto pelo código ICAO
@@ -110,6 +160,7 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportSearc
     const csvResult = await fetchFromCsvFile(upperIcaoCode);
     if (csvResult) {
       airportCache.set(upperIcaoCode, csvResult);
+      saveCacheToStorage(); // Persistir no localStorage
       return {
         success: true,
         source: 'csv',
@@ -125,6 +176,7 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportSearc
     const supabaseResult = await fetchFromSupabase(upperIcaoCode);
     if (supabaseResult) {
       airportCache.set(upperIcaoCode, supabaseResult);
+      saveCacheToStorage(); // Persistir no localStorage
       return {
         success: true,
         source: 'manual',
@@ -163,6 +215,7 @@ export async function fetchAirportByIcao(icaoCode: string): Promise<AirportSearc
         };
         
         airportCache.set(upperIcaoCode, airportInfo);
+        saveCacheToStorage(); // Persistir no localStorage
         return {
           success: true,
           source: 'api',
@@ -200,6 +253,7 @@ export async function saveManualAirport(airportInfo: AirportInfo): Promise<boole
     
     // Atualizar cache local
     airportCache.set(icaoCode, airportInfo);
+    saveCacheToStorage(); // Persistir no localStorage
     
     // Salvar no Supabase
     const { error } = await supabase

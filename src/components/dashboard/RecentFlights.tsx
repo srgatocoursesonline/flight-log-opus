@@ -1,18 +1,27 @@
+import { useState } from "react";
 import { Plane, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
-import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { useSupabaseFlights, Flight } from '@/hooks/supabase/useSupabaseFlights';
 import { useFlightNavigation } from '@/hooks/business/useFlightNavigation';
+import { FlightDetailModal } from '@/components/flights/FlightDetailModal';
 
 export const RecentFlights = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { flights, isLoading } = useSupabaseFlights();
   const { navigateToAddFlight } = useFlightNavigation();
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const handleViewAll = () => {
     navigate('/flights');
+  };
+
+  const handleFlightClick = (flight: Flight) => {
+    setSelectedFlight(flight);
+    setIsModalOpen(true);
   };
 
   // Pegar os 3 voos mais recentes
@@ -64,7 +73,7 @@ export const RecentFlights = () => {
               key={flight.id} 
               className="flight-item flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-border/50 cursor-pointer hover:border-primary/50 transition-all duration-300"
               style={{ animationDelay: `${index * 0.1}s` }}
-              onClick={handleViewAll}
+              onClick={() => handleFlightClick(flight)}
             >
               <div className="rounded-lg bg-primary/10 p-3 icon-hover">
                 <Plane className="h-5 w-5 text-blue-600" />
@@ -103,6 +112,13 @@ export const RecentFlights = () => {
           ))
         )}
       </div>
+
+      {/* Modal de Detalhes do Voo */}
+      <FlightDetailModal 
+        flight={selectedFlight}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </div>
   );
 };

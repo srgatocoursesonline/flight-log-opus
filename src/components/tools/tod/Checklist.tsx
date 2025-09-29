@@ -115,10 +115,10 @@ export function Checklist({ inputs, outputs }: ChecklistProps) {
               </div>
 
               <div className="space-y-2">
-                <p className="font-semibold flex items-center gap-2">
+                <div className="font-semibold flex items-center gap-2">
                   <Badge variant="secondary">Velocidade</Badge>
                   Marcos sugeridos:
-                </p>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {gates.map((g, i) => (
                     <Badge key={i} variant="outline" className="text-sm">
