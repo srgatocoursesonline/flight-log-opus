@@ -9,6 +9,7 @@ import { ViewMaintenanceModal } from '../components/maintenance/ViewMaintenanceM
 import { MaintenanceList } from '../components/maintenance/MaintenanceList';
 import MaintenanceSummary from '../components/maintenance/MaintenanceSummary';
 import type { MaintenanceRecord } from '../types/maintenance';
+import { formatCurrency } from '@/lib/utils';
 
 const Maintenance = () => {
   const { t } = useTranslation();
@@ -55,16 +56,16 @@ const Maintenance = () => {
         <div>
           <h1 className="mobile-title gradient-title flex items-center">
             <Wrench className="h-8 w-8 mr-3 text-primary" />
-            {t('navigation.maintenance')}
+            {t('maintenance.title')}
           </h1>
           <p className="text-readable-muted mt-1">
-            Gerencie a manutenção de suas aeronaves e equipamentos
+            {t('maintenance.subtitle')}
           </p>
         </div>
-        
+
         <Button onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Nova Manutenção
+          {t('maintenance.newMaintenance')}
         </Button>
       </div>
 
@@ -74,7 +75,7 @@ const Maintenance = () => {
           <div className="bg-card rounded-lg p-4 border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Pendentes</p>
+                <p className="text-sm text-muted-foreground">{t('maintenance.pending')}</p>
                 <p className="text-2xl font-bold text-yellow-600">
                   {maintenanceRecords.filter(r => r.status === 'pending').length}
                 </p>
@@ -88,7 +89,7 @@ const Maintenance = () => {
           <div className="bg-card rounded-lg p-4 border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Concluídas</p>
+                <p className="text-sm text-muted-foreground">{t('maintenance.completed')}</p>
                 <p className="text-2xl font-bold text-green-600">
                   {maintenanceRecords.filter(r => r.status === 'completed').length}
                 </p>
@@ -102,9 +103,9 @@ const Maintenance = () => {
           <div className="bg-card rounded-lg p-4 border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Horas Totais</p>
+                <p className="text-sm text-muted-foreground">{t('maintenance.totalHours')}</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {maintenanceRecords.reduce((sum, r) => sum + (r.actual_hours || 0), 0).toFixed(1)}h
+                  {maintenanceRecords.reduce((sum, r) => sum + (r.actual_hours || 0), 0).toFixed(1)}{t('profile.hoursShort')}
                 </p>
               </div>
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
@@ -116,12 +117,12 @@ const Maintenance = () => {
           <div className="bg-card rounded-lg p-4 border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Custo Total</p>
+                <p className="text-sm text-muted-foreground">{t('maintenance.totalCost')}</p>
                 <p className="text-2xl font-bold text-red-600">
-                  R$ {maintenanceRecords.reduce((sum, r) => {
-                    const recordCost = r.items?.reduce((itemSum, item) => itemSum + (item.actual_cost || 0), 0) || 0;
+                  {formatCurrency(maintenanceRecords.reduce((sum, r) => {
+                    const recordCost = r.items?.reduce((itemSum, item) => itemSum + (item.cost || 0), 0) || 0;
                     return sum + recordCost;
-                  }, 0).toFixed(2)}
+                  }, 0))}
                 </p>
               </div>
               <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
@@ -138,7 +139,7 @@ const Maintenance = () => {
       )}
 
       {/* Lista de Manutenções */}
-      <MaintenanceList 
+      <MaintenanceList
         onEdit={handleEdit}
         onView={handleView}
       />

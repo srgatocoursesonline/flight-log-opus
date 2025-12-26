@@ -30,12 +30,12 @@ interface EditProfileModalProps {
 }
 
 export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileModalProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const { getFinancialStats } = useSupabaseFinancial();
   const { updateProfile } = useProfile();
-  
+
   // Sincronização automática do career_rating com lucro líquido
   const { currentNetProfit } = useProfileFinancialSync();
 
@@ -101,7 +101,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
 
   // Função para formatar CR
   const formatCR = (cr: number) => {
-    return cr.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return cr.toLocaleString(i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const handleAvatarUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,15 +128,15 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         .getPublicUrl(filePath);
 
       setFormData(prev => ({ ...prev, avatar_url: data.publicUrl }));
-      
+
       toast({
-        title: "Sucesso!",
-        description: "Avatar atualizado com sucesso",
+        title: t('common.success'),
+        description: t('profile.edit.avatarSuccess'),
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Erro ao fazer upload do avatar",
+        title: t('common.error'),
+        description: t('profile.edit.avatarError'),
         variant: "destructive",
       });
     }
@@ -160,15 +160,15 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       });
 
       toast({
-        title: "Sucesso!",
-        description: "Perfil atualizado com sucesso",
+        title: t('common.success'),
+        description: t('profile.edit.success'),
       });
-      
+
       onClose();
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Erro ao atualizar perfil",
+        title: t('common.error'),
+        description: t('profile.edit.error'),
         variant: "destructive",
       });
     } finally {
@@ -182,7 +182,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            {t('profile.edit.title', 'Editar Perfil')}
+            {t('profile.edit.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -209,7 +209,7 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                 className="flex items-center gap-2"
               >
                 <Upload className="h-4 w-4" />
-                Alterar Avatar
+                {t('profile.edit.changeAvatar')}
               </Button>
             </div>
           </div>
@@ -217,26 +217,26 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
-              Informações Básicas
+              {t('profile.edit.basicInfo')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="display_name">Nome de Exibição</Label>
+              <Label htmlFor="display_name">{t('profile.edit.displayName')}</Label>
               <Input
                 id="display_name"
                 value={formData.display_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
                 placeholder="Cmdte. Rodrigo"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description">{t('profile.edit.description')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Conte um pouco sobre sua experiência como piloto..."
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder={t('profile.edit.descriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -245,17 +245,17 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Star className="h-5 w-5" />
-              Dados Históricos
+              {t('profile.edit.historicalData')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="initial_flights">Voos Iniciais (Histórico)</Label>
+              <Label htmlFor="initial_flights">{t('profile.edit.initialFlights')}</Label>
               <Input
                 id="initial_flights"
                 type="number"
                 min="0"
                 value={formData.initial_flights || ""}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value = e.target.value;
                   const numValue = value === "" ? 0 : Number(value);
                   setFormData(prev => ({ ...prev, initial_flights: numValue }));
@@ -263,28 +263,27 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
                 placeholder="Ex: 127"
               />
               <p className="text-xs text-muted-foreground">
-                Novos voos serão somados a este valor automaticamente
+                {t('profile.edit.initialFlightsDesc')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="initial_minutes">Horas de Voo Iniciais</Label>
+              <Label htmlFor="initial_minutes">{t('profile.edit.initialHours')}</Label>
               <Input
                 id="initial_minutes"
                 type="number"
                 min="0"
-                step="0.1"
                 value={formData.initial_minutes ? (formData.initial_minutes / 60).toFixed(1) : ""}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value = e.target.value;
                   const hoursValue = value === "" ? 0 : Number(value);
                   const minutesValue = Math.round(hoursValue * 60);
                   setFormData(prev => ({ ...prev, initial_minutes: minutesValue }));
                 }}
-                placeholder="Ex: 200.5 (horas)"
+                placeholder="Ex: 200.5"
               />
               <p className="text-xs text-muted-foreground">
-                Novas horas de voo serão somadas a este valor automaticamente
+                {t('profile.edit.initialHoursDesc')}
               </p>
             </div>
           </div>
@@ -292,31 +291,31 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Trophy className="h-5 w-5" />
-              Estatísticas de Carreira
+              {t('profile.careerStats')}
             </h3>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="career_started">Carreira Iniciada</Label>
+                <Label htmlFor="career_started">{t('profile.edit.careerStarted')}</Label>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <Input
                     id="career_started"
                     type="date"
                     value={formData.career_started}
-                    onChange={(e) => setFormData(prev => ({ ...prev, career_started: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, career_started: e.target.value }))}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="perfect_flights">Pousos Perfeitos</Label>
+                <Label htmlFor="perfect_flights">{t('profile.edit.perfectFlights')}</Label>
                 <Input
                   id="perfect_flights"
                   type="number"
                   min="0"
                   value={formData.perfect_flights || ""}
-                  onChange={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const value = e.target.value;
                     const numValue = value === "" ? 0 : Number(value);
                     setFormData(prev => ({ ...prev, perfect_flights: numValue }));
@@ -327,14 +326,14 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="achievements">Conquistas</Label>
+              <Label htmlFor="achievements">{t('profile.achievements')}</Label>
               <div className="flex items-start gap-2">
                 <Trophy className="h-4 w-4 text-success mt-3" />
                 <Textarea
                   id="achievements"
                   value={formData.achievements}
-                  onChange={(e) => setFormData(prev => ({ ...prev, achievements: e.target.value }))}
-                  placeholder="Descreva suas principais conquistas e certificações..."
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, achievements: e.target.value }))}
+                  placeholder={t('profile.edit.achievementsPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -344,19 +343,19 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
           <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Resumo Calculado
+              {t('profile.edit.summary')}
             </h4>
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between">
-                <span>Total de Voos:</span>
-                <span className="font-mono">{formData.initial_flights} voos de histórico</span>
+                <span>{t('profile.edit.calculatedTotalFlights')}</span>
+                <span className="font-mono">{formData.initial_flights} {t('common.flights')}</span>
               </div>
               <div className="flex justify-between">
-                <span>Total de Horas:</span>
-                <span className="font-mono">{formData.initial_minutes}h</span>
+                <span>{t('profile.edit.calculatedTotalHours')}</span>
+                <span className="font-mono">{formData.initial_minutes / 60}h</span>
               </div>
               <div className="flex justify-between">
-                <span>CR Atual:</span>
+                <span>{t('profile.edit.currentCR')}</span>
                 <span className="font-mono text-accent">{formatCR(dynamicCR)} CR</span>
               </div>
             </div>
@@ -365,10 +364,10 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
 
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={onClose} disabled={isSaving}>
-            Cancelar
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "Salvando..." : "Salvar Alterações"}
+            {isSaving ? t('profile.edit.saving') : t('profile.edit.saveChanges')}
           </Button>
         </div>
       </DialogContent>

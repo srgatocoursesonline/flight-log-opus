@@ -7,8 +7,10 @@ import { useFinancialSettings } from '@/hooks/business/useFinancialSettings';
 
 import { DollarSign, RotateCcw, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export const FinancialSettingsManager = () => {
+  const { t, i18n } = useTranslation();
   const { settings, isLoading, updateInitialBalance, resetToDefault } = useFinancialSettings();
   const [tempValue, setTempValue] = useState(settings.initialBalance.toString());
   const [isSaving, setIsSaving] = useState(false);
@@ -19,52 +21,52 @@ export const FinancialSettingsManager = () => {
   }, [settings.initialBalance]);
 
   const formatCR = (amount: number) => {
-    return amount.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return amount.toLocaleString(i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
       const newValue = parseFloat(tempValue.replace(/[^0-9.-]/g, ''));
-      
+
       console.log('🔍 DEBUG - handleSave:', {
         tempValue,
         newValue,
         currentBalance: settings.initialBalance,
         isNaN: isNaN(newValue)
       });
-      
+
       if (isNaN(newValue)) {
-        toast.error('Por favor, insira um valor numérico válido');
+        toast.error(t('settings.financial.invalidValue', 'Por favor, insira um valor numérico válido'));
         return;
       }
-      
+
       if (newValue < 0) {
-        toast.error('O valor inicial não pode ser negativo');
+        toast.error(t('settings.financial.negativeValue', 'O valor inicial não pode ser negativo'));
         return;
       }
-      
+
       console.log('🚀 Chamando updateInitialBalance com:', newValue);
       await updateInitialBalance(newValue);
       console.log('✅ updateInitialBalance concluído');
-      toast.success('Valor inicial atualizado com sucesso!');
+      toast.success(t('settings.financial.success', 'Valor inicial atualizado com sucesso!'));
     } catch (error) {
       console.error('❌ Erro ao salvar valor inicial:', error);
-      toast.error('Erro ao salvar o valor inicial');
+      toast.error(t('settings.financial.error', 'Erro ao salvar o valor inicial'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (confirm('Tem certeza que deseja restaurar o valor padrão?')) {
+    if (confirm(t('settings.financial.confirmReset', 'Tem certeza que deseja restaurar o valor padrão?'))) {
       try {
         await resetToDefault();
         setTempValue('5922235');
-        toast.success('Valor inicial restaurado para o padrão');
+        toast.success(t('settings.financial.resetSuccess', 'Valor inicial restaurado para o padrão'));
       } catch (error) {
         console.error('Erro ao restaurar valor padrão:', error);
-        toast.error('Erro ao restaurar o valor padrão');
+        toast.error(t('settings.financial.resetError', 'Erro ao restaurar o valor padrão'));
       }
     }
   };
@@ -89,7 +91,7 @@ export const FinancialSettingsManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Configurações Financeiras
+            {t('settings.financial.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -107,67 +109,65 @@ export const FinancialSettingsManager = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5 text-primary" />
-          Configurações Financeiras
+          {t('settings.financial.title')}
         </CardTitle>
         <CardDescription>
-          Configure o valor inicial da sua conta para cálculos financeiros
+          {t('settings.financial.initialBalanceDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="initial-balance">Valor Inicial (CR)</Label>
+            <Label htmlFor="initial-balance">{t('settings.financial.initialBalance')} (CR)</Label>
             <div className="flex gap-2">
               <Input
                 id="initial-balance"
                 type="text"
                 value={formatInputValue(tempValue)}
-                onChange={(e) => handleInputChange(e.target.value)}
-                placeholder="Digite o valor inicial"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e.target.value)}
+                placeholder={t('settings.financial.placeholder', 'Digite o valor inicial')}
                 className="flex-1"
               />
-              <Button 
-                onClick={handleSave} 
+              <Button
+                onClick={handleSave}
                 disabled={isSaving}
                 size="sm"
               >
                 <Save className="h-4 w-4 mr-1" />
-                {isSaving ? 'Salvando...' : 'Salvar'}
+                {isSaving ? t('common.saving') : t('common.save')}
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Valor atual: <span className="font-medium text-foreground">{formatCR(settings.initialBalance)} CR</span>
+              {t('settings.financial.currentValue', 'Valor atual')}: <span className="font-medium text-foreground">{formatCR(settings.initialBalance)} CR</span>
             </p>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-border/50">
             <div>
-              <h4 className="font-medium text-foreground">Restaurar Padrão</h4>
+              <h4 className="font-medium text-foreground">{t('settings.financial.restoreDefault', 'Restaurar Padrão')}</h4>
               <p className="text-sm text-muted-foreground">
-                Voltar ao valor padrão de {formatCR(5922235)}
+                {t('settings.financial.restoreDesc', 'Voltar ao valor padrão de {{value}}', { value: formatCR(5922235) })}
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleReset}
               disabled={settings.initialBalance === 5922235}
             >
               <RotateCcw className="h-4 w-4 mr-1" />
-              Restaurar
+              {t('common.restore', 'Restaurar')}
             </Button>
           </div>
         </div>
 
         <div className="bg-muted/50 p-4 rounded-lg">
-          <h4 className="font-medium text-foreground mb-2">💡 Como funciona</h4>
+          <h4 className="font-medium text-foreground mb-2">💡 {t('settings.financial.howItWorks', 'Como funciona')}</h4>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            O valor inicial é a base do seu sistema financeiro. Todas as receitas e despesas 
-            serão calculadas a partir deste valor. Quando você registrar voos com status "completo", 
-            o CR desses voos será somado ao valor inicial.
+            {t('settings.financial.howItWorksDesc', 'O valor inicial é a base do seu sistema financeiro. Todas as receitas e despesas serão calculadas a partir deste valor. Quando você registrar voos com status "completo", o CR desses voos será somado ao valor inicial.')}
           </p>
           <p className="text-sm text-muted-foreground mt-2">
-            <strong>Fórmula:</strong> Receita Total = Valor Inicial + CR dos Voos + Receitas Extras
+            <strong>{t('settings.financial.formula', 'Fórmula')}:</strong> {t('settings.financial.formulaDesc', 'Receita Total = Valor Inicial + CR dos Voos + Receitas Extras')}
           </p>
         </div>
       </CardContent>

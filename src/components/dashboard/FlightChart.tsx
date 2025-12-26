@@ -28,7 +28,7 @@ const getChartColors = () => {
 type FilterPeriod = '3' | '6' | '12' | 'all';
 
 export const FlightChart = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { flights, isLoading } = useSupabaseFlights();
   const [colors, setColors] = useState(getChartColors());
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('6');
@@ -92,17 +92,18 @@ export const FlightChart = () => {
 
   // Formatar o rótulo do tooltip
   const formatTooltipLabel = (value: string) => {
+    if (!value) return '';
     const [year, month] = value.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US', { month: 'short', year: 'numeric' });
   };
 
   // Formatar o valor do tooltip
   const formatTooltipValue = (value: number, name: string) => {
     if (name === 'cr') {
-      return [`R$ ${value.toFixed(0)}`, 'Career Rating'];
+      return [`R$ ${value.toFixed(0)}`, t('flightChart.careerRating')];
     }
-    return [value, 'Voos'];
+    return [value, t('flightChart.flights')];
   };
 
   if (isLoading) {
@@ -115,7 +116,7 @@ export const FlightChart = () => {
         <div className="h-80 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-sm">Carregando dados...</p>
+            <p className="text-sm">{t('common.loading')}</p>
           </div>
         </div>
       </div>
@@ -131,7 +132,7 @@ export const FlightChart = () => {
         </div>
         <div className="h-80 flex items-center justify-center">
           <p className="text-sm text-muted-foreground">
-            Nenhum voo registrado. Adicione seus primeiros voos para ver o gráfico!
+            {t('flightChart.noData')}
           </p>
         </div>
       </div>
@@ -139,10 +140,10 @@ export const FlightChart = () => {
   }
 
   const filterOptions: { value: FilterPeriod; label: string }[] = [
-    { value: '3', label: '3 meses' },
-    { value: '6', label: '6 meses' },
-    { value: '12', label: '12 meses' },
-    { value: 'all', label: 'Todos' },
+    { value: '3', label: t('flightChart.months3') },
+    { value: '6', label: t('flightChart.months6') },
+    { value: '12', label: t('flightChart.months12') },
+    { value: 'all', label: t('flightChart.all') },
   ];
 
   return (
@@ -153,18 +154,17 @@ export const FlightChart = () => {
             <h3 className="text-lg font-semibold text-foreground mb-1">{t('flightChart.title')}</h3>
             <p className="text-sm text-readable-muted">{t('flightChart.subtitle')}</p>
           </div>
-          
+
           {/* Filtros de Período */}
           <div className="flex gap-2 flex-wrap">
             {filterOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => setFilterPeriod(option.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
-                  filterPeriod === option.value
-                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                    : 'bg-card hover:bg-accent border-border text-muted-foreground hover:text-foreground'
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${filterPeriod === option.value
+                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                  : 'bg-card hover:bg-accent border-border text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 {option.label}
               </button>
@@ -172,27 +172,27 @@ export const FlightChart = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="h-80 relative">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               stroke={colors.text}
               fontSize={12}
               tickLine={false}
               axisLine={false}
               tickFormatter={formatTooltipLabel}
             />
-            <YAxis 
+            <YAxis
               yAxisId="left"
               stroke={colors.flightLine}
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
-            <YAxis 
+            <YAxis
               yAxisId="right"
               orientation="right"
               stroke={colors.crLine}
@@ -201,7 +201,7 @@ export const FlightChart = () => {
               axisLine={false}
               tickFormatter={(value) => `R$ ${value}`}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: colors.tooltipBg,
                 border: `1px solid ${colors.tooltipBorder}`,
@@ -215,9 +215,9 @@ export const FlightChart = () => {
               formatter={formatTooltipValue}
               cursor={{ fill: colors.grid, opacity: 0.3 }}
             />
-            <Bar 
+            <Bar
               yAxisId="left"
-              dataKey="flights" 
+              dataKey="flights"
               fill={colors.flightLine}
               radius={[8, 8, 0, 0]}
               maxBarSize={80}
@@ -225,9 +225,9 @@ export const FlightChart = () => {
               animationEasing="ease-out"
               name="flights"
             />
-            <Bar 
+            <Bar
               yAxisId="right"
-              dataKey="cr" 
+              dataKey="cr"
               fill={colors.crLine}
               radius={[8, 8, 0, 0]}
               maxBarSize={80}
@@ -238,18 +238,18 @@ export const FlightChart = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      
+
       <div className="flex justify-center gap-6 mt-4">
         <div className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded" 
+          <div
+            className="w-3 h-3 rounded"
             style={{ backgroundColor: colors.flightLine }}
           />
           <span className="text-sm text-readable-muted">{t('flightChart.flights')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded" 
+          <div
+            className="w-3 h-3 rounded"
             style={{ backgroundColor: colors.crLine }}
           />
           <span className="text-sm text-readable-muted">{t('flightChart.careerRating')}</span>

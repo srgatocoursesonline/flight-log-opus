@@ -116,7 +116,7 @@ const FlightMaps: React.FC = () => {
   const [showAllRoutes, setShowAllRoutes] = useState(true);
   const [activeTab, setActiveTab] = useState('map');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Dados de tempo real simulados (para demonstração)
   const [realTimeData, setRealTimeData] = useState<{
     lat: number;
@@ -133,7 +133,7 @@ const FlightMaps: React.FC = () => {
     setTimeout(() => {
       const sampleRoutes = generateSampleRoutes();
       setRoutes(sampleRoutes);
-      
+
       // Encontrar rota ativa para dados em tempo real
       const activeRoute = sampleRoutes.find(r => r.status === 'active');
       if (activeRoute) {
@@ -149,7 +149,7 @@ const FlightMaps: React.FC = () => {
           speed: 450
         });
       }
-      
+
       setIsLoading(false);
     }, 1000);
   }, []);
@@ -161,7 +161,7 @@ const FlightMaps: React.FC = () => {
     const interval = setInterval(() => {
       setRealTimeData(prev => {
         if (!prev) return prev;
-        
+
         // Simular movimento da aeronave
         return {
           ...prev,
@@ -218,7 +218,7 @@ const FlightMaps: React.FC = () => {
             {t('maps.subtitle', 'Visualize e acompanhe rotas de voo em tempo real')}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -227,16 +227,16 @@ const FlightMaps: React.FC = () => {
             disabled={isLoading}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Atualizar
+            {t('financialReports.refresh')}
           </Button>
-          
+
           <Button
             variant={showAllRoutes ? 'default' : 'outline'}
             size="sm"
             onClick={handleShowAllRoutes}
           >
             <Globe className="h-4 w-4 mr-2" />
-            Todas as Rotas
+            {t('maps.allRoutes')}
           </Button>
         </div>
       </div>
@@ -254,36 +254,36 @@ const FlightMaps: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Concluídos</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('maps.completed')}</p>
                 <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
               </div>
               <div className="w-3 h-3 bg-green-500 rounded-full" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Ativos</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('maps.active')}</p>
                 <p className="text-2xl font-bold text-red-600">{stats.active}</p>
               </div>
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Planejados</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('maps.planned')}</p>
                 <p className="text-2xl font-bold text-blue-600">{stats.planned}</p>
               </div>
               <div className="w-3 h-3 bg-blue-500 rounded-full" />
@@ -321,35 +321,35 @@ const FlightMaps: React.FC = () => {
         <CardHeader>
           <CardTitle className="text-lg flex items-center">
             <Info className="h-5 w-5 mr-2 text-primary" />
-            Informações
+            {t('settings.about')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h4 className="font-semibold mb-2">Legenda do Mapa:</h4>
+              <h4 className="font-semibold mb-2">{t('maps.mapLegend')}:</h4>
               <ul className="space-y-1 text-muted-foreground">
                 <li className="flex items-center">
                   <div className="w-3 h-1 bg-green-500 mr-2" />
-                  Voos Concluídos
+                  {t('maps.completed')}
                 </li>
                 <li className="flex items-center">
                   <div className="w-3 h-1 bg-red-500 mr-2" />
-                  Voos Ativos
+                  {t('maps.active')}
                 </li>
                 <li className="flex items-center">
                   <div className="w-3 h-1 bg-blue-500 mr-2" />
-                  Voos Planejados
+                  {t('maps.planned')}
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Recursos:</h4>
+              <h4 className="font-semibold mb-2">{t('maps.features')}:</h4>
               <ul className="space-y-1 text-muted-foreground">
-                <li>• Tracking em tempo real</li>
-                <li>• Múltiplas camadas de mapa</li>
-                <li>• Waypoints e rotas detalhadas</li>
-                <li>• Filtros e busca avançada</li>
+                <li>• {t('maps.realtimeTracking')}</li>
+                <li>• {t('maps.multipleLayers')}</li>
+                <li>• {t('maps.detailedWaypoints')}</li>
+                <li>• {t('maps.advancedFilters')}</li>
               </ul>
             </div>
           </div>

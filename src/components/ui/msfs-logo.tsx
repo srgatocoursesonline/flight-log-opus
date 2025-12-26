@@ -16,7 +16,7 @@ export const MSFSLogo = ({ className, size = "md" }: MSFSLogoProps) => {
     <div className={cn("flex items-center", className)}>
       <svg
         viewBox="0 0 200 60"
-        className={cn(sizeClasses[size], "text-primary-foreground")}
+        className={cn(sizeClasses[size], "text-foreground")}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -28,8 +28,8 @@ export const MSFSLogo = ({ className, size = "md" }: MSFSLogoProps) => {
             <stop offset="100%" stopColor="#004578" />
           </linearGradient>
           <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="100%" stopColor="#E3E3E3" />
+            <stop offset="0%" stopColor="currentColor" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.7" />
           </linearGradient>
         </defs>
 

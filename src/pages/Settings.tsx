@@ -15,7 +15,7 @@ import MaintenanceItemsManager from "@/components/maintenance/MaintenanceItemsMa
 
 const Settings = () => {
   const { t } = useTranslation();
-  
+
   // Estados para controlar seções abertas/fechadas - TODAS RECOLHIDAS POR PADRÃO
   const [openSections, setOpenSections] = useState({
     notifications: false,
@@ -27,14 +27,14 @@ const Settings = () => {
     data: false,
     security: false
   });
-  
+
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
   };
-  
+
   // Ouvir o evento para abrir a seção de carreira
   useEffect(() => {
     const handleOpenCareerSection = () => {
@@ -45,35 +45,35 @@ const Settings = () => {
     };
 
     window.addEventListener('openCareerSection', handleOpenCareerSection);
-    
+
     return () => {
       window.removeEventListener('openCareerSection', handleOpenCareerSection);
     };
   }, []);
-  
+
   const handleExportData = () => {
     // TODO: Implementar export de dados
     console.log('Export data - TODO');
   };
-  
+
   const handleBackup = () => {
     // TODO: Implementar backup
     console.log('Backup - TODO');
   };
-  
+
   const handleResetData = () => {
     // TODO: Implementar reset de dados
-    if (confirm('Tem certeza que deseja resetar todos os dados?')) {
+    if (confirm(t('common.confirmClear'))) {
       // Aqui seria implementado o reset real
       console.log('Reset data - TODO');
     }
   };
-  
+
   const handleConnectSupabase = () => {
     // TODO: Implementar conexão Supabase
     console.log('Connect Supabase - TODO');
   };
-  
+
   return (
     <div className="mobile-page-layout mobile-section pb-20 lg:pb-6">
       <div className="flex flex-col gap-1 fade-in">
@@ -104,7 +104,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ const Settings = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground">{t('settings.notifications.push')}</h4>
@@ -122,7 +122,7 @@ const Settings = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
 
               </div>
             </CollapsibleContent>
@@ -147,7 +147,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-6 border-t border-border/50">
                 <FinancialSettingsManager />
@@ -176,7 +176,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <FlightConfigManager />
@@ -203,7 +203,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <div className="space-y-6">
@@ -239,7 +239,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <CareerRatingManager />
@@ -266,7 +266,7 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
@@ -276,7 +276,7 @@ const Settings = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground">{t('settings.flights.autoSync')}</h4>
@@ -284,7 +284,7 @@ const Settings = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
 
               </div>
             </CollapsibleContent>
@@ -309,29 +309,29 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground">{t('settings.data.export')}</h4>
-                    <p className="text-sm text-muted-foreground">Baixe seus dados de voo</p>
+                    <p className="text-sm text-muted-foreground">{t('settings.data.exportDesc', 'Baixe seus dados de voo')}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={handleExportData}>{t('settings.data.export')}</Button>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground">{t('settings.data.backup')}</h4>
-                    <p className="text-sm text-muted-foreground">Crie um backup dos seus dados</p>
+                    <p className="text-sm text-muted-foreground">{t('settings.data.backupDesc', 'Crie um backup dos seus dados')}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={handleBackup}>{t('settings.data.backup')}</Button>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground text-destructive">{t('settings.data.reset')}</h4>
-                    <p className="text-sm text-muted-foreground">Apagar permanentemente todos os dados de voo</p>
+                    <p className="text-sm text-muted-foreground">{t('settings.data.resetDesc', 'Apagar permanentemente todos os dados de voo')}</p>
                   </div>
                   <Button variant="destructive" size="sm" onClick={handleResetData}>{t('settings.data.reset')}</Button>
                 </div>
@@ -358,12 +358,12 @@ const Settings = () => {
                 </div>
               </div>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 border-t border-border/50">
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
-                    Recursos de segurança e privacidade para proteger seus dados
+                    {t('settings.security.description', 'Recursos de segurança e privacidade para proteger seus dados')}
                   </p>
                   <Button variant="hud" onClick={handleConnectSupabase}>
                     {t('settings.security.connectAccount')}

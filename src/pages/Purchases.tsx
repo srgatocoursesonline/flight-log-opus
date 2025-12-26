@@ -29,9 +29,10 @@ const formatCurrency = (value: number) => {
 
 // Componente StatusBadge clicável
 const StatusBadge = ({ status, purchaseId, onStatusChange }: { status: string; purchaseId: string; onStatusChange?: () => void }) => {
+  const { t } = useTranslation();
   const { updatePurchase } = useSupabasePurchases();
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50';
@@ -44,21 +45,21 @@ const StatusBadge = ({ status, purchaseId, onStatusChange }: { status: string; p
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return 'Pendente';
-      case 'approved': return 'Aprovado';
-      case 'completed': return 'Concluído';
-      case 'cancelled': return 'Cancelado';
+      case 'pending': return t('common.pending') || 'Pendente';
+      case 'approved': return t('common.approved') || 'Aprovado';
+      case 'completed': return t('common.completed') || 'Concluído';
+      case 'cancelled': return t('common.cancelled') || 'Cancelado';
       default: return status;
     }
   };
 
   const handleStatusChange = useCallback(async () => {
     if (isUpdating) return;
-    
+
     const statusOrder: string[] = ['pending', 'approved', 'completed', 'cancelled'];
     const currentIndex = statusOrder.indexOf(status);
     let nextStatus: string;
-    
+
     // Ciclo: pending -> approved -> completed -> cancelled -> pending
     if (status === 'pending') {
       nextStatus = 'approved';
@@ -71,11 +72,11 @@ const StatusBadge = ({ status, purchaseId, onStatusChange }: { status: string; p
     } else {
       nextStatus = 'pending';
     }
-    
+
     try {
       setIsUpdating(true);
       const success = await updatePurchase(purchaseId, { status: nextStatus });
-      
+
       if (success && onStatusChange) {
         onStatusChange();
       }
@@ -87,7 +88,7 @@ const StatusBadge = ({ status, purchaseId, onStatusChange }: { status: string; p
   }, [status, purchaseId, onStatusChange, isUpdating, updatePurchase]);
 
   return (
-    <Badge 
+    <Badge
       className={`${getStatusColor(status)} cursor-pointer transition-colors ${isUpdating ? 'opacity-50 animate-pulse' : ''}`}
       onClick={handleStatusChange}
       title="Clique para alterar o status"
@@ -152,7 +153,7 @@ const Purchases = () => {
 
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    
+
     const monthPurchases = purchases.filter(p => {
       const purchaseDate = new Date(p.purchaseDate);
       return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
@@ -160,7 +161,7 @@ const Purchases = () => {
 
     const totalMonth = monthPurchases.reduce((sum, p) => sum + p.finalValue, 0);
     const pending = purchases.filter(p => p.status === 'pending').length;
-    
+
     return {
       totalMonth,
       pending,
@@ -197,16 +198,16 @@ const Purchases = () => {
         <div>
           <h1 className="mobile-title gradient-title flex items-center">
             <ShoppingCart className="h-8 w-8 mr-3 text-primary" />
-            {t('navigation.purchases')}
+            {t('purchases.title')}
           </h1>
           <p className="text-readable-muted mt-1 whitespace-nowrap overflow-hidden">
-            Gerencie compras de combustível, equipamentos e suprimentos
+            {t('purchases.subtitle')}
           </p>
         </div>
-        
+
         <Button onClick={handleNewPurchase}>
           <ShoppingCart className="h-4 w-4 mr-2" />
-          Nova Compra
+          {t('purchases.newPurchase')}
         </Button>
       </div>
 
@@ -215,14 +216,14 @@ const Purchases = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Gastos Este Mês
+              {t('purchases.monthlySpending')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalMonth)}</div>
             <p className="text-xs text-readable-muted">
-              {stats.monthCount} {stats.monthCount === 1 ? 'compra' : 'compras'} este mês
+              {stats.monthCount} {t('common.purchase', { count: stats.monthCount })} {t('common.thisMonth')}
             </p>
           </CardContent>
         </Card>
@@ -230,14 +231,14 @@ const Purchases = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Pedidos Pendentes
+              {t('purchases.pendingOrders')}
             </CardTitle>
             <Package className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pending}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.pending === 1 ? 'pedido pendente' : 'pedidos pendentes'}
+              {stats.pending} {t('common.pendingOrder', { count: stats.pending })}
             </p>
           </CardContent>
         </Card>
@@ -245,47 +246,46 @@ const Purchases = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total de Compras
+              {t('purchases.totalPurchases')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{purchases.length}</div>
             <p className="text-xs text-muted-foreground">
-              compras registradas
+              {t('common.purchasesRegistered')}
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Lista de Compras */}
-      
+
       <Card>
         <CardHeader>
-          <CardTitle>Compras Recentes</CardTitle>
+          <CardTitle>{t('purchases.recentPurchases')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-readable-muted">Carregando compras...</p>
+              <p className="text-readable-muted">{t('common.loading')}</p>
             </div>
           ) : purchases.length === 0 ? (
             <div className="text-center py-8">
               <ShoppingCart className="h-12 w-12 mx-auto text-readable-muted mb-3" />
-              <h3 className="text-lg font-semibold mb-2">Nenhuma compra ainda</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('purchases.noPurchases')}</h3>
               <p className="text-readable-muted max-w-md mx-auto mb-4">
-                Clique em "Nova Compra" para registrar compras de combustível, 
-                equipamentos e suprimentos para suas operações.
+                {t('purchases.subtitle')}
               </p>
               <Button onClick={handleNewPurchase} variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
-                Primeira Compra
+                {t('purchases.firstPurchase')}
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              {purchases.map((purchase) => (
+              {purchases.map((purchase: any) => (
                 <div key={purchase.id} className="flex items-center justify-between p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -336,7 +336,7 @@ const Purchases = () => {
       </Card>
 
       {/* Modal de Nova Compra */}
-      <NewPurchaseModal 
+      <NewPurchaseModal
         ref={newPurchaseModalRef}
         onSuccess={handleSuccess}
       />
@@ -357,7 +357,7 @@ const Purchases = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta compra? Esta ação também excluirá 
+              Tem certeza que deseja excluir esta compra? Esta ação também excluirá
               a transação financeira associada e não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -379,7 +379,7 @@ const Purchases = () => {
 // Modal de Edição de Compra - Definido fora do componente Purchases
 const EditPurchaseModal = ({ purchase, isOpen, onClose, onSuccess }: any) => {
   const aircraftManager = useSupabaseAircraftManager();
-  
+
   const [formData, setFormData] = useState({
     title: purchase?.title || '',
     category: purchase?.category || '',
@@ -492,172 +492,172 @@ const EditPurchaseModal = ({ purchase, isOpen, onClose, onSuccess }: any) => {
 
   // Modal de Edição com estilos corrigidos para modo escuro
   return (
-      <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Editar Compra</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 text-foreground hover:bg-accent"
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border shadow-xl">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-foreground">Editar Compra</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0 text-foreground hover:bg-accent"
+          >
+            ×
+          </Button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Título */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Título *</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+
+          {/* Categoria */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Categoria *</label>
+            <select
+              value={formData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
             >
-              ×
+              <option value="">Selecione a categoria</option>
+              {PURCHASE_CATEGORIES.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subcategoria */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Subcategoria *</label>
+            <select
+              value={formData.subcategory}
+              onChange={(e) => handleInputChange('subcategory', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="">Selecione a subcategoria</option>
+              {SUBCATEGORIES[formData.category]?.map(sub => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Valores */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-foreground">Valor Orçado (CR)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.budgetedValue}
+                onChange={(e) => handleInputChange('budgetedValue', parseFloat(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-foreground">Valor Negociado (CR)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.negotiatedValue}
+                onChange={(e) => handleInputChange('negotiatedValue', parseFloat(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-foreground">Valor Final (CR) *</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.finalValue}
+                onChange={(e) => handleInputChange('finalValue', parseFloat(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Data da Compra */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Data da Compra *</label>
+            <input
+              type="date"
+              value={formData.purchaseDate}
+              onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+
+          {/* Comprador */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Comprador *</label>
+            <input
+              type="text"
+              value={formData.buyer}
+              onChange={(e) => handleInputChange('buyer', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Status *</label>
+            <select
+              value={formData.status}
+              onChange={(e) => handleInputChange('status', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="pending">Pendente</option>
+              <option value="completed">Concluído</option>
+              <option value="cancelled">Cancelado</option>
+            </select>
+          </div>
+
+          {/* Observações */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-foreground">Observações</label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+              rows={3}
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="border-border hover:bg-accent"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Salvar Alterações
             </Button>
           </div>
-  
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Título */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Título *</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              />
-            </div>
-  
-            {/* Categoria */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Categoria *</label>
-              <select
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              >
-                <option value="">Selecione a categoria</option>
-                {PURCHASE_CATEGORIES.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-  
-            {/* Subcategoria */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Subcategoria *</label>
-              <select
-                value={formData.subcategory}
-                onChange={(e) => handleInputChange('subcategory', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              >
-                <option value="">Selecione a subcategoria</option>
-                {SUBCATEGORIES[formData.category]?.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
-            </div>
-  
-            {/* Valores */}
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground">Valor Orçado (CR)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.budgetedValue}
-                  onChange={(e) => handleInputChange('budgetedValue', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground">Valor Negociado (CR)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.negotiatedValue}
-                  onChange={(e) => handleInputChange('negotiatedValue', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground">Valor Final (CR) *</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.finalValue}
-                  onChange={(e) => handleInputChange('finalValue', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                  required
-                />
-              </div>
-            </div>
-  
-            {/* Data da Compra */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Data da Compra *</label>
-              <input
-                type="date"
-                value={formData.purchaseDate}
-                onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              />
-            </div>
-  
-            {/* Comprador */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Comprador *</label>
-              <input
-                type="text"
-                value={formData.buyer}
-                onChange={(e) => handleInputChange('buyer', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              />
-            </div>
-  
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Status *</label>
-              <select
-                value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                required
-              >
-                <option value="pending">Pendente</option>
-                <option value="completed">Concluído</option>
-                <option value="cancelled">Cancelado</option>
-              </select>
-            </div>
-  
-            {/* Observações */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground">Observações</label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => handleInputChange('notes', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
-                rows={3}
-              />
-            </div>
-  
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="border-border hover:bg-accent"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                Salvar Alterações
-              </Button>
-            </div>
-          </form>
-        </div>
+        </form>
       </div>
-    );
+    </div>
+  );
 };
 
 export default Purchases;
