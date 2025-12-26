@@ -1,120 +1,155 @@
-# Flight Log Opus - Project Structure
+# Estrutura do Projeto - Flight Log Opus
 
-## Overview
+Este documento descreve a estrutura organizacional do projeto Flight Log Opus, seguindo as melhores práticas de arquitetura de software.
 
-Flight Log Opus is a web application for managing flight logs, tracking career progression, and monitoring financial aspects of flight activities. The application integrates with Supabase for backend data storage and authentication.
-
-## Project Structure
+## 📁 Visão Geral da Estrutura
 
 ```
 flight-log-opus/
-├── public/                  # Static assets
-├── src/
-│   ├── components/          # React components
-│   │   ├── career/          # Career-related components
-│   │   ├── dashboard/       # Dashboard components
-│   │   ├── flights/         # Flight management components
-│   │   ├── financial/       # Financial components
-│   │   ├── layout/          # Layout components
-│   │   └── ui/              # UI primitive components (shadcn/ui)
-│   │
-│   ├── contexts/            # React context providers
-│   │   └── AuthContext.tsx  # Authentication context
-│   │
-│   ├── db/                  # Database-related files
-│   │   ├── supabase/
-│   │   │   ├── functions/   # Supabase RPC functions
-│   │   │   ├── schema/      # Database schema definitions
-│   │   │   └── fixes/       # Database fix scripts
-│   │   └── README.md        # Database documentation
-│   │
-│   ├── hooks/               # Custom React hooks
-│   │   ├── use-toast.ts     # Toast notification hook
-│   │   ├── useSupabaseCareerManager.ts    # Career data management
-│   │   ├── useSupabaseFlightStatusManager.ts  # Flight status management
-│   │   └── ... other hooks
-│   │
-│   ├── lib/                 # Utility libraries
-│   │   ├── supabase.ts      # Supabase client and types
-│   │   └── i18n.ts          # Internationalization setup
-│   │
-│   ├── pages/               # Application pages
-│   │   ├── Index.tsx        # Dashboard page
-│   │   ├── Flights.tsx      # Flight management page
-│   │   ├── Settings.tsx     # Settings page
-│   │   └── ... other pages
-│   │
-│   ├── utils/               # Utility functions
-│   │   └── autoRefresh.ts   # Page refresh utility
-│   │
-│   ├── App.tsx              # Root application component
-│   ├── main.tsx             # Application entry point
-│   └── index.css            # Global styles
-│
-├── .env.example             # Example environment variables
-├── .env.local               # Local environment variables (git-ignored)
-├── package.json             # Project dependencies and scripts
-├── tailwind.config.ts       # Tailwind CSS configuration
-├── tsconfig.json            # TypeScript configuration
-└── vite.config.ts           # Vite configuration
+├── src/                          # Frontend React/TypeScript
+│   ├── app/                      # Configurações e inicialização
+│   ├── processes/                # Processos de negócio complexos
+│   ├── pages/                    # Páginas da aplicação
+│   ├── widgets/                  # Componentes complexos compostos
+│   ├── features/                 # Funcionalidades por domínio
+│   │   ├── auth/                 # Autenticação e autorização
+│   │   ├── flights/              # Gestão de voos
+│   │   ├── financial/            # Sistema financeiro
+│   │   ├── maintenance/          # Manutenção de aeronaves
+│   │   ├── career/               # Progressão de carreira
+│   │   ├── maps/                 # Mapas e navegação
+│   │   └── profile/              # Perfil do usuário
+│   ├── entities/                 # Entidades de domínio
+│   └── shared/                   # Código compartilhado
+│       ├── ui/                   # Componentes UI reutilizáveis
+│       ├── lib/                  # Bibliotecas e utilitários
+│       ├── api/                  # Clientes de API
+│       ├── config/               # Configurações
+│       ├── types/                # Tipos TypeScript
+│       ├── hooks/                # React hooks customizados
+│       └── utils/                # Funções utilitárias
+├── backend/                      # Backend Node.js/TypeScript
+│   ├── src/
+│   │   ├── controllers/          # Controladores da API
+│   │   ├── models/               # Modelos de dados
+│   │   ├── middleware/           # Middleware Express
+│   │   ├── validators/           # Validações de entrada
+│   │   ├── config/               # Configurações do servidor
+│   │   └── utils/                # Utilitários do backend
+│   ├── routes/                   # Rotas da API
+│   └── services/                 # Serviços de negócio
+├── companion/                    # Aplicação companion MSFS
+├── docs/                         # Documentação do projeto
+│   ├── api/                      # Documentação de APIs
+│   ├── guides/                   # Guias de instalação e uso
+│   ├── database/                 # Documentação do banco de dados
+│   ├── deployment/               # Guias de deployment
+│   └── development/              # Guias de desenvolvimento
+├── scripts/                      # Scripts de automação
+│   ├── debug/                    # Scripts de debug
+│   ├── database/                 # Scripts de banco de dados
+│   └── deployment/               # Scripts de deployment
+├── database/                     # Arquivos SQL e migrações
+├── config/                       # Configurações do projeto
+├── public/                       # Assets públicos
+└── data/                         # Dados externos (CSV, etc.)
 ```
 
-## Key Components and Features
+## 🏗️ Arquitetura Frontend (Feature-Sliced Design)
 
-### Authentication
-- User authentication via Supabase Auth
-- User profile management with custom display names and avatars
+### Camadas (de cima para baixo)
 
-### Flight Management
-- Flight logging with detailed information
-- Custom aircraft configuration
-- Flight status tracking
+1. **app/** - Configurações e inicialização da aplicação
+   - Configuração de rotas
+   - Providers de contexto
+   - Estilos globais
 
-### Career Progression
-- Career rating tracking from Microsoft Flight Simulator
-- Career class and level visualization
-- Progress monitoring
+2. **processes/** - Processos de negócio complexos
+   - Fluxos de trabalho multi-etapa
+   - Orquestração de features
 
-### Financial Management
-- Income and expense tracking
-- Category management
-- Financial reporting and visualization
+3. **pages/** - Páginas completas da aplicação
+   - Componentes de página
+   - Layouts específicos de página
 
-### Settings
-- Theme switching (light/dark)
-- Language selection (pt-BR/en-US)
-- Data synchronization options
+4. **widgets/** - Componentes complexos compostos
+   - Dashboards
+   - Formulários complexos
+   - Visualizações de dados
 
-## Database Structure
+5. **features/** - Funcionalidades por domínio
+   - **auth/** - Login, registro, autorização
+   - **flights/** - CRUD de voos, tracking
+   - **financial/** - Transações, relatórios financeiros
+   - **maintenance/** - Registro de manutenção
+   - **career/** - Progressão, conquistas
+   - **maps/** - Visualização de mapas
+   - **profile/** - Gestão de perfil
 
-The application uses Supabase (PostgreSQL) with the following key tables:
-- `profiles`: User profile information
-- `flights`: Flight log entries
-- `flight_statuses`: Possible flight statuses
-- `custom_aircraft`: User-defined aircraft
-- `financial_transactions`: Financial transactions
-- `revenue_categories`: Revenue category definitions
-- `expense_categories`: Expense category definitions
-- `goals`: User goals
-- `user_settings`: User preferences
+6. **entities/** - Entidades de domínio
+   - Tipos de dados principais
+   - Modelos de dados
 
-For more details on the database structure, see `src/db/README.md`.
+7. **shared/** - Código compartilhado
+   - **ui/** - Componentes reutilizáveis (botões, inputs, etc.)
+   - **lib/** - Bibliotecas externas configuradas
+   - **api/** - Clientes de API e serviços
+   - **config/** - Configurações compartilhadas
+   - **types/** - Tipos TypeScript globais
+   - **hooks/** - React hooks customizados
+   - **utils/** - Funções utilitárias puras
 
-## Development
+## 🏗️ Arquitetura Backend (MVC Pattern)
 
-### Environment Setup
-1. Copy `.env.example` to `.env.local`
-2. Fill in your Supabase URL and anon key
-3. Install dependencies: `npm install`
-4. Run the development server: `npm run dev`
+### Estrutura MVC
 
-### Supabase Setup
-1. Create a new Supabase project
-2. Execute the schema files in `src/db/supabase/schema/`
-3. Execute the function files in `src/db/supabase/functions/`
+- **controllers/** - Lógica de controle e resposta HTTP
+- **models/** - Modelos de dados e interação com banco
+- **middleware/** - Middleware para autenticação, validação, etc.
+- **validators/** - Validação de entrada de dados
+- **config/** - Configurações do servidor e ambiente
+- **utils/** - Funções auxiliares do backend
 
-## Troubleshooting
+## 📋 Convenções de Nomenclatura
 
-For career data persistence issues, refer to:
-- `CORRECAO_DADOS_CARREIRA.md` - Detailed solutions for career data issues
-- Execute the fix script in `src/db/supabase/fixes/fix-all-career-issues.sql`
+### Arquivos
+- **Componentes**: PascalCase (ex: `FlightCard.tsx`)
+- **Hooks**: camelCase com prefixo 'use' (ex: `useAuth.ts`)
+- **Utilitários**: camelCase (ex: `formatDate.ts`)
+- **Tipos**: PascalCase com sufixo 'Type' (ex: `FlightType.ts`)
+- **Constantes**: UPPER_SNAKE_CASE (ex: `API_ENDPOINTS.ts`)
+
+### Pastas
+- **features/**: kebab-case (ex: `flight-tracking`)
+- **Componentes**: kebab-case (ex: `flight-card`)
+
+## 🚀 Como Começar
+
+### Desenvolvimento Frontend
+```bash
+cd flight-log-opus
+npm install
+npm run dev
+```
+
+### Desenvolvimento Backend
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+### Companion MSFS
+```bash
+cd companion
+npm install
+npm run dev
+```
+
+## 📚 Recursos Adicionais
+
+- [Guia de Instalação](docs/guides/FLIGHT_TRACKING_SETUP.md)
+- [Configuração Supabase](docs/guides/SUPABASE_SETUP_GUIDE.md)
+- [Integração MSFS](docs/guides/MSFS_INTEGRATION_GUIDE.md)
+- [API Documentation](docs/api/)
+- [Database Schema](docs/database/)
