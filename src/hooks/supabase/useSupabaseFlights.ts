@@ -331,6 +331,12 @@ export const useSupabaseFlights = () => {
       : 0;
     // Only count CR from completed flights
     const totalCR = completedFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
+
+    // Calculate CR also considering "Concluído" string which might come from older records or UI
+    const legacyCompletedFlights = realFlights.filter(flight => 
+      flight.status === 'completed' || (flight.status as any) === 'Concluído'
+    );
+    const totalLegacyCR = legacyCompletedFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
     
     return {
       // Only real data for all calculations and displays
@@ -338,7 +344,7 @@ export const useSupabaseFlights = () => {
       totalDistance: totalRealDistance,
       totalFlightTime: Math.round(totalRealFlightTime / 60), // in hours
       averageRating: Math.round(averageRating),
-      totalCR,
+      totalCR: totalLegacyCR, // Use the more inclusive calculation
     };
   }, [realFlights]);
   
