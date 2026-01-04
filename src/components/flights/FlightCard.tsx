@@ -57,7 +57,8 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   const editModalRef = useRef<AddFlightModalRef>(null);
 
   const handleCardClick = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button, [role="menuitem"]')) {
+    // Evitar abrir detalhes se clicar em botões, dropdowns ou menus
+    if ((e.target as HTMLElement).closest('button, [role="menuitem"], .quick-status-edit')) {
       return;
     }
     setShowDetailModal(true);
@@ -144,14 +145,6 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
       console.error('Error deleting flight:', error);
     }
   };
-
-  const handleCardClick = useCallback((e: React.MouseEvent) => {
-    // Evitar abrir detalhes se clicar em botões, dropdowns ou menus
-    if ((e.target as HTMLElement).closest('button, [role="menuitem"], .quick-status-edit')) {
-      return;
-    }
-    setShowDetailModal(true);
-  }, []);
 
   return (
     <>
