@@ -59,7 +59,9 @@ const getDefaultFormData = (): FlightFormData => {
     originCountry: '',
     destinationCountry: '',
     originAirportName: '',
-    destinationAirportName: ''
+    destinationAirportName: '',
+    originCity: '',
+    destinationCity: ''
   };
 }
 

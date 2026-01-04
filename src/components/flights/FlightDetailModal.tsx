@@ -37,9 +37,76 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
   const flightSettings = useFlightSettings();
   const [localFlight, setLocalFlight] = useState(flight);
 
-  // Atualizar estado local quando o flight prop mudar
+  // Atualizar estado local quando o flight prop mudar e enriquecer dados faltantes
   useEffect(() => {
+    if (!flight) {
+      setLocalFlight(null);
+      return;
+    }
+
     setLocalFlight(flight);
+
+    const enrichFlightData = async () => {
+      let needsUpdate = false;
+      let updatedOrigin = flight.originAirportInfo;
+      let updatedDestination = flight.destinationAirportInfo;
+
+      // Verificar se precisa buscar origem (se não tem info ou se falta cidade)
+      if (flight.departure && (!updatedOrigin || !updatedOrigin.city)) {
+        try {
+          const result = await fetchAirportByIcao(flight.departure);
+          if (result.success && result.data) {
+            updatedOrigin = {
+              name: result.data.name,
+              city: result.data.city,
+              iata_code: result.data.iata_code,
+              state: result.data.state,
+              ...updatedOrigin // Preservar dados existentes
+            };
+            // Se veio da API, garantimos que tem os dados novos
+            if (result.data.city) updatedOrigin.city = result.data.city;
+            if (result.data.name) updatedOrigin.name = result.data.name;
+            
+            needsUpdate = true;
+          }
+        } catch (e) {
+          console.error('Erro ao buscar aeroporto de origem no modal:', e);
+        }
+      }
+
+      // Verificar se precisa buscar destino (se não tem info ou se falta cidade)
+      if (flight.arrival && (!updatedDestination || !updatedDestination.city)) {
+        try {
+          const result = await fetchAirportByIcao(flight.arrival);
+          if (result.success && result.data) {
+            updatedDestination = {
+              name: result.data.name,
+              city: result.data.city,
+              iata_code: result.data.iata_code,
+              state: result.data.state,
+              ...updatedDestination // Preservar dados existentes
+            };
+            // Se veio da API, garantimos que tem os dados novos
+            if (result.data.city) updatedDestination.city = result.data.city;
+            if (result.data.name) updatedDestination.name = result.data.name;
+            
+            needsUpdate = true;
+          }
+        } catch (e) {
+          console.error('Erro ao buscar aeroporto de destino no modal:', e);
+        }
+      }
+
+      if (needsUpdate) {
+        setLocalFlight(prev => prev ? ({
+          ...prev,
+          originAirportInfo: updatedOrigin,
+          destinationAirportInfo: updatedDestination
+        }) : null);
+      }
+    };
+
+    enrichFlightData();
   }, [flight]);
 
   if (!localFlight) return null;

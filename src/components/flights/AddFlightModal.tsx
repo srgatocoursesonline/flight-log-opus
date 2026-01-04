@@ -129,7 +129,9 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         originCountry: flight.originCountry || '',
         destinationCountry: flight.destinationCountry || '',
         originAirportName: flight.originAirportInfo?.name || '',
-        destinationAirportName: flight.destinationAirportInfo?.name || ''
+        destinationAirportName: flight.destinationAirportInfo?.name || '',
+        originCity: flight.originAirportInfo?.city || '',
+        destinationCity: flight.destinationAirportInfo?.city || ''
       });
     }
   }, [flight]);
@@ -215,6 +217,7 @@ useEffect(() => {
         setFormData(prev => ({
           ...prev,
           destinationAirportName: result.data.name || '',
+          destinationCity: result.data.city || '',
           destinationCountry: prev.destinationCountry || result.data.country_code || ''
         }));
       } else if (!result.success && open) {
@@ -244,6 +247,7 @@ const handleManualAirportSave = async (airportInfo: AirportInfo) => {
       setFormData(prev => ({
         ...prev,
         destinationAirportName: airportInfo.name,
+        destinationCity: airportInfo.city || '',
         destinationCountry: airportInfo.country_code || prev.destinationCountry
       }));
     }
@@ -462,10 +466,12 @@ const handleManualAirportSave = async (airportInfo: AirportInfo) => {
         destinationCountry: formData.destinationCountry,
         originAirportInfo: {
           name: formData.originAirportName,
+          city: formData.originCity,
           icao_code: formData.departure.toUpperCase()
         },
         destinationAirportInfo: {
           name: formData.destinationAirportName,
+          city: formData.destinationCity,
           icao_code: formData.arrival.toUpperCase()
         }
       };
