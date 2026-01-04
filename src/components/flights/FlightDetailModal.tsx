@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -35,8 +35,14 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
   const { t } = useTranslation();
   const statusManager = useSupabaseFlightStatusManager();
   const flightSettings = useFlightSettings();
+  const [localFlight, setLocalFlight] = useState(flight);
 
-  if (!flight) return null;
+  // Atualizar estado local quando o flight prop mudar
+  useEffect(() => {
+    setLocalFlight(flight);
+  }, [flight]);
+
+  if (!localFlight) return null;
 
   const getStatusBadge = (status: Flight['status']) => {
     // Tentar encontrar status customizado primeiro
@@ -117,12 +123,12 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
                 <Plane className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <span className="text-xl font-bold font-mono">{flight.callsign}</span>
-                <p className="text-sm description-text font-normal">{flight.aircraft}</p>
+                <span className="text-xl font-bold font-mono">{localFlight.callsign}</span>
+                <p className="text-sm description-text font-normal">{localFlight.aircraft}</p>
               </div>
             </DialogTitle>
             <div className="flex items-center gap-2">
-              {getStatusBadge(flight.status)}
+              {getStatusBadge(localFlight.status)}
             </div>
           </div>
           <DialogDescription>
@@ -133,13 +139,27 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
         <div className="space-y-6 mt-6">
           {/* Informações Básicas da Rota */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <MapPin className="h-5 w-5 text-blue-600" />
-              <div>
+            <div className="flex items-start gap-3 p-4 bg-muted/20 rounded-lg">
+              <MapPin className="h-5 w-5 text-blue-600 mt-1" />
+              <div className="flex-1">
                 <p className="text-sm description-text">Rota</p>
-                <p className="text-lg font-semibold font-mono text-readable">
-                  {flight.departure} → {flight.arrival}
-                </p>
+                <div className="space-y-1">
+                  <p className="text-lg font-semibold font-mono text-readable">
+                    {localFlight.departure} → {localFlight.arrival}
+                  </p>
+                  {localFlight.originAirportInfo?.name && (
+                    <div className="text-sm text-muted-foreground">
+                      <p>{localFlight.originAirportInfo.name}</p>
+                      <p className="text-xs">{localFlight.originAirportInfo.city && localFlight.originAirportInfo.state ? `${localFlight.originAirportInfo.city}, ${localFlight.originAirportInfo.state}` : ''}</p>
+                    </div>
+                  )}
+                  {localFlight.destinationAirportInfo?.name && (
+                    <div className="text-sm text-muted-foreground">
+                      <p>{localFlight.destinationAirportInfo.name}</p>
+                      <p className="text-xs">{localFlight.destinationAirportInfo.city && localFlight.destinationAirportInfo.state ? `${localFlight.destinationAirportInfo.city}, ${localFlight.destinationAirportInfo.state}` : ''}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
@@ -147,7 +167,7 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
               <div>
                 <p className="text-sm description-text">Horários</p>
                 <p className="text-lg font-semibold text-readable">
-                  {flight.departureTime || 'N/A'} - {flight.arrivalTime || 'N/A'}
+                  {localFlight.departureTime || 'N/A'} - {localFlight.arrivalTime || 'N/A'}
                 </p>
               </div>
             </div>
@@ -156,7 +176,7 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
               <div>
                 <p className="text-sm description-text">Data</p>
                 <p className="text-lg font-semibold text-readable">
-                  {formatDate(flight.date)}
+                  {formatDate(localFlight.date)}
                 </p>
               </div>
             </div>
@@ -173,35 +193,35 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
                 <Clock className="h-6 w-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm description-text mb-1">Duração</p>
                 <p className="text-lg font-bold text-readable font-mono">
-                  {flight.flightTime || 'N/A'}
+                  {localFlight.flightTime || 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
                 <Route className="h-6 w-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm description-text mb-1">Distância</p>
                 <p className="text-lg font-bold text-readable font-mono">
-                  {flight.distance ? `${flight.distance} nm` : 'N/A'}
+                  {localFlight.distance ? `${localFlight.distance} nm` : 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
                 <TrendingDown className="h-6 w-6 mx-auto mb-2 text-blue-600" />
                 <p className="text-sm description-text mb-1">Landing Rate</p>
-                <p className={cn('text-lg font-bold font-mono', flight.landingRate ? getLandingRateColor(flight.landingRate) : 'description-text')}>
-                  {flight.landingRate ? `${flight.landingRate} fpm` : 'N/A'}
+                <p className={cn('text-lg font-bold font-mono', localFlight.landingRate ? getLandingRateColor(localFlight.landingRate) : 'description-text')}>
+                  {localFlight.landingRate ? `${localFlight.landingRate} fpm` : 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
                 <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
                 <p className="text-sm description-text mb-1">Experience Points</p>
-                <p className={cn('text-lg font-bold font-mono', flight.experiencePoints ? 'text-readable' : 'description-text')}>
-                  {flight.experiencePoints || 'N/A'}
+                <p className={cn('text-lg font-bold font-mono', localFlight.experiencePoints ? 'text-readable' : 'description-text')}>
+                  {localFlight.experiencePoints || 'N/A'}
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/20 rounded-lg">
                 <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
                 <p className="text-sm description-text mb-1">Career Rating</p>
-                <p className={cn('text-lg font-bold font-mono', flight.careerRating ? 'text-readable' : 'description-text')}>
-                  {flight.careerRating || 'N/A'}
+                <p className={cn('text-lg font-bold font-mono', localFlight.careerRating ? 'text-readable' : 'description-text')}>
+                  {localFlight.careerRating || 'N/A'}
                 </p>
               </div>
             </div>
@@ -219,17 +239,17 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
                 <div>
                   <p className="text-sm description-text">Combustível Usado</p>
                   <p className="text-lg font-semibold font-mono text-readable">
-                    {flight.fuelUsed ? `${flight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
+                    {localFlight.fuelUsed ? `${localFlight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
                   </p>
                 </div>
               </div>
-              {flight.route && (
+              {localFlight.route && (
                 <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
                   <Route className="h-5 w-5 text-blue-600" />
                   <div className="flex-1">
                     <p className="text-sm description-text">Rota Planejada</p>
                     <p className="text-sm font-mono text-readable break-all">
-                      {flight.route}
+                      {localFlight.route}
                     </p>
                   </div>
                 </div>
@@ -238,11 +258,11 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
           </div>
 
           {/* Observações */}
-          {flight.notes && (
+          {localFlight.notes && (
             <div>
               <h3 className="text-lg font-semibold mb-4">Observações</h3>
               <div className="p-4 bg-muted/10 rounded-lg border-l-4 border-primary">
-                <p className="text-readable italic">"{flight.notes}"</p>
+                <p className="text-readable italic">"{localFlight.notes}"</p>
               </div>
             </div>
           )}

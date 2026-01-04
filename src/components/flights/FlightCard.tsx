@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MobileCard } from '@/components/ui/mobile-card';
+import { FlightDetailModal } from './FlightDetailModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,8 +51,16 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   const statusManager = useSupabaseFlightStatusManager();
   const flightSettings = useFlightSettings();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [shouldRenderModal, setShouldRenderModal] = useState(false);
   const editModalRef = useRef<AddFlightModalRef>(null);
+
+  const handleCardClick = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, [role="menuitem"]')) {
+      return;
+    }
+    setShowDetailModal(true);
+  }, []);
 
   const getStatusBadge = (status: Flight['status']) => {
     // Tentar encontrar status customizado primeiro
@@ -182,7 +191,11 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         />
       </div>
       
-      <Card className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card">
+      <Card
+        className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card cursor-pointer"
+        onClick={handleCardClick}
+        tabIndex={0}
+      >
       <CardContent className="p-6">
         {/* Header com Callsign, Aircraft e Status */}
           <div className="flex items-start justify-between mb-4">
@@ -227,11 +240,18 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
 
           {/* Rota e Horários */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-blue-600" />
-              <span className="text-sm description-text font-mono">
-                {flight.departure} → {flight.arrival}
-              </span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-blue-600" />
+                <span className="text-sm description-text font-mono">
+                  {flight.departure} → {flight.arrival}
+                </span>
+              </div>
+              {flight.originAirportInfo?.name && flight.destinationAirportInfo?.name && (
+                <div className="text-xs text-muted-foreground ml-6">
+                  {flight.originAirportInfo.name} → {flight.destinationAirportInfo.name}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-blue-600" />
@@ -325,6 +345,13 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           }}
         />
       )}
+
+      {/* Modal de Detalhes */}
+      <FlightDetailModal
+        flight={flight}
+        open={showDetailModal}
+        onOpenChange={setShowDetailModal}
+      />
 
       {/* Dialog de Confirmação de Exclusão */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

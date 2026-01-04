@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -6,16 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  DollarSign, 
-  Receipt, 
-  TrendingUp, 
-  TrendingDown, 
   Calendar, 
   Download,
   RefreshCw,
   AlertCircle
 } from 'lucide-react';
-import { DREStatement } from './DREStatement';
+import { FinancialOverview } from './FinancialOverview';
+import { DetailedDRE } from './DetailedDRE';
 import { useSupabaseFinancialReports } from '@/hooks/supabase/useSupabaseFinancialReports';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
@@ -29,7 +26,7 @@ export const FinancialReports: React.FC = () => {
     isLoading,
     error,
     refresh,
-    lastUpdated
+    lastSync: lastUpdated
   } = useSupabaseFinancialReports();
 
   const handleRefresh = async () => {
@@ -125,83 +122,6 @@ export const FinancialReports: React.FC = () => {
         </Badge>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <DollarSign className="h-4 w-4 mr-2 text-green-500" />
-              Receita Total
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <div className="text-2xl font-bold text-green-600">
-                {formatCurrency(dreData?.totalRevenue || 0)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Receipt className="h-4 w-4 mr-2 text-red-500" />
-              Despesas Totais
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <div className="text-2xl font-bold text-red-600">
-                {formatCurrency(dreData?.totalExpenses || 0)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2 text-blue-500" />
-              Lucro Líquido
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <div className={`text-2xl font-bold ${
-                (dreData?.netProfit || 0) >= 0 ? 'text-blue-600' : 'text-red-600'
-              }`}>
-                {formatCurrency(dreData?.netProfit || 0)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingDown className="h-4 w-4 mr-2 text-purple-500" />
-              Margem de Lucro
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold text-purple-600">
-                {((dreData?.profitMargin || 0)).toFixed(1)}%
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
@@ -211,11 +131,11 @@ export const FinancialReports: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <DREStatement dreData={dreData} isLoading={isLoading} />
+          <FinancialOverview dreData={dreData} isLoading={isLoading} />
         </TabsContent>
 
         <TabsContent value="dre" className="space-y-6">
-          <DREStatement dreData={dreData} isLoading={isLoading} />
+          <DetailedDRE dreData={dreData} isLoading={isLoading} />
         </TabsContent>
 
         <TabsContent value="transactions" className="space-y-6">

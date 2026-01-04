@@ -3,9 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle, XCircle, RefreshCw, Database, FileCode, Code } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, Database, FileCode, Code, Plane } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { UpdateFlightsAirports } from './UpdateFlightsAirports';
 
 export const SuperDiagnostic = () => {
   const { user } = useAuth();
@@ -14,11 +15,6 @@ export const SuperDiagnostic = () => {
   const [dbStatus, setDbStatus] = useState<{success?: boolean; error?: string}>({});
   const [envVars, setEnvVars] = useState<Record<string, string>>({});
   const [dbInfo, setDbInfo] = useState<{tables: string[]}>({ tables: [] });
-
-  useEffect(() => {
-    loadEnvironmentVariables();
-    runTests();
-  }, [runTests]);
 
   const loadEnvironmentVariables = () => {
     // Collect all VITE_ environment variables
@@ -51,6 +47,12 @@ export const SuperDiagnostic = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadEnvironmentVariables();
+    runTests();
+  }, []);
+
   
   const testAuth = async () => {
     try {
@@ -171,9 +173,10 @@ export const SuperDiagnostic = () => {
           </div>
           
           <Tabs defaultValue="connection">
-            <TabsList className="grid grid-cols-3 mb-4">
+            <TabsList className="grid grid-cols-4 mb-4">
               <TabsTrigger value="connection">Conexão</TabsTrigger>
               <TabsTrigger value="database">Banco de Dados</TabsTrigger>
+              <TabsTrigger value="airports">Aeroportos</TabsTrigger>
               <TabsTrigger value="environment">Variáveis de Ambiente</TabsTrigger>
             </TabsList>
             
@@ -341,7 +344,11 @@ ADD COLUMN IF NOT EXISTS career_class TEXT DEFAULT 'D';`}
                 </CardContent>
               </Card>
             </TabsContent>
-            
+           
+            <TabsContent value="airports" className="space-y-4">
+              <UpdateFlightsAirports />
+            </TabsContent>
+           
             <TabsContent value="environment">
               <Card>
                 <CardHeader className="pb-2">

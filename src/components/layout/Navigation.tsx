@@ -272,15 +272,15 @@ export const Navigation = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
-        <div className="glass-panel flex grow flex-col gap-y-3 px-4 pb-3 pt-16">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col lg:overflow-hidden lg:h-screen">
+        <div className="glass-panel flex h-full flex-col gap-y-3 px-4 pb-3 pt-16">
           <div className="flex shrink-0 items-center">
             <div className="flex items-center gap-3">
               <MSFSLogo size="lg" className="pulse-glow" />
             </div>
           </div>
-          <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-1">
+          <nav className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden min-h-0">
+            <ul role="list" className="flex flex-col gap-y-1">
               {/* Dashboard - sempre fixo no topo */}
               <li>
                 <NavLink

@@ -131,6 +131,11 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
                   <span className="font-mono font-semibold text-foreground truncate">
                     {flight.departure} → {flight.arrival}
                   </span>
+                  {flight.originAirportInfo?.name && flight.destinationAirportInfo?.name && (
+                    <span className="text-muted-foreground truncate">
+                      {flight.originAirportInfo.name} → {flight.destinationAirportInfo.name}
+                    </span>
+                  )}
                   <span className="text-readable-muted truncate">
                     {flight.aircraft}
                   </span>
@@ -152,7 +157,7 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
                      variant="ghost"
                      size="sm"
                      className="h-6 w-6 p-0 hover:bg-muted/50"
-                     onClick={(e) => e.stopPropagation()}
+                     onClick={(e: React.MouseEvent) => e.stopPropagation()}
                    >
                      <MoreVertical className="h-3 w-3" />
                    </Button>
