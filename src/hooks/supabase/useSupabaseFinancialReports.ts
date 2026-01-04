@@ -73,7 +73,7 @@ export interface FinancialFilters {
 export const useSupabaseFinancialReports = () => {
   const { user } = useAuth();
   const { getInitialBalance } = useFinancialSettings();
-  const { getFlightStats } = useSupabaseFlights();
+  const { getFlightStats, flights } = useSupabaseFlights();
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [dreData, setDreData] = useState<DREData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,7 +135,7 @@ export const useSupabaseFinancialReports = () => {
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
       if (error) {
-        setError('Erro ao carregar transações financeiras');
+        setError(new Error('Erro ao carregar transações financeiras'));
         toast.error('Erro ao carregar transações financeiras');
         return;
       }
@@ -153,7 +153,7 @@ export const useSupabaseFinancialReports = () => {
 
       // Transformar dados
       const transformedTransactions: FinancialTransaction[] = data.map(item => {
-        const category = categoriesMap.get(item.category_id || '');
+        const category = categoriesMap.get(item.category_id || '') as { name?: string; icon?: string } | undefined;
         return {
           id: item.id,
           type: item.transaction_type,
@@ -178,7 +178,7 @@ export const useSupabaseFinancialReports = () => {
         return fetchTransactions(filters, retryCount + 1);
       }
       
-      setError('Erro ao conectar com o banco de dados');
+      setError(new Error('Erro ao conectar com o banco de dados'));
       toast.error('Erro ao conectar com o banco de dados');
     } finally {
       setIsLoading(false);
@@ -297,7 +297,7 @@ export const useSupabaseFinancialReports = () => {
   useEffect(() => {
     const dre = calculateDRE(transactions);
     setDreData(dre);
-  }, [transactions]);
+  }, [transactions, flights]);
 
   // Buscar DRE para período específico
   const getDREForPeriod = useCallback(async (startDate: Date, endDate: Date) => {

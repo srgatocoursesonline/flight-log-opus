@@ -132,7 +132,14 @@ const FlightCardCompact = memo(({ flight }: FlightCardCompactProps) => {
                     {flight.departure} → {flight.arrival}
                   </span>
                   {flight.originAirportInfo?.name && flight.destinationAirportInfo?.name && (
-                    <span className="text-muted-foreground truncate">
+                    <span 
+                      className="text-muted-foreground truncate transition-all duration-300"
+                      style={{ 
+                        fontSize: 'clamp(8px, 0.9vw + 4px, 11px)',
+                        lineHeight: '1.2'
+                      }}
+                      title={`${flight.originAirportInfo.name} → ${flight.destinationAirportInfo.name}`}
+                    >
                       {flight.originAirportInfo.name} → {flight.destinationAirportInfo.name}
                     </span>
                   )}

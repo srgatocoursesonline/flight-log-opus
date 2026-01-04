@@ -2,7 +2,7 @@
 // SUPABASE FLIGHTS MANAGER HOOK
 // ============================================
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -199,26 +199,8 @@ export const useSupabaseFlights = () => {
 
     try {
       // Transform updates to match database columns
-      const dbUpdates: Partial<{
-        callsign: string;
-        aircraft: string;
-        departure: string;
-        arrival: string;
-        departure_time: string;
-        arrival_time: string;
-        flight_time: string;
-        distance: number;
-        fuel_used: number;
-        landing_rate: number;
-        experience_points: number;
-        career_rating: number;
-        status: string;
-        route: string;
-        notes: string;
-        service_type: string;
-        origin_country: string;
-        destination_country: string;
-      }> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dbUpdates: any = {};
       if (updates.callsign !== undefined) dbUpdates.callsign = updates.callsign;
       if (updates.aircraft !== undefined) dbUpdates.aircraft = updates.aircraft;
       if (updates.departure !== undefined) dbUpdates.departure = updates.departure;
@@ -256,8 +238,8 @@ export const useSupabaseFlights = () => {
       }
 
       const previousStatus = flightData.status;
-      // Verificar se o status está mudando para "Concluído"
-      const isStatusChangingToCompleted = updates.status === 'Concluído' && previousStatus !== 'Concluído';
+      // Verificar se o status está mudando para "completed"
+      const isStatusChangingToCompleted = updates.status === 'completed' && previousStatus !== 'completed';
 
       const { error: updateError } = await supabase
         .from('flights')
@@ -327,13 +309,16 @@ export const useSupabaseFlights = () => {
     }
   };
 
+  // Memoize real flights to avoid infinite loops in consumers
+  const realFlights = useMemo(() => flights.filter(flight => !flight.isExample), [flights]);
+
   // Get flight statistics
-  const getFlightStats = () => {
+  const getFlightStats = useCallback(() => {
     // Use only real flights (excluding mock data)
-    const realFlights = flights.filter(flight => !flight.isExample);
+    // const realFlights = flights.filter(flight => !flight.isExample); // Using memoized version instead
     
     // Filter only completed flights for CR calculation
-    const completedFlights = realFlights.filter(flight => flight.status === 'Concluído');
+    const completedFlights = realFlights.filter(flight => flight.status === 'completed');
     
     // Statistics based only on real flights
     const totalRealFlights = realFlights.length;
@@ -346,7 +331,7 @@ export const useSupabaseFlights = () => {
       : 0;
     // Only count CR from completed flights
     const totalCR = completedFlights.reduce((sum, flight) => sum + flight.careerRating, 0);
-
+    
     return {
       // Only real data for all calculations and displays
       totalFlights: totalRealFlights,
@@ -355,7 +340,7 @@ export const useSupabaseFlights = () => {
       averageRating: Math.round(averageRating),
       totalCR,
     };
-  };
+  }, [realFlights]);
   
   // Helper function to convert flight time to minutes
   const parseFlightTime = (flightTime: string): number => {
@@ -372,7 +357,7 @@ export const useSupabaseFlights = () => {
   };
 
   return {
-    flights: flights.filter(flight => !flight.isExample), // Return only real flights
+    flights: realFlights, // Return memoized real flights
     isLoading,
     error,
     addFlight,

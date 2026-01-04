@@ -29,6 +29,7 @@ import Companies from "./pages/Companies";
 import TodCalculatorPage from "./pages/TodCalculator";
 import FlightPlannerPage from "./pages/FlightPlanner";
 import AirportSearchTool from "./pages/AirportSearchTool";
+import ResponsiveTest from "./pages/ResponsiveTest";
 import { AuthCallback } from "./pages/AuthCallback";
 
 
@@ -73,6 +74,7 @@ const AppContent = () => {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/diagnostic" element={<Diagnostic />} />
         <Route path="/super-diagnostic" element={<SuperDiagnostic />} />
+        <Route path="/test-responsive" element={<ResponsiveTest />} />
 
         
         {/* Protected Routes */}

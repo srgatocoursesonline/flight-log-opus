@@ -239,6 +239,16 @@ export const Navigation = () => {
     setLoadingPath(null);
   }, [location.pathname]);
 
+  // Timeout de segurança para o loading state
+  useEffect(() => {
+    if (loadingPath) {
+      const timer = setTimeout(() => {
+        setLoadingPath(null);
+      }, 2000); // 2 segundos timeout é suficiente para navegação local
+      return () => clearTimeout(timer);
+    }
+  }, [loadingPath]);
+
   // Salvar estado de expansão no localStorage
   const saveExpandedState = (newState: Record<string, boolean>) => {
     localStorage.setItem('navigation-expanded-sections', JSON.stringify(newState));

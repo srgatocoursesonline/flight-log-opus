@@ -38,7 +38,6 @@ import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights'
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { AddFlightModal, AddFlightModalRef } from './AddFlightModal';
-import { FlightDetailModal } from './FlightDetailModal';
 import { QuickStatusEdit } from './QuickStatusEdit';
 import { cn } from '@/lib/utils';
 
@@ -155,7 +154,6 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           value={`${flight.departure} → ${flight.arrival}`}
           badge={getStatusBadge(flight.status)}
           icon={<Plane className="h-5 w-5 text-blue-600" />}
-          primaryActions={[]}
           secondaryActions={[
             {
               label: 'Editar',
@@ -193,7 +191,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         />
       </div>
       
-      <Card className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card">
+      <Card className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card cursor-pointer" onClick={handleCardClick}>
       <CardContent className="p-6">
         {/* Header com Callsign, Aircraft e Status */}
           <div className="flex items-start justify-between mb-4">

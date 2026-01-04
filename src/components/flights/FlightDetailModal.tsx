@@ -137,125 +137,154 @@ export const FlightDetailModal = ({ flight, open, onOpenChange }: FlightDetailMo
         </DialogHeader>
 
         <div className="space-y-6 mt-6">
-          {/* Informações Básicas da Rota */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-start gap-3 p-4 bg-muted/20 rounded-lg">
-              <MapPin className="h-5 w-5 text-blue-600 mt-1" />
-              <div className="flex-1">
-                <p className="text-sm description-text">Rota</p>
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold font-mono text-readable">
-                    {localFlight.departure} → {localFlight.arrival}
-                  </p>
-                  {localFlight.originAirportInfo?.name && (
-                    <div className="text-sm text-muted-foreground">
-                      <p>{localFlight.originAirportInfo.name}</p>
-                      <p className="text-xs">{localFlight.originAirportInfo.city && localFlight.originAirportInfo.state ? `${localFlight.originAirportInfo.city}, ${localFlight.originAirportInfo.state}` : ''}</p>
-                    </div>
-                  )}
-                  {localFlight.destinationAirportInfo?.name && (
-                    <div className="text-sm text-muted-foreground">
-                      <p>{localFlight.destinationAirportInfo.name}</p>
-                      <p className="text-xs">{localFlight.destinationAirportInfo.city && localFlight.destinationAirportInfo.state ? `${localFlight.destinationAirportInfo.city}, ${localFlight.destinationAirportInfo.state}` : ''}</p>
-                    </div>
-                  )}
+          {/* Layout Horizontal Unificado (Estilo Cartão de Embarque) */}
+          <div className="bg-card/50 border rounded-xl overflow-hidden shadow-sm">
+            {/* Topo: Rota e Tempos */}
+            <div className="p-6 md:p-8 flex flex-col md:flex-row gap-8 items-center justify-between relative">
+              {/* Background Decoration */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5 opacity-50 pointer-events-none" />
+              
+              {/* Origem */}
+              <div className="flex flex-col items-center md:items-start text-center md:text-left z-10 min-w-[140px]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="outline" className="text-xs text-muted-foreground bg-background/50">
+                    Origem
+                  </Badge>
+                </div>
+                <span className="text-4xl md:text-5xl font-bold font-mono tracking-tight text-primary">
+                  {localFlight.departure}
+                </span>
+                <div className="mt-1 flex flex-col">
+                  <span className="text-sm font-medium text-foreground/80 truncate max-w-[180px]">
+                    {localFlight.originAirportInfo?.city || 'Desconhecido'}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate max-w-[180px]">
+                    {localFlight.originAirportInfo?.name}
+                  </span>
+                </div>
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/50">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-sm font-mono font-medium">{localFlight.departureTime || '--:--'}</span>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <Clock className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="text-sm description-text">Horários</p>
-                <p className="text-lg font-semibold text-readable">
-                  {localFlight.departureTime || 'N/A'} - {localFlight.arrivalTime || 'N/A'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-              <Calendar className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="text-sm description-text">Data</p>
-                <p className="text-lg font-semibold text-readable">
-                  {formatDate(localFlight.date)}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          {/* Métricas de Performance Detalhadas */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Star className="h-5 w-5 text-blue-600" />
-              Métricas de Performance
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Clock className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm description-text mb-1">Duração</p>
-                <p className="text-lg font-bold text-readable font-mono">
-                  {localFlight.flightTime || 'N/A'}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Route className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm description-text mb-1">Distância</p>
-                <p className="text-lg font-bold text-readable font-mono">
-                  {localFlight.distance ? `${localFlight.distance} nm` : 'N/A'}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <TrendingDown className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                <p className="text-sm description-text mb-1">Landing Rate</p>
-                <p className={cn('text-lg font-bold font-mono', localFlight.landingRate ? getLandingRateColor(localFlight.landingRate) : 'description-text')}>
-                  {localFlight.landingRate ? `${localFlight.landingRate} fpm` : 'N/A'}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                <p className="text-sm description-text mb-1">Experience Points</p>
-                <p className={cn('text-lg font-bold font-mono', localFlight.experiencePoints ? 'text-readable' : 'description-text')}>
-                  {localFlight.experiencePoints || 'N/A'}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <Star className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                <p className="text-sm description-text mb-1">Career Rating</p>
-                <p className={cn('text-lg font-bold font-mono', localFlight.careerRating ? 'text-readable' : 'description-text')}>
-                  {localFlight.careerRating || 'N/A'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Informações Adicionais */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Fuel className="h-5 w-5 text-blue-600" />
-              Informações Adicionais
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-                <Fuel className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm description-text">Combustível Usado</p>
-                  <p className="text-lg font-semibold font-mono text-readable">
-                    {localFlight.fuelUsed ? `${localFlight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
-                  </p>
+              {/* Centro: Visualização da Rota */}
+              <div className="flex-1 w-full md:w-auto flex flex-col items-center justify-center px-4 z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="secondary" className="text-[10px] h-5 px-2 font-mono">
+                    {localFlight.flightTime || 'N/A'}
+                  </Badge>
                 </div>
-              </div>
-              {localFlight.route && (
-                <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg">
-                  <Route className="h-5 w-5 text-blue-600" />
-                  <div className="flex-1">
-                    <p className="text-sm description-text">Rota Planejada</p>
-                    <p className="text-sm font-mono text-readable break-all">
-                      {localFlight.route}
-                    </p>
+                
+                <div className="w-full flex items-center gap-3 relative">
+                  <div className="h-2 w-2 rounded-full bg-primary/20 ring-4 ring-primary/10" />
+                  <div className="h-[2px] flex-1 bg-gradient-to-r from-primary/20 via-primary/50 to-primary/20 relative">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-1.5 bg-background border rounded-full shadow-sm z-20">
+                      <Plane className="h-4 w-4 text-primary rotate-90 md:rotate-0" />
+                    </div>
                   </div>
+                  <div className="h-2 w-2 rounded-full bg-primary/20 ring-4 ring-primary/10" />
+                </div>
+
+                <div className="mt-2 text-xs font-mono text-muted-foreground flex items-center gap-1.5">
+                  <Route className="h-3 w-3" />
+                  {localFlight.distance ? `${localFlight.distance} nm` : '--- nm'}
+                </div>
+              </div>
+
+              {/* Destino */}
+              <div className="flex flex-col items-center md:items-end text-center md:text-right z-10 min-w-[140px]">
+                <div className="flex items-center gap-2 mb-1 justify-end">
+                  <Badge variant="outline" className="text-xs text-muted-foreground bg-background/50">
+                    Destino
+                  </Badge>
+                </div>
+                <span className="text-4xl md:text-5xl font-bold font-mono tracking-tight text-primary">
+                  {localFlight.arrival}
+                </span>
+                <div className="mt-1 flex flex-col items-center md:items-end">
+                  <span className="text-sm font-medium text-foreground/80 truncate max-w-[180px]">
+                    {localFlight.destinationAirportInfo?.city || 'Desconhecido'}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate max-w-[180px]">
+                    {localFlight.destinationAirportInfo?.name}
+                  </span>
+                </div>
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/50">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-sm font-mono font-medium">{localFlight.arrivalTime || '--:--'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Rodapé do Ticket: Data e Status */}
+            <div className="bg-muted/30 border-t px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium text-foreground">{formatDate(localFlight.date)}</span>
+                </div>
+                <div className="hidden md:block w-px h-4 bg-border" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Fuel className="h-4 w-4" />
+                  <span>Combustível: <span className="font-mono text-foreground">{localFlight.fuelUsed ? `${localFlight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}</span></span>
+                </div>
+              </div>
+              
+              {localFlight.route && (
+                <div className="flex items-center gap-2 max-w-xs truncate text-muted-foreground" title={localFlight.route}>
+                  <MapPin className="h-3 w-3" />
+                  <span className="font-mono text-xs truncate">{localFlight.route}</span>
                 </div>
               )}
             </div>
           </div>
+
+            {/* Métricas de Performance Detalhadas */}
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider pl-1">
+                Performance e Resultados
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col p-4 bg-card border rounded-lg hover:bg-accent/5 transition-colors">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <TrendingDown className="h-4 w-4" />
+                    <span className="text-xs font-medium">Landing Rate</span>
+                  </div>
+                  <div className="mt-auto">
+                    <p className={cn('text-2xl font-bold font-mono tracking-tight', localFlight.landingRate ? getLandingRateColor(localFlight.landingRate) : 'text-muted-foreground')}>
+                      {localFlight.landingRate ? localFlight.landingRate : '---'}
+                      <span className="text-xs text-muted-foreground ml-1 font-sans font-normal">fpm</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col p-4 bg-card border rounded-lg hover:bg-accent/5 transition-colors">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Star className="h-4 w-4" />
+                    <span className="text-xs font-medium">XP Total</span>
+                  </div>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold font-mono tracking-tight text-foreground">
+                      {localFlight.experiencePoints || '0'}
+                      <span className="text-xs text-muted-foreground ml-1 font-sans font-normal">pts</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col p-4 bg-card border rounded-lg hover:bg-accent/5 transition-colors">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Star className="h-4 w-4" />
+                    <span className="text-xs font-medium">Career Rating</span>
+                  </div>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold font-mono tracking-tight text-foreground">
+                      {localFlight.careerRating || '0'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           {/* Observações */}
           {localFlight.notes && (

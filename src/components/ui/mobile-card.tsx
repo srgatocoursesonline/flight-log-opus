@@ -33,6 +33,12 @@ interface MobileCardProps {
     value: number;
     isPositive: boolean;
   };
+  details?: Array<{
+    label: string;
+    value: string | number;
+    icon?: ReactNode;
+  }>;
+  notes?: string;
 }
 
 export const MobileCard = ({
@@ -47,7 +53,9 @@ export const MobileCard = ({
   className,
   children,
   compact = false,
-  trend
+  trend,
+  details,
+  notes
 }: MobileCardProps) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -186,6 +194,41 @@ export const MobileCard = ({
       {children && (
         <div className="mt-2">
           {children}
+        </div>
+      )}
+
+      {/* Details Grid */}
+      {details && details.length > 0 && (
+        <div className={cn(
+          "grid gap-2 mt-3",
+          details.length > 2 ? "grid-cols-2" : "grid-cols-1"
+        )}>
+          {details.map((detail, index) => (
+            <div key={index} className="flex items-center gap-2 p-2 bg-muted/20 rounded-md">
+              {detail.icon && (
+                <div className="text-muted-foreground">
+                  {detail.icon}
+                </div>
+              )}
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">
+                  {detail.label}
+                </span>
+                <span className="text-xs font-medium truncate font-mono">
+                  {detail.value}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Notes */}
+      {notes && (
+        <div className="mt-3 p-2 bg-muted/10 rounded-md border border-border/20">
+          <p className="text-xs text-muted-foreground italic line-clamp-2">
+            "{notes}"
+          </p>
         </div>
       )}
 

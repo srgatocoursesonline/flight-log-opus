@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,8 @@ import {
   RefreshCw,
   AlertCircle
 } from 'lucide-react';
-import { DREStatement } from './DREStatement';
+import { DetailedDRE } from './DetailedDRE';
+import { FinancialOverview } from './FinancialOverview';
 import { useSupabaseFinancialReports } from '@/hooks/supabase/useSupabaseFinancialReports';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
