@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const formatNumber = (value: string | number): string => {
+const formatNumber = (value: string | number, lng: string = 'pt-BR'): string => {
   if (typeof value === 'string') return value;
-  return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  return value.toLocaleString(lng === 'pt-BR' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 };
 
 interface StatsCardProps {
@@ -19,15 +19,18 @@ interface StatsCardProps {
   valueColor?: string;
 }
 
-export const StatsCard = ({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  trend, 
+import { useTranslation } from "react-i18next";
+
+export const StatsCard = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  trend,
   className,
-  valueColor 
+  valueColor
 }: StatsCardProps) => {
+  const { i18n } = useTranslation();
   return (
     <div className={cn("mobile-card hud-display stats-card relative overflow-hidden", className)}>
       <div className="flex items-start justify-between">
@@ -37,7 +40,7 @@ export const StatsCard = ({
           </p>
           <div className="mt-1 flex items-baseline gap-2">
             <p className={cn("mobile-value font-mono", valueColor || "text-green-600 dark:text-green-400")}>
-              {formatNumber(value)}
+              {formatNumber(value, i18n.language)}
             </p>
             {trend && (
               <span className={cn(
@@ -62,7 +65,7 @@ export const StatsCard = ({
           </div>
         )}
       </div>
-      
+
       {/* HUD-style corner decorations */}
       <div className="absolute top-0 left-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-l-2 border-primary/30 transition-all duration-300" />
       <div className="absolute top-0 right-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-r-2 border-primary/30 transition-all duration-300" />

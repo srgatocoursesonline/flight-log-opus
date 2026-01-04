@@ -2,7 +2,7 @@
 // SUPABASE CLIENT CONFIGURATION
 // ============================================
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 
 
@@ -15,7 +15,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 
 if (!supabaseUrl || !supabaseAnonKey) {
   // Error handling without console output
-  
+
   // Criar objeto de erro detalhado
   const error = new Error(
     'Configuração do Supabase falhou completamente - valores não disponíveis.'
@@ -25,10 +25,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Criar cliente Supabase com tratamento de erros
-let supabase;
+let supabase: SupabaseClient | any;
 try {
 
-  
+
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
@@ -41,17 +41,17 @@ try {
       },
     },
   });
-  
+
   // Verificar conexão - podemos tentar obter um item da tabela pública
 
   setTimeout(async () => {
     try {
       const { error } = await supabase.from('profiles').select('id').limit(1);
-      
+
       if (error) {
         // Error handling without console output
       } else {
-    
+
       }
     } catch (testError) {
       // Error handling without console output
@@ -65,13 +65,13 @@ try {
     auth: {
       getUser: () => Promise.resolve({ data: null, error: new Error('Cliente Supabase não inicializado corretamente') }),
       getSession: () => Promise.resolve({ data: { session: null }, error: new Error('Cliente Supabase não inicializado corretamente') }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
       signInWithPassword: () => Promise.resolve({ error: new Error('Cliente Supabase não inicializado corretamente') }),
     },
     from: () => ({
       select: () => Promise.resolve({ data: null, error: new Error('Cliente Supabase não inicializado corretamente') }),
     }),
-  };
+  } as any;
 }
 
 export { supabase };

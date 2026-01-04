@@ -27,6 +27,10 @@ export const MSFSLogo = ({ className, size = "md" }: MSFSLogoProps) => {
             <stop offset="50%" stopColor="#0078D4" />
             <stop offset="100%" stopColor="#004578" />
           </linearGradient>
+          <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="100%" stopColor="#E3E3E3" />
+          </linearGradient>
         </defs>
 
         {/* Simplified Flight Icon */}

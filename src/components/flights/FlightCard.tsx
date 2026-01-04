@@ -38,6 +38,7 @@ import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights'
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { AddFlightModal, AddFlightModalRef } from './AddFlightModal';
+import { FlightDetailModal } from './FlightDetailModal';
 import { QuickStatusEdit } from './QuickStatusEdit';
 import { cn } from '@/lib/utils';
 
@@ -65,22 +66,22 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
   const getStatusBadge = (status: Flight['status']) => {
     // Tentar encontrar status customizado primeiro
     const customStatus = statusManager.getStatusByName(status);
-    
+
     if (customStatus) {
       return (
-        <Badge 
-          className="text-xs font-medium border" 
-          style={{ 
-            backgroundColor: `${customStatus.color}20`, 
-            color: customStatus.color, 
-            borderColor: `${customStatus.color}30` 
+        <Badge
+          className="text-xs font-medium border"
+          style={{
+            backgroundColor: `${customStatus.color}20`,
+            color: customStatus.color,
+            borderColor: `${customStatus.color}30`
           }}
         >
           {customStatus.icon} {customStatus.name}
         </Badge>
       );
     }
-    
+
     // Fallback para status padrão
     const variants = {
       completed: 'bg-success/20 text-success border-success/30',
@@ -123,7 +124,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
     // Using Date.UTC to avoid timezone conversion issues
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(Date.UTC(year, month - 1, day));
-    
+
     // Format to Brazilian date format without timezone conversion
     return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -144,9 +145,17 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
     }
   };
 
+  const handleCardClick = useCallback((e: React.MouseEvent) => {
+    // Evitar abrir detalhes se clicar em botões, dropdowns ou menus
+    if ((e.target as HTMLElement).closest('button, [role="menuitem"], .quick-status-edit')) {
+      return;
+    }
+    setShowDetailModal(true);
+  }, []);
+
   return (
     <>
-      <div className="block md:hidden">
+      <div className="block md:hidden" onClick={handleCardClick}>
         <MobileCard
           title={flight.callsign}
           subtitle={flight.aircraft}
@@ -191,11 +200,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         />
       </div>
       
-      <Card
-        className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card cursor-pointer"
-        onClick={handleCardClick}
-        tabIndex={0}
-      >
+      <Card className="hud-display flight-item hover:border-primary/50 transition-all duration-300 hidden md:block mobile-card">
       <CardContent className="p-6">
         {/* Header com Callsign, Aircraft e Status */}
           <div className="flex items-start justify-between mb-4">
@@ -211,23 +216,29 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <QuickStatusEdit flight={flight} />
+              <div className="quick-status-edit">
+                <QuickStatusEdit flight={flight} />
+              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-panel">
-                  <DropdownMenuItem onClick={() => {
+                  <DropdownMenuItem onClick={(e) => {
+                    e.stopPropagation();
                     setShouldRenderModal(true);
                     setTimeout(() => editModalRef.current?.openModal(), 0);
                   }}>
                     <Edit className="h-4 w-4 mr-2" />
                     Editar
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setShowDeleteDialog(true)}
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDeleteDialog(true);
+                    }}
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -333,6 +344,13 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         </CardContent>
       </Card>
 
+      {/* Modal de Detalhes */}
+      <FlightDetailModal
+        flight={flight}
+        open={showDetailModal}
+        onOpenChange={setShowDetailModal}
+      />
+
       {/* Modal de Edição - Renderizado apenas quando necessário */}
       {shouldRenderModal && (
         <AddFlightModal
@@ -363,8 +381,14 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/80">
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+              className="bg-destructive hover:bg-destructive/80"
+            >
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>

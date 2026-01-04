@@ -16,7 +16,7 @@ const ptBR = {
       profile: "Perfil",
       settings: "Configurações"
     },
-    
+
     // Dashboard
     dashboard: {
       title: "Centro de Operações de Voo",
@@ -30,7 +30,7 @@ const ptBR = {
       last30Days: "Últimos 30 dias",
       accumulatedPoints: "Pontos acumulados"
     },
-    
+
     // Flights Page
     flights: {
       title: "Gerenciamento de Voos",
@@ -42,7 +42,7 @@ const ptBR = {
       noFlightsDesc: "Comece registrando seu primeiro voo para começar a rastrear a progressão da sua carreira.",
       logFirstFlight: "Registre Seu Primeiro Voo"
     },
-    
+
     // Goals Page
     goals: {
       title: "Metas de Carreira",
@@ -64,7 +64,7 @@ const ptBR = {
       monthsAgo: "{{count}} meses atrás",
       weeksAgo: "{{count}} semanas atrás"
     },
-    
+
     // History Page
     history: {
       title: "Histórico de Voos",
@@ -85,7 +85,7 @@ const ptBR = {
       showing: "Exibindo",
       of: "de"
     },
-    
+
     // Ranking Page
     ranking: {
       title: "Ranking de Pilotos",
@@ -99,7 +99,7 @@ const ptBR = {
       rating: "Rating",
       position: "Posição"
     },
-    
+
     // Profile Page
     profile: {
       title: "Perfil do Piloto",
@@ -137,7 +137,7 @@ const ptBR = {
       centuryClub: "Clube do Século",
       centuryClubDesc: "Completou 100+ voos"
     },
-    
+
     // Settings Page
     settings: {
       title: "Configurações",
@@ -177,7 +177,7 @@ const ptBR = {
       securityFeatures: "Recursos de segurança estarão disponíveis quando você se conectar ao Supabase para funcionalidade backend.",
       connectSupabase: "Conectar Supabase"
     },
-    
+
     // Financial Page
     financial: {
       title: "Gestão Financeira",
@@ -219,14 +219,14 @@ const ptBR = {
       monthlyOverview: "Visão Mensal",
       financialChart: "Gráfico Financeiro"
     },
-    
+
     // Not Found Page
     notFound: {
       title: "Página Não Encontrada",
       subtitle: "A página que você está procurando não existe.",
       backHome: "Voltar ao Dashboard"
     },
-    
+
     // Flight Chart
     flightChart: {
       title: "Atividade de Voos",
@@ -234,14 +234,14 @@ const ptBR = {
       flights: "Voos",
       careerRating: "Career Rating"
     },
-    
+
     // Recent Flights
     recentFlights: {
       title: "Voos Recentes",
       subtitle: "Suas últimas atividades de voo",
       viewAll: "Ver Todos"
     },
-    
+
     // Quick Actions
     quickActions: {
       logNewFlight: "Registrar Novo Voo",
@@ -251,19 +251,19 @@ const ptBR = {
       leaderboard: "Leaderboard",
       leaderboardDesc: "Compare com outros pilotos"
     },
-    
+
     // Status Bar
     statusBar: {
       online: "ONLINE",
       appName: "Microsoft Flight Simulator 2024"
     },
-    
+
     // App Info
     app: {
       name: "MSFS 2024",
       manager: "Career Manager"
     },
-    
+
     // Common terms
     common: {
       duration: "Duração",
@@ -301,13 +301,13 @@ const enUS = {
       dashboard: "Dashboard",
       flights: "Flights",
       ranking: "Ranking",
-      history: "History", 
+      history: "History",
       goals: "Goals",
       financial: "Financial",
       profile: "Profile",
       settings: "Settings"
     },
-    
+
     // Dashboard
     dashboard: {
       title: "Flight Operations Center",
@@ -321,7 +321,7 @@ const enUS = {
       last30Days: "Last 30 days",
       accumulatedPoints: "Accumulated points"
     },
-    
+
     // Flights Page
     flights: {
       title: "Flight Management",
@@ -333,7 +333,7 @@ const enUS = {
       noFlightsDesc: "Start by logging your first flight to begin tracking your career progression.",
       logFirstFlight: "Log Your First Flight"
     },
-    
+
     // Goals Page
     goals: {
       title: "Career Goals",
@@ -355,7 +355,7 @@ const enUS = {
       monthsAgo: "{{count}} months ago",
       weeksAgo: "{{count}} weeks ago"
     },
-    
+
     // History Page
     history: {
       title: "Flight History",
@@ -371,7 +371,7 @@ const enUS = {
       noHistory: "No flight history found",
       noHistoryDesc: "Your flights will appear here as you log them."
     },
-    
+
     // Ranking Page
     ranking: {
       title: "Pilot Rankings",
@@ -385,7 +385,7 @@ const enUS = {
       rating: "Rating",
       position: "Position"
     },
-    
+
     // Profile Page
     profile: {
       title: "Pilot Profile",
@@ -423,7 +423,7 @@ const enUS = {
       centuryClub: "Century Club",
       centuryClubDesc: "Completed 100+ flights"
     },
-    
+
     // Settings Page
     settings: {
       title: "Settings",
@@ -463,7 +463,7 @@ const enUS = {
       securityFeatures: "Security features will be available when you connect to Supabase for backend functionality.",
       connectSupabase: "Connect Supabase"
     },
-    
+
     // Financial Page
     financial: {
       title: "Financial Management",
@@ -505,14 +505,14 @@ const enUS = {
       monthlyOverview: "Monthly Overview",
       financialChart: "Financial Chart"
     },
-    
+
     // Not Found Page
     notFound: {
       title: "Page Not Found",
       subtitle: "The page you're looking for doesn't exist.",
       backHome: "Back to Dashboard"
     },
-    
+
     // Flight Chart
     flightChart: {
       title: "Flight Activity",
@@ -520,14 +520,14 @@ const enUS = {
       flights: "Flights",
       careerRating: "Career Rating"
     },
-    
+
     // Recent Flights
     recentFlights: {
       title: "Recent Flights",
       subtitle: "Your latest flight activities",
       viewAll: "View All"
     },
-    
+
     // Quick Actions
     quickActions: {
       logNewFlight: "Log New Flight",
@@ -537,19 +537,19 @@ const enUS = {
       leaderboard: "Leaderboard",
       leaderboardDesc: "Compare with other pilots"
     },
-    
+
     // Status Bar
     statusBar: {
       online: "ONLINE",
       appName: "Microsoft Flight Simulator 2024"
     },
-    
+
     // App Info
     app: {
       name: "MSFS 2024",
       manager: "Career Manager"
     },
-    
+
     // Common terms
     common: {
       duration: "Duration",
@@ -590,5 +590,15 @@ i18n
       caches: ['localStorage']
     }
   });
+
+// Sincronizar atributo lang do HTML com o idioma atual
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.lang = lng;
+  // Opcional: ajustar direção do texto se houver idiomas RTL (ex: ar)
+  // document.documentElement.dir = i18n.dir(lng);
+});
+
+// Definir idioma inicial
+document.documentElement.lang = i18n.language;
 
 export default i18n;

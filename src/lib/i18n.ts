@@ -29,9 +29,10 @@ const ptBR = {
       administrative: "Administrativo",
       companies: "Minhas Empresas",
       todCalculator: "Calculadora TOD",
-      flightPlanner: "Planejador de Voo"
+      flightPlanner: "Planejador de Voo",
+      airportSearch: "Busca de Aeroportos"
     },
-    
+
     // Flight Planner
     flightPlanner: {
       title: "Planejador de Voo",
@@ -57,7 +58,7 @@ const ptBR = {
       last30Days: "Últimos 30 dias",
       accumulatedPoints: "Pontos acumulados"
     },
-    
+
     // Flights Page
     flights: {
       title: "Gerenciamento de Voos",
@@ -70,7 +71,7 @@ const ptBR = {
       noFlightsDesc: "Comece registrando seu primeiro voo para começar a rastrear a progressão da sua carreira.",
       logFirstFlight: "Registre Seu Primeiro Voo"
     },
-    
+
     // Goals Page
     goals: {
       title: "Metas de Carreira",
@@ -92,7 +93,7 @@ const ptBR = {
       monthsAgo: "{{count}} meses atrás",
       weeksAgo: "{{count}} semanas atrás"
     },
-    
+
     // History Page
     history: {
       title: "Histórico de Voos",
@@ -113,7 +114,7 @@ const ptBR = {
       showing: "Exibindo",
       of: "de"
     },
-    
+
     // Ranking Page
     ranking: {
       title: "Ranking de Pilotos",
@@ -127,50 +128,45 @@ const ptBR = {
       rating: "Rating",
       position: "Posição"
     },
-    
+
     // Profile Page
     profile: {
-      title: "Perfil do Piloto",
-      subtitle: "Gerencie suas informações pessoais e estatísticas.",
-      personalInfo: "Informações Pessoais",
-      pilotName: "Nome do Piloto",
-      callSign: "Call Sign",
-      email: "Email",
-      joinDate: "Data de Entrada",
-      careerStats: "Estatísticas de Carreira",
-      achievements: "Conquistas",
-      editProfile: "Editar Perfil",
-      save: "Salvar",
-      cancel: "Cancelar",
-      professionalPilot: "Piloto Profissional",
-      flights: "Voos",
-      hours: "Horas",
-      careerStarted: "Carreira Iniciada",
-      monthsAgo: "{{count}} meses atrás",
-      totalFlightTime: "Tempo Total de Voo",
-      minutesShort: "min",
-      averagePerMonth: "Média: {{hours}}h/mês",
-      achievementsCount: "{{count}} desbloqueadas",
-      inProgress: "{{count}} em progresso",
-      perfectFlights: "Voos Perfeitos",
-      successRate: "{{rate}}% taxa de sucesso",
-      recentAchievements: "Conquistas Recentes",
-      atlanticCrossing: "Travessia do Atlântico",
-      atlanticCrossingDesc: "Completou um voo transatlântico",
-      unlockedAgo: "Desbloqueado {{time}}",
-      weeksAgo: "{{count}} semanas atrás",
-      highPerformer: "Alto Desempenho",
-      highPerformerDesc: "Manteve CR acima de 90 por 30 dias",
-      monthAgo: "{{count}} mês atrás",
       centuryClub: "Clube do Século",
-      centuryClubDesc: "Completou 100+ voos"
+      centuryClubDesc: "Completou 100+ voos",
+      statsBreakdown: "{{initial}} iniciais + {{system}} sistema",
+      edit: {
+        title: "Editar Perfil",
+        basicInfo: "Informações Básicas",
+        historicalData: "Dados Históricos",
+        summary: "Resumo Calculado",
+        changeAvatar: "Alterar Avatar",
+        displayName: "Nome de Exibição",
+        description: "Descrição",
+        descriptionPlaceholder: "Conte um pouco sobre sua experiência como piloto...",
+        initialFlights: "Voos Iniciais (Histórico)",
+        initialFlightsDesc: "Novos voos serão somados a este valor automaticamente",
+        initialHours: "Horas de Voo Iniciais",
+        initialHoursDesc: "Novas horas de voo serão somadas a este valor automaticamente",
+        careerStarted: "Carreira Iniciada",
+        perfectFlights: "Pousos Perfeitos",
+        achievementsPlaceholder: "Descreva suas principais conquistas e certificações...",
+        calculatedTotalFlights: "Total de Voos:",
+        calculatedTotalHours: "Total de Horas:",
+        currentCR: "CR Atual:",
+        saving: "Salvando...",
+        saveChanges: "Salvar Alterações",
+        success: "Perfil atualizado com sucesso",
+        error: "Erro ao atualizar perfil",
+        avatarSuccess: "Avatar atualizado com sucesso",
+        avatarError: "Erro ao fazer upload do avatar"
+      }
     },
-    
+
     // Settings Page
     settings: {
       title: "Configurações",
       subtitle: "Personalize sua experiência de voo.",
-      
+
       // Notifications section
       notifications: {
         title: "Notificações",
@@ -179,7 +175,7 @@ const ptBR = {
         push: "Notificações Push",
         pushDesc: "Receba notificações em tempo real no dispositivo"
       },
-      
+
       // Financial section
       financial: {
         title: "Financeiro",
@@ -188,7 +184,7 @@ const ptBR = {
         initialBalance: "Saldo Inicial",
         initialBalanceDesc: "Defina seu saldo inicial para cálculos financeiros"
       },
-      
+
       // Flights section
       flights: {
         title: "Voos",
@@ -197,7 +193,7 @@ const ptBR = {
         offlineMode: "Modo Offline",
         offlineModeDesc: "Permite uso offline com cache de dados"
       },
-      
+
       // Career section
       career: {
         title: "Carreira",
@@ -206,7 +202,7 @@ const ptBR = {
         class: "Classe de Piloto",
         selectClass: "Selecione a classe"
       },
-      
+
       // App section
       app: {
         title: "Aplicativo",
@@ -218,7 +214,7 @@ const ptBR = {
         dark: "Escuro",
         system: "Sistema"
       },
-      
+
       // Data section
       data: {
         title: "Dados e Backup",
@@ -227,14 +223,14 @@ const ptBR = {
         backup: "Backup",
         reset: "Redefinir"
       },
-      
+
       // Security section
       maintenance: {
         title: "Manutenção",
         categories: "Categorias de Manutenção",
         items: "Itens de Manutenção"
       },
-      
+
       security: {
         title: "Segurança",
         currentPassword: "Senha Atual",
@@ -245,7 +241,7 @@ const ptBR = {
         deleteAccount: "Excluir Conta"
       }
     },
-    
+
     // Financial Page
     financial: {
       title: "Gestão Financeira",
@@ -311,29 +307,16 @@ const ptBR = {
       monthlyOverview: "Visão Mensal",
       financialChart: "Gráfico Financeiro"
     },
-    
+
     // Not Found Page
     notFound: {
       title: "Página Não Encontrada",
       subtitle: "A página que você está procurando não existe.",
       backHome: "Voltar ao Dashboard"
     },
-    
-    // Flight Chart
-    flightChart: {
-      title: "Atividade de Voos",
-      subtitle: "Visão geral da progressão mensal",
-      flights: "Voos",
-      careerRating: "Career Rating"
-    },
-    
-    // Recent Flights
-    recentFlights: {
-      title: "Voos Recentes",
-      subtitle: "Suas últimas atividades de voo",
-      viewAll: "Ver Todos"
-    },
-    
+
+
+
     // Quick Actions
     quickActions: {
       logNewFlight: "Registrar Novo Voo",
@@ -343,19 +326,19 @@ const ptBR = {
       leaderboard: "Leaderboard",
       leaderboardDesc: "Compare com outros pilotos"
     },
-    
+
     // Status Bar
     statusBar: {
       online: "ONLINE",
       appName: "Microsoft Flight Simulator 2024"
     },
-    
+
     // App Info
     app: {
       name: "MSFS 2024",
       manager: "Career Manager"
     },
-    
+
     // Common terms
     common: {
       duration: "Duração",
@@ -374,15 +357,207 @@ const ptBR = {
       save: "Salvar",
       cancel: "Cancelar",
       loading: "Carregando...",
+      error: "Erro",
       callsign: "Callsign",
       route: "Rota",
       date: "Data",
       rating: "Rating",
       showing: "Exibindo",
       of: "de",
-      flights: "voos"
+      flights: "voos",
+      thisMonth: "este mês",
+      purchase_one: "compra",
+      purchase_other: "compras",
+      pendingOrder_one: "pedido pendente",
+      pendingOrder_other: "pedidos pendentes",
+      purchasesRegistered: "compras registradas",
+      distance: "Distância",
+      totalHours: "Tempo Total",
+      clearHistory: "Limpar Histórico",
+      confirmClear: "Tem certeza que deseja limpar todo o histórico? Esta ação não pode ser desfeita.",
+      clearAll: "Limpar Tudo",
+      deleteFlight: "Deletar Voo",
+      confirmDelete: "Tem certeza que deseja deletar este item? Esta ação não pode ser desfeita."
     },
 
+    // Career Rating Card
+    careerRating: {
+      title: "Rating de Carreira",
+      notFound: "Dados de Carreira não Encontrados",
+      setupDesc: "Configure seus dados de carreira do Microsoft Flight Simulator para visualizar seu progresso.",
+      setupNow: "Configurar Agora",
+      editTooltip: "Editar CR, Nível e Classe",
+      ratingTotal: "Rating Total",
+      level: "Nível",
+      class: "Classe",
+      classElite: "Classe S (Elite)",
+      classSpecialist: "Classe A (Especialista)",
+      classProfessional: "Classe B (Profissional)",
+      classExperienced: "Classe C (Experiente)",
+      classBeginner: "Classe D (Iniciante)",
+      success: "Dados de carreira atualizados com sucesso!",
+      error: "Erro ao salvar os dados",
+      performanceS: "Desempenho Excepcional",
+      performanceA: "Desempenho Excelente",
+      performanceB: "Bom Desempenho",
+      performanceC: "Desempenho Competente",
+      performanceD: "Desempenho em Desenvolvimento",
+      performanceDefault: "Desempenho Padrão"
+    },
+
+    // Recent Flights
+    recentFlights: {
+      title: "Voos Recentes",
+      subtitle: "Suas últimas atividades de voo",
+      viewAll: "Ver Todos",
+      noFlights: "Nenhum voo registrado ainda",
+      logFirstFlight: "Registrar Primeiro Voo"
+    },
+
+    // MSFS Flights
+    msfsFlights: {
+      favoriteAircraft: "Aeronave Favorita",
+      noFlights: "Nenhum voo do MSFS encontrado",
+      startServiceDesc: "Inicie o serviço companheiro para começar a registrar seus voos automaticamente.",
+      viewAll: "Ver todos os {{count}} voos"
+    },
+
+    // Flight Chart
+    flightChart: {
+      title: "Atividade de Voo",
+      subtitle: "Visão geral da progressão mensal",
+      flights: "Voos",
+      careerRating: "Career Rating",
+      months3: "3 meses",
+      months6: "6 meses",
+      months12: "12 meses",
+      all: "Todos",
+      noData: "Nenhum voo registrado. Adicione seus primeiros voos para ver o gráfico!"
+    },
+
+    // Career Rating Manager Section
+    careerManager: {
+      title: "Gerenciamento de Rating do MSFS",
+      reminder: "Lembrete",
+      reminderDesc: "Não esqueça de verificar seu Rating total, Nível e Classe no perfil do modo carreira do Microsoft Flight Simulator e atualizar aqui.",
+      dontShowAgain: "Não mostrar novamente",
+      totalRating: "Rating Total",
+      level: "Nível",
+      class: "Classe de Carreira",
+      selectClass: "Selecione a classe",
+      currentStatus: "Status Atual:",
+      lastUpdated: "Última atualização:",
+      updating: "Atualizando...",
+      updateButton: "Atualizar Dados da Carreira",
+      errorPositiveRating: "O rating total deve ser um número positivo",
+      errorPositiveLevel: "O nível deve ser um número positivo",
+      errorClassRequired: "A classe de carreira é obrigatória",
+      success: "Dados de carreira atualizados com sucesso",
+      successSql: "Dados de carreira atualizados via SQL direto",
+      warningUpdated: "Dados enviados, mas verifique se foram atualizados corretamente",
+      errorUpdate: "Erro ao atualizar dados de carreira: {{message}}"
+    },
+
+    // Purchases Page
+    purchases: {
+      title: "Gestão de Compras",
+      subtitle: "Gerencie compras de combustível, equipamentos e suprimentos.",
+      newPurchase: "Nova Compra",
+      firstPurchase: "Primeira Compra",
+      monthlySpending: "Gastos Este Mês",
+      pendingOrders: "Pedidos Pendentes",
+      totalPurchases: "Total de Compras",
+      recentPurchases: "Compras Recentes",
+      noPurchases: "Nenhuma compra registrada ainda",
+      statusChange: "Clique para alterar o status",
+      purchaseCode: "Código",
+      buyer: "Comprador",
+      budgeted: "Orçado",
+      negotiated: "Negociado",
+      finalValue: "Valor Final"
+    },
+
+    // Financial Reports
+    financialReports: {
+      title: "Relatórios Financeiros",
+      subtitle: "Visão completa das entradas, saídas e DRE em tempo real.",
+      overview: "Visão Geral",
+      detailedDRE: "DRE Detalhado",
+      transactions: "Transações",
+      totalRevenue: "Receita Total",
+      totalExpenses: "Despesas Totais",
+      netProfit: "Lucro Líquido",
+      profitMargin: "Margem de Lucro",
+      updatedAt: "Atualizado em",
+      syncing: "Sincronizando...",
+      synced: "Sincronizado",
+      export: "Exportar",
+      refresh: "Atualizar"
+    },
+
+    // Real-time Tracking
+    realtime: {
+      title: "Tracking em Tempo Real",
+      subtitle: "Monitore seus voos do MSFS 2024 em tempo real.",
+      connection: "Conexão WebSocket",
+      connectionDesc: "Dados em tempo real via ws://localhost:3001",
+      integration: "Integração MSFS 2024",
+      integrationDesc: "Integração via SimConnect",
+      autoSave: "Auto-Save",
+      autoSaveDesc: "Voos salvos automaticamente",
+      howToUse: "Como Usar",
+      preparation: "1. Preparação",
+      preparationSteps: [
+        "Inicie o MSFS 2024",
+        "Execute o companion service",
+        "Execute o flight tracking server",
+        "Carregue uma aeronave no simulador"
+      ],
+      tracking: "2. Tracking",
+      trackingSteps: [
+        "Visualização em tempo real no mapa",
+        "Voos detectados e salvos automaticamente",
+        "Caminho do voo mostrado em tempo real",
+        "Histórico disponível na página de voos"
+      ],
+      tip: "Mantenha esta página aberta durante o voo para monitorar em tempo real.",
+      usefulLinks: "Links Úteis",
+      msfsHistory: "Histórico de Voos MSFS",
+      serviceStatus: "Status do Flight Tracking Service"
+    },
+
+    // Maps
+    maps: {
+      title: "Mapas de Voo",
+      subtitle: "Visualize e acompanhe rotas de voo em tempo real.",
+      allRoutes: "Todas as Rotas",
+      completed: "Concluídos",
+      active: "Ativos",
+      planned: "Planejados",
+      mapLegend: "Legenda do Mapa",
+      features: "Recursos",
+      realtimeTracking: "Tracking em tempo real",
+      multipleLayers: "Múltiplas camadas de mapa",
+      detailedWaypoints: "Waypoints e rotas detalhadas",
+      advancedFilters: "Filtros e busca avançada"
+    },
+
+    // DRE
+    dre: {
+      title: "Demonstrativo de Resultados (DRE)",
+      noData: "Nenhum dado financeiro disponível.",
+      profit: "Lucro",
+      loss: "Prejuízo",
+      netProfit: "Lucro Líquido do Período",
+      grossRevenue: "RECEITA BRUTA",
+      operatingExpenses: "(-) Despesas Operacionais",
+      breakEven: "Ponto de Equilíbrio",
+      revenueByCategory: "Receitas por Categoria",
+      expensesByCategory: "Despesas por Categoria",
+      noRevenue: "Nenhuma receita registrada",
+      noExpense: "Nenhuma despesa registrada",
+      ofTotal: "do total"
+    },
     // Auth
     auth: {
       signOut: "Sair",
@@ -434,7 +609,7 @@ const enUS = {
       realtime: "Real Time",
       maps: "Maps",
       ranking: "Ranking",
-      history: "History", 
+      history: "History",
       goals: "Goals",
       financial: "Financial",
       maintenance: "Maintenance",
@@ -454,7 +629,7 @@ const enUS = {
       flightPlanner: "Flight Planner",
       airportSearch: "Airport Search"
     },
-    
+
     // Flight Planner
     flightPlanner: {
       title: "Flight Planner",
@@ -466,7 +641,7 @@ const enUS = {
       openExternal: "Open Externally",
       poweredBy: "Powered by Flight Simulator Planner"
     },
-    
+
     // Dashboard
     dashboard: {
       title: "Flight Operations Center",
@@ -480,7 +655,7 @@ const enUS = {
       last30Days: "Last 30 days",
       accumulatedPoints: "Accumulated points"
     },
-    
+
     // Flights Page
     flights: {
       title: "Flight Management",
@@ -490,9 +665,10 @@ const enUS = {
       filter: "Filter",
       noFlights: "No flights logged yet",
       noFlightsDesc: "Start by logging your first flight to begin tracking your career progression.",
-      logFirstFlight: "Log Your First Flight"
+      logFirstFlight: "Log Your First Flight",
+      addNewFlight: "Add New Flight"
     },
-    
+
     // Goals Page
     goals: {
       title: "Career Goals",
@@ -514,7 +690,7 @@ const enUS = {
       monthsAgo: "{{count}} months ago",
       weeksAgo: "{{count}} weeks ago"
     },
-    
+
     // History Page
     history: {
       title: "Flight History",
@@ -528,9 +704,14 @@ const enUS = {
       duration: "Duration",
       rating: "Rating",
       noHistory: "No flight history found",
-      noHistoryDesc: "Your flights will appear here as you log them."
+      noHistoryDesc: "Your flights will appear here as you log them.",
+      thisWeek: "This Week",
+      thisMonth: "This Month",
+      flights: "flights",
+      showing: "Showing",
+      of: "of"
     },
-    
+
     // Ranking Page
     ranking: {
       title: "Pilot Rankings",
@@ -544,7 +725,7 @@ const enUS = {
       rating: "Rating",
       position: "Position"
     },
-    
+
     // Profile Page
     profile: {
       title: "Pilot Profile",
@@ -580,14 +761,41 @@ const enUS = {
       highPerformerDesc: "Maintained CR above 90 for 30 days",
       monthAgo: "{{count}} month ago",
       centuryClub: "Century Club",
-      centuryClubDesc: "Completed 100+ flights"
+      centuryClubDesc: "Completed 100+ flights",
+      statsBreakdown: "{{initial}} initial + {{system}} system",
+      edit: {
+        title: "Edit Profile",
+        basicInfo: "Basic Information",
+        historicalData: "Historical Data",
+        summary: "Calculated Summary",
+        changeAvatar: "Change Avatar",
+        displayName: "Display Name",
+        description: "Description",
+        descriptionPlaceholder: "Tell us a bit about your flight experience...",
+        initialFlights: "Initial Flights (History)",
+        initialFlightsDesc: "New flights will be automatically added to this value",
+        initialHours: "Initial Flight Hours",
+        initialHoursDesc: "New flight hours will be automatically added to this value",
+        careerStarted: "Career Started",
+        perfectFlights: "Perfect Landings",
+        achievementsPlaceholder: "Describe your main achievements and certifications...",
+        calculatedTotalFlights: "Total Flights:",
+        calculatedTotalHours: "Total Hours:",
+        currentCR: "Current CR:",
+        saving: "Saving...",
+        saveChanges: "Save Changes",
+        success: "Profile updated successfully",
+        error: "Error updating profile",
+        avatarSuccess: "Avatar updated successfully",
+        avatarError: "Error uploading avatar"
+      }
     },
-    
+
     // Settings Page
     settings: {
       title: "Settings",
       subtitle: "Customize your flight experience.",
-      
+
       // Notifications section
       notifications: {
         title: "Notifications",
@@ -596,7 +804,7 @@ const enUS = {
         push: "Push Notifications",
         pushDesc: "Get real-time notifications on your device"
       },
-      
+
       // Financial section
       financial: {
         title: "Financial",
@@ -605,7 +813,7 @@ const enUS = {
         initialBalance: "Initial Balance",
         initialBalanceDesc: "Set your initial balance for financial calculations"
       },
-      
+
       // Flights section
       flights: {
         title: "Flights",
@@ -614,7 +822,7 @@ const enUS = {
         offlineMode: "Offline Mode",
         offlineModeDesc: "Enable offline usage with data caching"
       },
-      
+
       // Career section
       career: {
         title: "Career",
@@ -623,7 +831,7 @@ const enUS = {
         class: "Pilot Class",
         selectClass: "Select class"
       },
-      
+
       // App section
       app: {
         title: "Application",
@@ -635,7 +843,7 @@ const enUS = {
         dark: "Dark",
         system: "System"
       },
-      
+
       // Data section
       data: {
         title: "Data & Backup",
@@ -644,14 +852,14 @@ const enUS = {
         backup: "Backup",
         reset: "Reset"
       },
-      
+
       // Security section
       maintenance: {
         title: "Maintenance",
         categories: "Maintenance Categories",
         items: "Maintenance Items"
       },
-      
+
       security: {
         title: "Security",
         currentPassword: "Current Password",
@@ -662,7 +870,7 @@ const enUS = {
         deleteAccount: "Delete Account"
       }
     },
-    
+
     // Financial Page
     financial: {
       title: "Financial Management",
@@ -728,29 +936,16 @@ const enUS = {
       monthlyOverview: "Monthly Overview",
       financialChart: "Financial Chart"
     },
-    
+
     // Not Found Page
     notFound: {
       title: "Page Not Found",
       subtitle: "The page you're looking for doesn't exist.",
       backHome: "Back to Dashboard"
     },
-    
-    // Flight Chart
-    flightChart: {
-      title: "Flight Activity",
-      subtitle: "Monthly progression overview",
-      flights: "Flights",
-      careerRating: "Career Rating"
-    },
-    
-    // Recent Flights
-    recentFlights: {
-      title: "Recent Flights",
-      subtitle: "Your latest flight activities",
-      viewAll: "View All"
-    },
-    
+
+
+
     // Quick Actions
     quickActions: {
       logNewFlight: "Log New Flight",
@@ -760,19 +955,19 @@ const enUS = {
       leaderboard: "Leaderboard",
       leaderboardDesc: "Compare with other pilots"
     },
-    
+
     // Status Bar
     statusBar: {
       online: "ONLINE",
       appName: "Microsoft Flight Simulator 2024"
     },
-    
+
     // App Info
     app: {
       name: "MSFS 2024",
       manager: "Career Manager"
     },
-    
+
     // Common terms
     common: {
       duration: "Duration",
@@ -790,9 +985,208 @@ const enUS = {
       delete: "Delete",
       save: "Save",
       cancel: "Cancel",
-      loading: "Loading..."
+      loading: "Loading...",
+      error: "Error",
+      callsign: "Callsign",
+      route: "Route",
+      date: "Date",
+      rating: "Rating",
+      showing: "Showing",
+      of: "of",
+      flights: "flights",
+      thisMonth: "this month",
+      purchase_one: "purchase",
+      purchase_other: "purchases",
+      pendingOrder_one: "pending order",
+      pendingOrder_other: "pending orders",
+      purchasesRegistered: "purchases registered",
+      distance: "Distance",
+      totalHours: "Total Time",
+      clearHistory: "Clear History",
+      confirmClear: "Are you sure you want to clear all history? This action cannot be undone.",
+      clearAll: "Clear All",
+      deleteFlight: "Delete Flight",
+      confirmDelete: "Are you sure you want to delete this item? This action cannot be undone."
     },
 
+    // Career Rating Card
+    careerRating: {
+      title: "Career Rating",
+      notFound: "Career Data Not Found",
+      setupDesc: "Configure your Microsoft Flight Simulator career data to visualize your progress.",
+      setupNow: "Configure Now",
+      editTooltip: "Edit CR, Level, and Class",
+      ratingTotal: "Total Rating",
+      level: "Level",
+      class: "Class",
+      classElite: "Class S (Elite)",
+      classSpecialist: "Class A (Specialist)",
+      classProfessional: "Class B (Professional)",
+      classExperienced: "Class C (Experienced)",
+      classBeginner: "Class D (Beginner)",
+      success: "Career data updated successfully!",
+      error: "Error saving data",
+      performanceS: "Exceptional Performance",
+      performanceA: "Excellent Performance",
+      performanceB: "Good Performance",
+      performanceC: "Competent Performance",
+      performanceD: "Developing Performance",
+      performanceDefault: "Standard Performance"
+    },
+
+    // Recent Flights
+    recentFlights: {
+      title: "Recent Flights",
+      subtitle: "Your latest flight activities",
+      viewAll: "View All",
+      noFlights: "No flights logged yet",
+      logFirstFlight: "Log First Flight"
+    },
+
+    // MSFS Flights
+    msfsFlights: {
+      favoriteAircraft: "Favorite Aircraft",
+      noFlights: "No MSFS flights found",
+      startServiceDesc: "Start the companion service to begin logging your flights automatically.",
+      viewAll: "View all {{count}} flights"
+    },
+
+    // Flight Chart
+    flightChart: {
+      title: "Flight Activity",
+      subtitle: "Monthly progression overview",
+      flights: "Flights",
+      careerRating: "Career Rating",
+      months3: "3 months",
+      months6: "6 months",
+      months12: "12 months",
+      all: "All",
+      noData: "No flights logged. Add your first flights to see the chart!"
+    },
+
+    // Career Rating Manager Section
+    careerManager: {
+      title: "MSFS Rating Management",
+      reminder: "Reminder",
+      reminderDesc: "Don't forget to check your Total Rating, Level, and Class in your Microsoft Flight Simulator career profile and update it here.",
+      dontShowAgain: "Don't show again",
+      totalRating: "Total Rating",
+      level: "Level",
+      class: "Career Class",
+      selectClass: "Select class",
+      currentStatus: "Current Status:",
+      lastUpdated: "Last updated:",
+      updating: "Updating...",
+      updateButton: "Update Career Data",
+      errorPositiveRating: "Total rating must be a positive number",
+      errorPositiveLevel: "Level must be a positive number",
+      errorClassRequired: "Career class is required",
+      success: "Career data updated successfully",
+      successSql: "Career data updated via direct SQL",
+      warningUpdated: "Data sent, but check if it updated correctly",
+      errorUpdate: "Error updating career data: {{message}}"
+    },
+
+    // Purchases Page
+    purchases: {
+      title: "Purchase Management",
+      subtitle: "Manage purchases for fuel, equipment, and supplies.",
+      newPurchase: "New Purchase",
+      firstPurchase: "First Purchase",
+      monthlySpending: "Monthly Spending",
+      pendingOrders: "Pending Orders",
+      totalPurchases: "Total Purchases",
+      recentPurchases: "Recent Purchases",
+      noPurchases: "No purchases logged yet",
+      statusChange: "Click to change status",
+      purchaseCode: "Code",
+      buyer: "Buyer",
+      budgeted: "Budgeted",
+      negotiated: "Negotiated",
+      finalValue: "Final Value"
+    },
+
+    // Financial Reports
+    financialReports: {
+      title: "Financial Reports",
+      subtitle: "Complete view of revenues, expenses, and P&L in real time.",
+      overview: "Overview",
+      detailedDRE: "Detailed P&L",
+      transactions: "Transactions",
+      totalRevenue: "Total Revenue",
+      totalExpenses: "Total Expenses",
+      netProfit: "Net Profit",
+      profitMargin: "Profit Margin",
+      updatedAt: "Updated at",
+      syncing: "Syncing...",
+      synced: "Synced",
+      export: "Export",
+      refresh: "Refresh"
+    },
+
+    // Real-time Tracking
+    realtime: {
+      title: "Real-time Tracking",
+      subtitle: "Monitor your MSFS 2024 flights in real time.",
+      connection: "WebSocket Connection",
+      connectionDesc: "Real-time data via ws://localhost:3001",
+      integration: "MSFS 2024 Integration",
+      integrationDesc: "Integration via SimConnect",
+      autoSave: "Auto-Save",
+      autoSaveDesc: "Flights saved automatically",
+      howToUse: "How to Use",
+      preparation: "1. Preparation",
+      preparationSteps: [
+        "Start MSFS 2024",
+        "Run the companion service",
+        "Run the flight tracking server",
+        "Load an aircraft in the simulator"
+      ],
+      tracking: "2. Tracking",
+      trackingSteps: [
+        "Real-time visualization on the map",
+        "Flights detected and saved automatically",
+        "Flight path shown in real time",
+        "History available on the flights page"
+      ],
+      tip: "Keep this page open during flight to monitor in real time.",
+      usefulLinks: "Useful Links",
+      msfsHistory: "MSFS Flight History",
+      serviceStatus: "Flight Tracking Service Status"
+    },
+
+    // Maps
+    maps: {
+      title: "Flight Maps",
+      subtitle: "Visualize and track flight routes in real time.",
+      allRoutes: "All Routes",
+      completed: "Completed",
+      active: "Active",
+      planned: "Planned",
+      mapLegend: "Map Legend",
+      features: "Features",
+      realtimeTracking: "Real-time tracking",
+      multipleLayers: "Multiple map layers",
+      detailedWaypoints: "Detailed waypoints and routes",
+      advancedFilters: "Advanced filters and search"
+    },
+
+    // DRE
+    dre: {
+      title: "Profit & Loss Statement (P&L)",
+      noData: "No financial data available.",
+      profit: "Profit",
+      loss: "Loss",
+      netProfit: "Net Profit for the Period",
+      grossRevenue: "GROSS REVENUE",
+      operatingExpenses: "(-) Operating Expenses",
+      breakEven: "Break-even Point",
+      revenueByCategory: "Revenue by Category",
+      expensesByCategory: "Expenses by Category",
+      noRevenue: "No revenue recorded",
+      noExpense: "No expense recorded",
+      ofTotal: "of total"
+    },
     // Auth
     auth: {
       signOut: "Sign Out",
@@ -852,5 +1246,15 @@ i18n
       caches: ['localStorage']
     }
   });
+
+// Sincronizar atributo lang do HTML com o idioma atual
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.lang = lng;
+});
+
+// Definir idioma inicial
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = i18n.language;
+}
 
 export default i18n;

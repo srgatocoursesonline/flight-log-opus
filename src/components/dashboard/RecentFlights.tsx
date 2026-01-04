@@ -14,7 +14,7 @@ export const RecentFlights = () => {
   const { navigateToAddFlight } = useFlightNavigation();
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const handleViewAll = () => {
     navigate('/flights');
   };
@@ -37,10 +37,10 @@ export const RecentFlights = () => {
       return dateB.getTime() - dateA.getTime();
     })
     .slice(0, 3);
-    
 
 
-  
+
+
   return (
     <div className="hud-display recent-flights-container fade-in p-6">
       <div className="flex items-center justify-between mb-6">
@@ -52,7 +52,7 @@ export const RecentFlights = () => {
           {t('recentFlights.viewAll')}
         </Button>
       </div>
-      
+
       <div className="space-y-4">
         {isLoading ? (
           <div className="text-center py-4">
@@ -62,15 +62,15 @@ export const RecentFlights = () => {
         ) : recentFlights.length === 0 ? (
           <div className="text-center py-8">
             <Plane className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-            <p className="text-sm text-readable-muted mb-3">Nenhum voo registrado ainda</p>
+            <p className="text-sm text-readable-muted mb-3">{t('recentFlights.noFlights')}</p>
             <Button size="sm" variant="hud" onClick={navigateToAddFlight}>
-              Registrar Primeiro Voo
+              {t('recentFlights.logFirstFlight')}
             </Button>
           </div>
         ) : (
           recentFlights.map((flight, index) => (
-            <div 
-              key={flight.id} 
+            <div
+              key={flight.id}
               className="flight-item flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-border/50 cursor-pointer hover:border-primary/50 transition-all duration-300"
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => handleFlightClick(flight)}
@@ -78,7 +78,7 @@ export const RecentFlights = () => {
               <div className="rounded-lg bg-primary/10 p-3 icon-hover">
                 <Plane className="h-5 w-5 text-blue-600" />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-foreground font-mono">{flight.departure}</span>
@@ -87,7 +87,7 @@ export const RecentFlights = () => {
                   <div className="h-px flex-1 bg-border" />
                   <span className="font-semibold text-foreground font-mono">{flight.arrival}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-sm text-readable-muted">
                   <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3 text-blue-600" />
@@ -99,7 +99,7 @@ export const RecentFlights = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-right">
                 <div className="text-lg font-bold text-green-500 font-mono">
                   {flight.careerRating}
@@ -114,7 +114,7 @@ export const RecentFlights = () => {
       </div>
 
       {/* Modal de Detalhes do Voo */}
-      <FlightDetailModal 
+      <FlightDetailModal
         flight={selectedFlight}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}

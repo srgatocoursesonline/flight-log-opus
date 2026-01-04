@@ -220,6 +220,14 @@ O projeto está hospedado no **Cloudflare Pages** com:
 
 ## 🔄 **Mudanças Recentes**
 
+### 📅 **Consolidação & Globalização - Dezembro 2025**
+
+- ✅ **Internacionalização Completa**: Implementação total de i18n (PT-BR/EN-US) com suporte a formatação de moeda e data regional.
+- ✅ **Gestão de Carreira & Perfil**: Integração profunda entre estatísticas financeiras e rating de carreira (CR) no perfil do usuário.
+- ✅ **Refatoração de Tipagem**: Eliminação de tipos implícitos `any` e melhoria na segurança de tipos em todo o projeto.
+- ✅ **Estabilidade de Runtime**: Correção de erros críticos de lifecycle (hooks) em componentes de gráficos e modais.
+- ✅ **Otimização de Dashboards**: Gráficos Recharts agora são totalmente reativos e seguem o tema do sistema.
+
 ### 📅 **Reorganização Completa - 2024**
 
 - ✅ **Estrutura FSD** implementada no frontend

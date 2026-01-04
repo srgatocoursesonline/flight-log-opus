@@ -5,12 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+import i18n from './i18n';
+
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', {
+  const language = i18n.language || 'pt-BR';
+  return new Intl.NumberFormat(language === 'en-US' ? 'en-US' : 'pt-BR', {
     style: 'currency',
-    currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    currency: language === 'en-US' ? 'USD' : 'BRL',
+    minimumFractionDigits: language === 'en-US' ? 2 : 2,
+    maximumFractionDigits: language === 'en-US' ? 2 : 2,
   }).format(value)
 }
 
@@ -21,7 +24,8 @@ export function formatDate(date: string | Date): string {
     d.getMonth(),
     d.getDate()
   ));
-  return utcDate.toLocaleDateString('pt-BR', {
+  const language = i18n.language || 'pt-BR';
+  return utcDate.toLocaleDateString(language === 'en-US' ? 'en-US' : 'pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

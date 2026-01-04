@@ -1,7 +1,7 @@
-import { 
-  Clock, 
-  Plane, 
-  TrendingUp, 
+import {
+  Clock,
+  Plane,
+  TrendingUp,
   Trophy,
   Timer,
   Users,
@@ -26,7 +26,7 @@ const Index = () => {
   const { getFlightStats } = useSupabaseFlights();
   const { displayName, isLoading: greetingLoading, greeting } = useGreeting();
   const stats = getFlightStats();
-  
+
   return (
     <div className="mobile-section">
       <div className="mobile-fade-in">
@@ -34,7 +34,7 @@ const Index = () => {
           {t('dashboard.title')}
         </h1>
         <p className="mobile-subtitle">
-          {greetingLoading ? 'Carregando...' : `${greeting}, ${displayName}!`}
+          {greetingLoading ? t('common.loading') : `${greeting}, ${displayName}!`}
         </p>
       </div>
 
@@ -44,7 +44,7 @@ const Index = () => {
           <div className="mobile-slide-up">
             <CareerRatingCard />
           </div>
-          <div className="mobile-slide-up" style={{animationDelay: '100ms'}}>
+          <div className="mobile-slide-up" style={{ animationDelay: '100ms' }}>
             <StatsCard
               title={t('dashboard.totalFlights')}
               value={stats.totalFlights}
@@ -54,7 +54,7 @@ const Index = () => {
               valueColor="text-gray-900 dark:text-white"
             />
           </div>
-          <div className="mobile-slide-up" style={{animationDelay: '200ms'}}>
+          <div className="mobile-slide-up" style={{ animationDelay: '200ms' }}>
             <StatsCard
               title={t('dashboard.flightHours')}
               value={stats.totalFlightTime}
@@ -64,7 +64,7 @@ const Index = () => {
               valueColor="text-gray-900 dark:text-white"
             />
           </div>
-          <div className="mobile-slide-up" style={{animationDelay: '300ms'}}>
+          <div className="mobile-slide-up" style={{ animationDelay: '300ms' }}>
             <StatsCard
               title={t('dashboard.totalCR')}
               value={stats.totalCR}
@@ -80,10 +80,10 @@ const Index = () => {
       {/* Charts and Activity */}
       <div className="mobile-section">
         <div className="mobile-grid-1 lg:grid-cols-3 lg:gap-6">
-          <div className="lg:col-span-2 mobile-slide-up" style={{animationDelay: '400ms'}}>
+          <div className="lg:col-span-2 mobile-slide-up" style={{ animationDelay: '400ms' }}>
             <FlightChart />
           </div>
-          <div className="mobile-slide-up" style={{animationDelay: '500ms'}}>
+          <div className="mobile-slide-up" style={{ animationDelay: '500ms' }}>
             <RecentFlights />
           </div>
         </div>
@@ -91,7 +91,7 @@ const Index = () => {
 
       {/* MSFS Integration */}
       <div className="mobile-section">
-        <div className="mobile-slide-up" style={{animationDelay: '600ms'}}>
+        <div className="mobile-slide-up" style={{ animationDelay: '600ms' }}>
           <MSFSFlights limit={3} showHeader={true} showActions={false} />
         </div>
       </div>
@@ -99,7 +99,7 @@ const Index = () => {
       {/* Quick Actions */}
       <div className="mobile-section">
         <div className="mobile-grid-3">
-          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{animationDelay: '700ms'}} onClick={navigateToAddFlight}>
+          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{ animationDelay: '700ms' }} onClick={navigateToAddFlight}>
             <div className="flex items-center gap-3 relative z-10">
               <div className="rounded-lg bg-primary/10 p-2">
                 <Plane className="h-5 w-5 text-primary quick-action-icon" />
@@ -110,8 +110,8 @@ const Index = () => {
               </div>
             </div>
           </div>
-          
-          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{animationDelay: '800ms'}}>
+
+          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{ animationDelay: '800ms' }}>
             <div className="flex items-center gap-3 relative z-10">
               <div className="rounded-lg bg-accent/10 p-2">
                 <TrendingUp className="h-5 w-5 text-accent quick-action-icon" />
@@ -122,8 +122,8 @@ const Index = () => {
               </div>
             </div>
           </div>
-          
-          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{animationDelay: '900ms'}}>
+
+          <div className="mobile-card mobile-slide-up cursor-pointer hover:shadow-lg transition-all duration-200" style={{ animationDelay: '900ms' }}>
             <div className="flex items-center gap-3 relative z-10">
               <div className="rounded-lg bg-success/10 p-2">
                 <Users className="h-5 w-5 text-success quick-action-icon" />

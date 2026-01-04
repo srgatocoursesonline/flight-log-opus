@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Plane, 
-  Clock, 
-  MapPin, 
-  Gauge, 
-  Mountain, 
+import {
+  Plane,
+  Clock,
+  MapPin,
+  Gauge,
+  Mountain,
   Trash2,
   RefreshCw,
   ExternalLink,
@@ -36,22 +36,22 @@ interface MSFSFlightsProps {
   showActions?: boolean;
 }
 
-export const MSFSFlights = ({ 
-  limit = 5, 
-  showHeader = true, 
-  showActions = true 
+export const MSFSFlights = ({
+  limit = 5,
+  showHeader = true,
+  showActions = true
 }: MSFSFlightsProps) => {
   const { t } = useTranslation();
-  const { 
-    flights, 
-    stats, 
-    loading, 
-    error, 
-    deleteFlight, 
-    clearAllFlights, 
-    refresh 
+  const {
+    flights,
+    stats,
+    loading,
+    error,
+    deleteFlight,
+    clearAllFlights,
+    refresh
   } = useSupabaseMSFSFlights();
-  
+
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isClearing, setIsClearing] = useState(false);
 
@@ -94,7 +94,8 @@ export const MSFSFlights = ({
       date.getHours(),
       date.getMinutes()
     ));
-    return utcDate.toLocaleString('pt-BR', {
+    const { i18n } = useTranslation();
+    return utcDate.toLocaleString(i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -111,14 +112,14 @@ export const MSFSFlights = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plane className="h-5 w-5" />
-              Voos MSFS 2024
+              {t('navigation.flights')} MSFS 2024
             </CardTitle>
           </CardHeader>
         )}
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Carregando voos...</span>
+            <span className="ml-2">{t('common.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -139,7 +140,7 @@ export const MSFSFlights = ({
         <CardContent>
           <div className="flex items-center justify-center py-8 text-destructive">
             <AlertCircle className="h-6 w-6" />
-            <span className="ml-2">Erro ao carregar voos: {error}</span>
+            <span className="ml-2">{t('common.error')}: {error}</span>
           </div>
         </CardContent>
       </Card>
@@ -153,10 +154,10 @@ export const MSFSFlights = ({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base">
               <Plane className="h-4 w-4" />
-              Voos MSFS 2024
+              {t('navigation.flights')} MSFS 2024
               {stats && (
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {stats.totalFlights} voos
+                  {stats.totalFlights} {t('common.flights')}
                 </Badge>
               )}
             </CardTitle>
@@ -184,19 +185,18 @@ export const MSFSFlights = ({
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Limpar Histórico</AlertDialogTitle>
+                        <AlertDialogTitle>{t('common.clearHistory')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Tem certeza que deseja limpar todo o histórico de voos do MSFS? 
-                          Esta ação não pode ser desfeita.
+                          {t('common.confirmClear')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleClearAll}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          Limpar Tudo
+                          {t('common.clearAll')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -211,25 +211,25 @@ export const MSFSFlights = ({
                 <div className="text-lg font-bold text-primary">
                   {stats.totalFlights}
                 </div>
-                <div className="text-xs text-readable-muted">Voos</div>
+                <div className="text-xs text-readable-muted">{t('common.flights')}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {formatFlightTime(stats.totalFlightTime)}
                 </div>
-                <div className="text-xs text-readable-muted">Tempo Total</div>
+                <div className="text-xs text-readable-muted">{t('common.totalHours')}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {Math.round(stats.totalDistance)} NM
                 </div>
-                <div className="text-xs text-readable-muted">Distância</div>
+                <div className="text-xs text-readable-muted">{t('common.distance')}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
                   {stats.mostUsedAircraft || 'N/A'}
                 </div>
-                <div className="text-xs text-readable-muted">Aeronave Favorita</div>
+                <div className="text-xs text-readable-muted">{t('msfsFlights.favoriteAircraft')}</div>
               </div>
             </div>
           )}
@@ -240,10 +240,10 @@ export const MSFSFlights = ({
           <div className="text-center py-8">
             <Plane className="h-8 w-8 mx-auto text-blue-600 mb-3" />
             <p className="text-sm text-readable-muted mb-3">
-              Nenhum voo do MSFS encontrado
+              {t('msfsFlights.noFlights')}
             </p>
             <p className="text-xs text-readable-muted">
-              Inicie o serviço companheiro para começar a registrar seus voos automaticamente.
+              {t('msfsFlights.startServiceDesc')}
             </p>
           </div>
         ) : (
@@ -260,7 +260,7 @@ export const MSFSFlights = ({
                         {formatDateTime(flight.departure_time)}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-blue-600" />
@@ -273,7 +273,7 @@ export const MSFSFlights = ({
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-blue-600" />
@@ -293,7 +293,7 @@ export const MSFSFlights = ({
                       </div>
                     </div>
                   </div>
-                  
+
                   {showActions && (
                     <div className="flex items-center gap-2 ml-4">
                       <AlertDialog>
@@ -309,18 +309,18 @@ export const MSFSFlights = ({
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Deletar Voo</AlertDialogTitle>
+                            <AlertDialogTitle>{t('common.deleteFlight')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Tem certeza que deseja deletar este voo? Esta ação não pode ser desfeita.
+                              {t('common.confirmDelete')}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDeleteFlight(flight.id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Deletar
+                              {t('common.delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -330,12 +330,12 @@ export const MSFSFlights = ({
                 </div>
               </div>
             ))}
-            
+
             {flights.length > limit && (
               <div className="text-center pt-4">
                 <Button variant="outline" size="sm">
                   <ExternalLink className="h-4 w-4 mr-2" />
-                  Ver todos os {flights.length} voos
+                  {t('msfsFlights.viewAll', { count: flights.length })}
                 </Button>
               </div>
             )}

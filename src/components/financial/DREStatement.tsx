@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, DollarSign, Receipt, Target, Activity } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 import { DREData } from '@/hooks/supabase/useSupabaseFinancialReports';
 import { formatCurrency } from '@/lib/utils';
 
@@ -12,13 +13,14 @@ interface DREStatementProps {
 }
 
 export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Activity className="h-5 w-5 mr-2" />
-            Demonstrativo de Resultados (DRE)
+            {t('dre.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -36,10 +38,10 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Demonstrativo de Resultados (DRE)</CardTitle>
+          <CardTitle>{t('dre.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Nenhum dado financeiro disponível.</p>
+          <p className="text-muted-foreground">{t('dre.noData')}</p>
         </CardContent>
       </Card>
     );
@@ -62,13 +64,13 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center">
               <Activity className="h-5 w-5 mr-2" />
-              Demonstrativo de Resultados (DRE)
+              {t('dre.title')}
             </span>
-            <Badge 
+            <Badge
               variant={netProfit >= 0 ? "default" : "destructive"}
               className="text-sm"
             >
-              {netProfit >= 0 ? 'Lucro' : 'Prejuízo'}
+              {netProfit >= 0 ? t('dre.profit') : t('dre.loss')}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -79,7 +81,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center">
                   <DollarSign className="h-4 w-4 mr-1 text-green-500" />
-                  Receita Total
+                  {t('financialReports.totalRevenue')}
                 </span>
                 <TrendingUp className="h-4 w-4 text-green-500" />
               </div>
@@ -93,7 +95,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center">
                   <Receipt className="h-4 w-4 mr-1 text-red-500" />
-                  Despesas Totais
+                  {t('financialReports.totalExpenses')}
                 </span>
                 <TrendingDown className="h-4 w-4 text-red-500" />
               </div>
@@ -107,9 +109,9 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center">
                   <Target className="h-4 w-4 mr-1 text-blue-500" />
-                  Lucro Líquido
+                  {t('dre.netProfit')}
                 </span>
-                <Badge 
+                <Badge
                   variant={netProfit >= 0 ? "default" : "destructive"}
                   className="text-xs"
                 >
@@ -125,11 +127,11 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
           {/* Barra de Progresso da Margem */}
           <div className="mt-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Margem de Lucro</span>
+              <span>{t('financialReports.profitMargin')}</span>
               <span>{profitMargin.toFixed(1)}%</span>
             </div>
-            <Progress 
-              value={Math.abs(profitMargin)} 
+            <Progress
+              value={Math.abs(profitMargin)}
               className={`${netProfit >= 0 ? 'bg-green-100' : 'bg-red-100'}`}
             />
           </div>
@@ -143,7 +145,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
           <CardHeader>
             <CardTitle className="text-lg flex items-center">
               <DollarSign className="h-4 w-4 mr-2 text-green-500" />
-              Receitas por Categoria
+              {t('dre.revenueByCategory')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -160,17 +162,17 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{category.percentage.toFixed(1)}% do total</span>
+                    <span>{category.percentage.toFixed(1)}% {t('dre.ofTotal')}</span>
                   </div>
-                  <Progress 
-                    value={category.percentage} 
+                  <Progress
+                    value={category.percentage}
                     className="h-2 bg-green-100"
                   />
                 </div>
               ))}
               {revenueByCategory.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Nenhuma receita registrada
+                  {t('dre.noRevenue')}
                 </p>
               )}
             </div>
@@ -182,7 +184,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
           <CardHeader>
             <CardTitle className="text-lg flex items-center">
               <Receipt className="h-4 w-4 mr-2 text-red-500" />
-              Despesas por Categoria
+              {t('dre.expensesByCategory')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -199,17 +201,17 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{category.percentage.toFixed(1)}% do total</span>
+                    <span>{category.percentage.toFixed(1)}% {t('dre.ofTotal')}</span>
                   </div>
-                  <Progress 
-                    value={category.percentage} 
+                  <Progress
+                    value={category.percentage}
                     className="h-2 bg-red-100"
                   />
                 </div>
               ))}
               {expensesByCategory.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Nenhuma despesa registrada
+                  {t('dre.noExpense')}
                 </p>
               )}
             </div>
@@ -220,14 +222,14 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
       {/* Estrutura DRE Detalhada */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Estrutura Detalhada do DRE</CardTitle>
+          <CardTitle className="text-lg">{t('financialReports.detailedDRE')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {/* Receita Bruta */}
             <div className="border-b pb-2">
               <div className="flex justify-between font-semibold">
-                <span>RECEITA BRUTA</span>
+                <span>{t('dre.grossRevenue')}</span>
                 <span className="text-green-600">{formatCurrency(totalRevenue)}</span>
               </div>
             </div>
@@ -235,7 +237,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
             {/* Deduções */}
             <div className="border-b pb-2">
               <div className="flex justify-between">
-                <span className="ml-4">(-) Despesas Operacionais</span>
+                <span className="ml-4">{t('dre.operatingExpenses')}</span>
                 <span className="text-red-600">-{formatCurrency(totalExpenses)}</span>
               </div>
             </div>
@@ -243,7 +245,7 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
             {/* Resultado Líquido */}
             <div className="border-b pb-2">
               <div className="flex justify-between font-bold text-lg">
-                <span>LUCRO LÍQUIDO DO PERÍODO</span>
+                <span>{t('dre.netProfit')}</span>
                 <span className={netProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
                   {formatCurrency(netProfit)}
                 </span>
@@ -253,11 +255,11 @@ export const DREStatement: React.FC<DREStatementProps> = ({ dreData, isLoading }
             {/* Indicadores */}
             <div className="grid grid-cols-2 gap-4 pt-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Margem de Lucro: </span>
+                <span className="text-muted-foreground">{t('financialReports.profitMargin')}: </span>
                 <span className="font-semibold">{profitMargin.toFixed(1)}%</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Ponto de Equilíbrio: </span>
+                <span className="text-muted-foreground">{t('dre.breakEven')}: </span>
                 <span className="font-semibold">
                   {formatCurrency(totalRevenue > 0 ? totalExpenses : 0)}
                 </span>

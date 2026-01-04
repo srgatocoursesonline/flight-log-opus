@@ -1,5 +1,6 @@
 import { Trophy, AlertCircle, Edit3, Save, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { useSupabaseCareerManager } from '@/hooks/supabase/useSupabaseCareerManager';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 
 export function CareerRatingCard() {
+  const { t } = useTranslation();
   const { careerData, isLoading, refresh, updateCareerData } = useSupabaseCareerManager();
   const [showReminder, setShowReminder] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +22,7 @@ export function CareerRatingCard() {
     careerClass: 'D' as 'S' | 'A' | 'B' | 'C' | 'D'
   });
   const navigate = useNavigate();
-  
+
   // Sincronização automática do career_rating com lucro líquido
   useProfileFinancialSync();
 
@@ -34,7 +36,7 @@ export function CareerRatingCard() {
       });
     }
   }, [careerData]);
-  
+
   // Verificar se o lembrete deve ser exibido (baseado em localStorage)
   useEffect(() => {
     const reminderHidden = localStorage.getItem('career_reminder_hidden');
@@ -84,10 +86,10 @@ export function CareerRatingCard() {
     try {
       await updateCareerData(editData);
       setIsEditing(false);
-      toast.success('Dados de carreira atualizados com sucesso!');
+      toast.success(t('careerRating.success'));
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      toast.error('Erro ao salvar os dados');
+      toast.error(t('careerRating.error'));
     }
   };
 
@@ -104,12 +106,12 @@ export function CareerRatingCard() {
 
   const getPerformanceText = (careerClass: string) => {
     switch (careerClass) {
-      case 'S': return 'Desempenho Excepcional';
-      case 'A': return 'Desempenho Excelente';
-      case 'B': return 'Bom Desempenho';
-      case 'C': return 'Desempenho Competente';
-      case 'D': return 'Desempenho em Desenvolvimento';
-      default: return 'Desempenho Padrão';
+      case 'S': return t('careerRating.performanceS');
+      case 'A': return t('careerRating.performanceA');
+      case 'B': return t('careerRating.performanceB');
+      case 'C': return t('careerRating.performanceC');
+      case 'D': return t('careerRating.performanceD');
+      default: return t('careerRating.performanceDefault');
     }
   };
 
@@ -119,16 +121,16 @@ export function CareerRatingCard() {
       <div className="hud-display stats-card p-4 relative overflow-hidden">
         <Alert className="bg-primary/10 border-primary/20">
           <AlertCircle className="h-3.5 w-3.5" />
-          <AlertTitle className="text-sm">Dados de Carreira não Encontrados</AlertTitle>
+          <AlertTitle className="text-sm">{t('careerRating.notFound')}</AlertTitle>
           <AlertDescription className="text-xs">
-            Configure seus dados de carreira do Microsoft Flight Simulator para visualizar seu progresso.
-            <Button 
-              variant="hud" 
-              size="sm" 
+            {t('careerRating.setupDesc')}
+            <Button
+              variant="hud"
+              size="sm"
               className="mt-1 h-7 text-xs"
               onClick={navigateToSettings}
             >
-              Configurar Agora
+              {t('careerRating.setupNow')}
             </Button>
           </AlertDescription>
         </Alert>
@@ -142,7 +144,7 @@ export function CareerRatingCard() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <p className="text-xs font-medium text-readable-muted uppercase tracking-wider">
-              Rating de Carreira
+              {t('careerRating.title')}
             </p>
             {!isEditing && (
               <Button
@@ -150,77 +152,77 @@ export function CareerRatingCard() {
                 size="sm"
                 onClick={startEditing}
                 className="h-5 w-5 p-0 hover:bg-primary/10"
-                title="Editar CR, Nível e Classe"
+                title={t('careerRating.editTooltip')}
               >
                 <Edit3 className="h-2.5 w-2.5" />
               </Button>
             )}
           </div>
-          
+
           {isEditing ? (
             <div className="space-y-2">
-            <div>
-              <label className="text-xs text-readable-muted mb-0.5 block">Rating Total</label>
-              <Input
-                type="number"
-                value={editData.totalRating}
-                onChange={(e) => setEditData(prev => ({ ...prev, totalRating: parseInt(e.target.value) || 0 }))}
-                className="h-7 text-xs"
-                min="0"
-                max="9999999"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-xs text-readable-muted mb-0.5 block">Nível</label>
+                <label className="text-xs text-readable-muted mb-0.5 block">{t('careerRating.ratingTotal')}</label>
                 <Input
                   type="number"
-                  value={editData.level}
-                  onChange={(e) => setEditData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
+                  value={editData.totalRating}
+                  onChange={(e) => setEditData(prev => ({ ...prev, totalRating: parseInt(e.target.value) || 0 }))}
                   className="h-7 text-xs"
-                  min="1"
+                  min="0"
+                  max="9999999"
                 />
               </div>
-              <div>
-                <label className="text-xs text-readable-muted mb-0.5 block">Classe</label>
-                <Select
-                  value={editData.careerClass}
-                  onValueChange={(value: 'S' | 'A' | 'B' | 'C' | 'D') => setEditData(prev => ({ ...prev, careerClass: value }))}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-readable-muted mb-0.5 block">{t('careerRating.level')}</label>
+                  <Input
+                    type="number"
+                    value={editData.level}
+                    onChange={(e) => setEditData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
+                    className="h-7 text-xs"
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-readable-muted mb-0.5 block">{t('careerRating.class')}</label>
+                  <Select
+                    value={editData.careerClass}
+                    onValueChange={(value: 'S' | 'A' | 'B' | 'C' | 'D') => setEditData(prev => ({ ...prev, careerClass: value }))}
+                  >
+                    <SelectTrigger className="h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="S">{t('careerRating.classElite')}</SelectItem>
+                      <SelectItem value="A">{t('careerRating.classSpecialist')}</SelectItem>
+                      <SelectItem value="B">{t('careerRating.classProfessional')}</SelectItem>
+                      <SelectItem value="C">{t('careerRating.classExperienced')}</SelectItem>
+                      <SelectItem value="D">{t('careerRating.classBeginner')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex gap-1.5 pt-1">
+                <Button
+                  size="sm"
+                  onClick={saveChanges}
+                  className="h-6 px-2 text-xs"
+                  disabled={isLoading}
                 >
-                  <SelectTrigger className="h-7 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="S">Classe S (Elite)</SelectItem>
-                    <SelectItem value="A">Classe A (Especialista)</SelectItem>
-                    <SelectItem value="B">Classe B (Profissional)</SelectItem>
-                    <SelectItem value="C">Classe C (Experiente)</SelectItem>
-                    <SelectItem value="D">Classe D (Iniciante)</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Save className="h-2.5 w-2.5 mr-1" />
+                  {t('common.save')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelEditing}
+                  className="h-6 px-2 text-xs"
+                >
+                  <X className="h-2.5 w-2.5 mr-1" />
+                  {t('common.cancel')}
+                </Button>
               </div>
             </div>
-            <div className="flex gap-1.5 pt-1">
-              <Button
-                size="sm"
-                onClick={saveChanges}
-                className="h-6 px-2 text-xs"
-                disabled={isLoading}
-              >
-                <Save className="h-2.5 w-2.5 mr-1" />
-                Salvar
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={cancelEditing}
-                className="h-6 px-2 text-xs"
-              >
-                <X className="h-2.5 w-2.5 mr-1" />
-                Cancelar
-              </Button>
-            </div>
-          </div>
           ) : (
             <>
               <div className="mt-1 flex items-baseline gap-1">
@@ -233,13 +235,13 @@ export function CareerRatingCard() {
               </div>
               {careerData && (
                 <p className="mobile-card-subtitle text-readable-muted mt-0.5 text-xs">
-                  Classe {careerData.careerClass} • Nível {careerData.level}
+                  {t('careerRating.class')} {careerData.careerClass} • {t('careerRating.level')} {careerData.level}
                 </p>
               )}
             </>
           )}
         </div>
-        
+
         {!isEditing && (
           <div className="mobile-icon-container rounded-lg bg-primary/10 icon-hover flex-shrink-0">
             <div className="text-primary">
@@ -248,7 +250,7 @@ export function CareerRatingCard() {
           </div>
         )}
       </div>
-      
+
       {/* HUD-style corner decorations */}
       <div className="absolute top-0 left-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-l-2 border-primary/30 transition-all duration-300" />
       <div className="absolute top-0 right-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-r-2 border-primary/30 transition-all duration-300" />
