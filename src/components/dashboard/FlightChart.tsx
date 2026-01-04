@@ -101,7 +101,15 @@ export const FlightChart = () => {
   // Formatar o valor do tooltip
   const formatTooltipValue = (value: number, name: string) => {
     if (name === 'cr') {
-      return [`R$ ${value.toFixed(0)}`, t('flightChart.careerRating')];
+      return [
+        new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(value),
+        t('flightChart.careerRating')
+      ];
     }
     return [value, t('flightChart.flights')];
   };
@@ -175,7 +183,7 @@ export const FlightChart = () => {
 
       <div className="h-80 relative">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <BarChart data={chartData} margin={{ top: 5, right: 40, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="date"
@@ -199,7 +207,12 @@ export const FlightChart = () => {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `R$ ${value}`}
+              tickFormatter={(value) => new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(value)}
             />
             <Tooltip
               contentStyle={{

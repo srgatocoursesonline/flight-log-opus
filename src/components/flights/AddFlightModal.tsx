@@ -96,7 +96,9 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         originCountry: flight.originCountry || '',
         destinationCountry: flight.destinationCountry || '',
         originAirportName: flight.originAirportInfo?.name || '',
-        destinationAirportName: flight.destinationAirportInfo?.name || ''
+        destinationAirportName: flight.destinationAirportInfo?.name || '',
+        originCity: flight.originAirportInfo?.city || '',
+        destinationCity: flight.destinationAirportInfo?.city || ''
       };
     } else {
       // Se é novo voo, tentar carregar rascunho
