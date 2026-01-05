@@ -555,3 +555,54 @@
     @apply transform scale-105;
   }
 }
+
+/* ============================================
+   SCROLLBAR CUSTOMIZADA PARA SIDEBAR
+   ============================================ */
+
+/* Webkit (Chrome, Edge, Safari, Opera) */
+.scrollbar-hover-reveal::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+/* Track (trilho) - Sempre transparente */
+.scrollbar-hover-reveal::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 3px !important;
+}
+
+/* Thumb (indicador) - Invisível por padrão */
+.scrollbar-hover-reveal::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border-radius: 3px !important;
+  transition: background 0.3s ease, width 0.2s ease !important;
+}
+
+/* Thumb aparece quando a sidebar está em hover */
+.scrollbar-hover-reveal:hover::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Thumb em estado hover (quando o mouse está sobre o thumb) */
+.scrollbar-hover-reveal:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.45) !important;
+  width: 8px !important;
+}
+
+/* Thumb em estado active */
+.scrollbar-hover-reveal:hover::-webkit-scrollbar-thumb:active {
+  background: rgba(59, 130, 246, 0.65) !important;
+}
+
+/* Corner (canto) */
+.scrollbar-hover-reveal::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* Firefox Support */
+.scrollbar-hover-reveal {
+  scrollbar-color: rgba(59, 130, 246, 0.25) transparent !important;
+  scrollbar-width: thin !important;
+}
+

@@ -28,6 +28,17 @@ import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
 import { MobileDrawer } from "./MobileDrawer";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Estrutura do menu com seções
 const menuStructure = {
@@ -112,41 +123,39 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
     (item.to !== "/dashboard" && location.pathname.startsWith(item.to))
   );
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onToggle();
-    }
-  };
-
   return (
-    <div className="mb-2">
-      {/* Cabeçalho da seção */}
-      <button
-        onClick={onToggle}
-        onKeyDown={handleKeyDown}
-        className={cn(
-          "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-          "hover:bg-accent hover:text-accent-foreground",
-          "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-          isAnyItemActive ? "bg-accent text-accent-foreground" : "text-readable-muted"
-        )}
-        role="button"
-        aria-expanded={isExpanded}
-        aria-controls={`section-${section.key}`}
-        tabIndex={0}
-      >
-        <span>{t(section.labelKey)}</span>
-        {isExpanded ? (
-          <Minus className="h-4 w-4" />
-        ) : (
-          <Plus className="h-4 w-4" />
-        )}
-      </button>
+    <Collapsible
+      open={isExpanded}
+      onOpenChange={() => onToggle()}
+      className="mb-2"
+    >
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <CollapsibleTrigger asChild>
+            <button
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                "hover:bg-accent hover:text-accent-foreground",
+                "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                isAnyItemActive ? "bg-accent text-accent-foreground" : "text-readable-muted"
+              )}
+            >
+              <span>{t(section.labelKey)}</span>
+              {isExpanded ? (
+                <Minus className="h-4 w-4" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+            </button>
+          </CollapsibleTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>{isExpanded ? "Recolher menu" : "Expandir menu"}</p>
+        </TooltipContent>
+      </Tooltip>
 
-      {/* Itens da seção */}
-      {isExpanded && (
-        <div id={`section-${section.key}`} className="ml-4 mt-1 space-y-1">
+      <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
+        <div className="ml-4 mt-1 space-y-1">
           {section.items.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.to || 
@@ -178,8 +187,8 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
             );
           })}
         </div>
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 
@@ -267,6 +276,19 @@ export const Navigation = () => {
     });
   };
 
+  // Lógica para expandir/recolher tudo
+  const areAllExpanded = menuStructure.sections.every(section => expandedSections[section.key]);
+
+  const handleToggleAll = () => {
+    const newState = menuStructure.sections.reduce((acc, section) => {
+      acc[section.key] = !areAllExpanded;
+      return acc;
+    }, {} as Record<string, boolean>);
+    
+    setExpandedSections(newState);
+    saveExpandedState(newState);
+  };
+
   // Função para renderizar itens do bottom bar mobile (4 principais + drawer)
   const getBottomBarItems = () => {
     return [
@@ -280,7 +302,7 @@ export const Navigation = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
-    <>
+    <TooltipProvider delayDuration={0}>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col lg:overflow-hidden lg:h-screen">
         <div className="glass-panel flex h-full flex-col gap-y-3 px-4 pb-3 pt-16">
@@ -289,7 +311,7 @@ export const Navigation = () => {
               <MSFSLogo size="lg" className="pulse-glow" />
             </div>
           </div>
-          <nav className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden min-h-0">
+          <nav className="scrollbar-hover-reveal flex flex-1 flex-col overflow-y-auto overflow-x-hidden min-h-0">
             <ul role="list" className="flex flex-col gap-y-1">
               {/* Dashboard - sempre fixo no topo */}
               <li>
@@ -316,6 +338,32 @@ export const Navigation = () => {
                   )}
                   {t(menuStructure.dashboard.labelKey)}
                 </NavLink>
+              </li>
+
+              {/* Botão Global Expand/Collapse */}
+              <li className="px-2 pb-2 flex items-center justify-between">
+                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                   Menu
+                 </span>
+                 <Tooltip>
+                   <TooltipTrigger asChild>
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       className="h-6 w-6 hover:bg-accent hover:text-accent-foreground"
+                       onClick={handleToggleAll}
+                     >
+                       {areAllExpanded ? (
+                         <Minus className="h-4 w-4" />
+                       ) : (
+                         <Plus className="h-4 w-4" />
+                       )}
+                     </Button>
+                   </TooltipTrigger>
+                   <TooltipContent side="right">
+                     <p>{areAllExpanded ? "Recolher tudo" : "Expandir tudo"}</p>
+                   </TooltipContent>
+                 </Tooltip>
               </li>
 
               {/* Seções expansíveis */}
@@ -396,6 +444,6 @@ export const Navigation = () => {
             </div>
           </nav>
       </div>
-    </>
+    </TooltipProvider>
   );
 };

@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, Calendar, Filter, Plane, Search, CalendarIcon, Plus } from "lucide-react";
+import { Download, Calendar, Filter, Plane, Search, CalendarIcon, Plus, Keyboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 import { AddFlightModal, AddFlightModalRef } from '@/components/flights/AddFlightModal';
@@ -25,6 +25,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
@@ -56,6 +62,23 @@ const History = () => {
     return count === 1 ? 'voo' : 'voos';
   };
   const [showFilters, setShowFilters] = useState(false);
+
+  // Atalho de teclado Ctrl+1 para abrir modal de adicionar voo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === '1') {
+        event.preventDefault();
+        if (addFlightModalRef.current) {
+          addFlightModalRef.current.openModal();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Calculate stats based on real flights
   const stats = useMemo(() => {
@@ -378,6 +401,26 @@ const History = () => {
             <Download className="h-4 w-4 mr-2 text-blue-600" />
             Export
           </Button>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => addFlightModalRef.current?.openModal()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Voo
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="flex items-center gap-2">
+                  <Keyboard className="h-4 w-4" />
+                  <span>Atalho: Ctrl + 1</span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 

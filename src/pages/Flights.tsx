@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
 import { List as FixedSizeList } from 'react-window';
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Plane, LayoutGrid, List, Wifi } from "lucide-react";
+import { Plus, Search, Filter, Plane, LayoutGrid, List, Wifi, Keyboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
@@ -21,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { ChartCRFlights } from '@/components/flights/ChartCRFlights';
 
@@ -136,6 +142,23 @@ const FlightsContent = () => {
     };
   }, [searchParams, setSearchParams]);
 
+  // Atalho de teclado Ctrl+1 para abrir modal de adicionar voo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === '1') {
+        event.preventDefault();
+        if (addFlightModalRef.current) {
+          addFlightModalRef.current.openModal();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Memoizar filtros para evitar re-renderizações desnecessárias
   const filterCriteria = useMemo(() => ({
     searchTerm: searchTerm.toLowerCase(),
@@ -246,13 +269,25 @@ const FlightsContent = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            onClick={() => addFlightModalRef.current?.openModal()}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('flights.addNewFlight')}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => addFlightModalRef.current?.openModal()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('flights.addNewFlight')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="flex items-center gap-2">
+                  <Keyboard className="h-4 w-4" />
+                  <span>Atalho: Ctrl + 1</span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <AddFlightModal 
           ref={addFlightModalRef} 
