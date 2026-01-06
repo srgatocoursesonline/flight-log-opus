@@ -49,6 +49,8 @@ interface MobileInputProps {
   showValidation?: boolean;
   autoComplete?: string;
   maxLength?: number;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 // Props do MobileTextarea
@@ -164,7 +166,9 @@ export const MobileInput: React.FC<MobileInputProps> = ({
   className,
   showValidation = true,
   autoComplete,
-  maxLength
+  maxLength,
+  onFocus,
+  onBlur: onBlurProp
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasBeenTouched, setHasBeenTouched] = useState(false);
@@ -197,6 +201,7 @@ export const MobileInput: React.FC<MobileInputProps> = ({
   const handleBlur = () => {
     setIsFocused(false);
     setHasBeenTouched(true);
+    onBlurProp?.();
   };
   
   const showError = showValidation && hasBeenTouched && !validationResult.isValid;
@@ -224,7 +229,10 @@ export const MobileInput: React.FC<MobileInputProps> = ({
           inputMode={keyboardType === 'decimal' ? 'decimal' : keyboardType === 'tel' ? 'tel' : keyboardType === 'number' ? 'numeric' : 'text'}
           value={value}
           onChange={handleChange}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true);
+            onFocus?.();
+          }}
           onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { MobileInput, MobileTextarea, MobileFormSection, MASKS, VALIDATIONS } from '@/components/ui/mobile-form';
+import { MobileInput, MobileTextarea, MASKS, VALIDATIONS } from '@/components/ui/mobile-form';
 import {
   Select,
   SelectContent,
@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Combobox } from '@/components/ui/combobox';
-import { Plus, Plane, Briefcase, Building2 } from 'lucide-react';
+import { Plus, Plane, Briefcase, Building2, Calendar, MapPin, Gauge, FileText, Wand2 } from 'lucide-react';
 import { useSupabaseFlights, type Flight } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseAircraftManager } from '@/hooks/supabase/useSupabaseAircraftManager';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
@@ -45,7 +45,32 @@ export interface AddFlightModalRef {
 
 export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>(({ trigger, flight, onClose }, ref) => {
   const { t } = useTranslation();
-  const { addFlight, updateFlight } = useSupabaseFlights();
+  const { addFlight, updateFlight, flights } = useSupabaseFlights();
+  const [suggestedCallsign, setSuggestedCallsign] = useState<string | null>(null);
+
+  const handleCallsignFocus = () => {
+    if (flight || formData.callsign) return;
+
+    // Encontrar último voo válido com formato AAA000
+    const lastFlight = flights.find(f => f.callsign && /^[A-Z]+\d+$/.test(f.callsign));
+
+    if (lastFlight) {
+      const match = lastFlight.callsign.match(/^([A-Z]+)(\d+)$/);
+      if (match) {
+        const prefix = match[1];
+        const numberStr = match[2];
+        const nextNum = parseInt(numberStr) + 1;
+        const nextNumStr = nextNum.toString().padStart(numberStr.length, '0');
+        setSuggestedCallsign(`${prefix}${nextNumStr}`);
+        return;
+      }
+    }
+
+    // Se não houver voos anteriores, sugerir MER001
+    if (flights.length === 0) {
+      setSuggestedCallsign('MER001');
+    }
+  };
   const aircraftManager = useSupabaseAircraftManager();
   const statusManager = useSupabaseFlightStatusManager();
   const { toast } = useToast();
@@ -93,7 +118,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         date: flight.date,
         route: flight.route || '',
         notes: flight.notes || '',
-        serviceType: flight.serviceType || 'employee',
+        serviceType: flight.serviceType || 'freelance',
         originCountry: flight.originCountry || '',
         destinationCountry: flight.destinationCountry || '',
         originAirportName: flight.originAirportInfo?.name || '',
@@ -128,7 +153,7 @@ export const AddFlightModal = forwardRef<AddFlightModalRef, AddFlightModalProps>
         date: flight.date,
         route: flight.route || '',
         notes: flight.notes || '',
-        serviceType: flight.serviceType || 'employee',
+        serviceType: flight.serviceType || 'freelance',
         originCountry: flight.originCountry || '',
         destinationCountry: flight.destinationCountry || '',
         originAirportName: flight.originAirportInfo?.name || '',
@@ -623,11 +648,11 @@ const handleManualAirportSave = async (airportInfo: AirportInfo) => {
           {trigger || defaultTrigger}
         </DialogTrigger>
       )}
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-panel">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between modal-title">
+      <DialogContent className="max-w-[95vw] lg:max-w-7xl max-h-[95vh] overflow-y-auto glass-panel p-6">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="flex items-center justify-between modal-title text-xl">
             <div className="flex items-center gap-2">
-              <Plane className="h-5 w-5 text-primary" />
+              <Plane className="h-6 w-6 text-primary" />
               {flight ? 'Editar Voo' : t('flights.logNewFlight')}
               {!flight && hasDraftData() && (
                 <span className="text-xs bg-yellow-500/20 text-yellow-600 px-2 py-1 rounded-md border border-yellow-500/30">
@@ -651,391 +676,418 @@ const handleManualAirportSave = async (airportInfo: AirportInfo) => {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <MobileFormSection title="Informações Básicas" className="mobile-form-section">
-            {/* Linha 1: Callsign e Aircraft */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <MobileInput
-                id="callsign"
-                label="Callsign"
-                value={formData.callsign}
-                onChange={(value) => setFormData({ ...formData, callsign: value.toUpperCase() })}
-                placeholder="TAM3007"
-                keyboardType="text"
-                validation={{
-                  ...VALIDATIONS.CALLSIGN,
-                  required: true
-                }}
-                required
-                maxLength={8}
-                autoComplete="off"
-                className="mobile-form-field"
-              />
-              <div className="mobile-form-field">
-                <Label htmlFor="aircraft" className="label-text mobile-form-label-required">
-                  Aircraft
-                  <span className="text-destructive ml-1">*</span>
-                </Label>
-                <div className="mt-1">
-                  <Combobox
-                    options={aircraftOptions.map(aircraft => ({ value: aircraft, label: aircraft }))}
-                    value={formData.aircraft}
-                    onValueChange={(value) => setFormData({ ...formData, aircraft: value })}
-                    placeholder="Selecione a aeronave"
-                    searchPlaceholder="Pesquisar aeronave..."
-                    emptyMessage="Nenhuma aeronave encontrada."
-                    className="mobile-form-input"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* COLUNA 1: IDENTIFICAÇÃO */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                <FileText className="h-5 w-5 text-blue-500" />
+                <h3 className="font-semibold text-foreground">Identificação</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <MobileInput
+                    id="callsign"
+                    label="Callsign"
+                    value={formData.callsign}
+                    onChange={(value) => setFormData({ ...formData, callsign: value.toUpperCase() })}
+                    placeholder={suggestedCallsign ? `${suggestedCallsign} (Sugestão)` : "TAM3007"}
+                    keyboardType="text"
+                    validation={{
+                      ...VALIDATIONS.CALLSIGN,
+                      required: true
+                    }}
+                    required
+                    maxLength={8}
+                    autoComplete="off"
+                    className="mobile-form-field"
+                    onFocus={handleCallsignFocus}
                   />
+                  {suggestedCallsign && !formData.callsign && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, callsign: suggestedCallsign });
+                        setSuggestedCallsign(null);
+                      }}
+                      className="absolute right-0 top-0 text-xs bg-primary/10 text-primary hover:bg-primary/20 px-2 py-0.5 rounded flex items-center gap-1 transition-colors"
+                      title={`Usar sugestão: ${suggestedCallsign}`}
+                    >
+                      <Wand2 className="h-3 w-3" />
+                      <span className="hidden sm:inline">Usar {suggestedCallsign}</span>
+                      <span className="sm:hidden">Usar</span>
+                    </button>
+                  )}
+                </div>
+                
+                <div className="mobile-form-field">
+                  <Label htmlFor="aircraft" className="label-text mobile-form-label-required">
+                    Aircraft
+                    <span className="text-destructive ml-1">*</span>
+                  </Label>
+                  <div className="mt-1">
+                    <Combobox
+                      options={aircraftOptions.map(aircraft => ({ value: aircraft, label: aircraft }))}
+                      value={formData.aircraft}
+                      onValueChange={(value) => setFormData({ ...formData, aircraft: value })}
+                      placeholder="Selecione"
+                      searchPlaceholder="Pesquisar..."
+                      emptyMessage="Nenhuma aeronave."
+                      className="mobile-form-input"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </MobileFormSection>
 
-          <MobileFormSection title="Aeroportos" className="mobile-form-section">
-            {/* Linha 2: Departure e Arrival */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <MobileInput
-                id="departure"
-                label="Origem (ICAO)"
-                value={formData.departure}
-                onChange={(value) => setFormData({ ...formData, departure: value.toUpperCase() })}
-                placeholder="SBGR"
-                keyboardType="text"
-                validation={{
-                  ...VALIDATIONS.ICAO,
-                  required: true
-                }}
-                required
-                maxLength={4}
-                autoComplete="off"
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="arrival"
-                label="Destino (ICAO)"
-                value={formData.arrival}
-                onChange={(value) => setFormData({ ...formData, arrival: value.toUpperCase() })}
-                placeholder="SBRJ"
-                keyboardType="text"
-                validation={{
-                  ...VALIDATIONS.ICAO,
-                  required: true
-                }}
-                required
-                maxLength={4}
-                autoComplete="off"
-                className="mobile-form-field"
-              />
-            </div>
-          </MobileFormSection>
+              <div className="grid grid-cols-2 gap-3">
+                <MobileInput
+                  id="date"
+                  label="Data"
+                  value={formData.date}
+                  onChange={(value) => setFormData({ ...formData, date: value })}
+                  keyboardType="date"
+                  validation={{
+                    required: true
+                  }}
+                  required
+                  className="mobile-form-field [&_input]:dark:[color-scheme:dark]"
+                />
 
-          <MobileFormSection title="Horários" className="mobile-form-section">
-            {/* Linha 3: Horários */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MobileInput
-                id="departureTime"
-                label="Decolagem"
-                value={formData.departureTime}
-                onChange={(value) => setFormData({ ...formData, departureTime: value })}
-                keyboardType="time"
-                validation={{
-                  required: isCompleted || isActive
-                }}
-                required={isCompleted || isActive}
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="arrivalTime"
-                label="Pouso"
-                value={formData.arrivalTime}
-                onChange={(value) => setFormData({ ...formData, arrivalTime: value })}
-                keyboardType="time"
-                validation={{
-                  required: isCompleted
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="flightTime"
-                label="Duração"
-                value={formData.flightTime}
-                onChange={(value) => setFormData({ ...formData, flightTime: value })}
-                placeholder="1h 30m"
-                keyboardType="text"
-                validation={{
-                  required: isCompleted
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-            </div>
-          </MobileFormSection>
+                <div className="mobile-form-field">
+                  <Label htmlFor="status" className="label-text mobile-form-label">
+                    Status
+                  </Label>
+                  <Select value={formData.status} onValueChange={(value: Flight['status']) => setFormData({ ...formData, status: value })}>
+                    <SelectTrigger className="mt-1 mobile-form-input">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          <MobileFormSection title="Métricas de Voo" className="mobile-form-section">
-            {/* Linha 4: Métricas */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MobileInput
-                id="distance"
-                label="Distância (nm)"
-                value={formData.distance}
-                onChange={(value) => setFormData({ ...formData, distance: value })}
-                placeholder="365"
-                keyboardType="number"
-                validation={{
-                  ...VALIDATIONS.POSITIVE_NUMBER,
-                  required: isCompleted
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="fuelUsed"
-                label={flightSettings.getFuelUnitLabel()}
-                value={formData.fuelUsed}
-                onChange={(value) => setFormData({ ...formData, fuelUsed: value })}
-                placeholder={flightSettings.getFuelUnitPlaceholder()}
-                keyboardType="decimal"
-                validation={{
-                  pattern: /^\d+(\.\d+)?$/,
-                  required: isCompleted,
-                  custom: (value: string) => {
-                    const num = parseFloat(value);
-                    if (value && (isNaN(num) || num < 0)) {
-                      return 'Deve ser um número positivo';
-                    }
-                    return null;
-                  }
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="landingRate"
-                label="Landing Rate (fpm)"
-                value={formData.landingRate}
-                onChange={(value) => setFormData({ ...formData, landingRate: value })}
-                placeholder="-156"
-                keyboardType="number"
-                validation={{
-                  ...VALIDATIONS.LANDING_RATE,
-                  required: isCompleted
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-            </div>
-          </MobileFormSection>
-
-          <MobileFormSection title="Pontuação e Status" className="mobile-form-section">
-            {/* Linha 5: XP, CR, Status e Data */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <MobileInput
-                id="experiencePoints"
-                label="XP"
-                value={formData.experiencePoints}
-                onChange={(value) => setFormData({ ...formData, experiencePoints: value })}
-                placeholder="1250"
-                keyboardType="number"
-                validation={{
-                  ...VALIDATIONS.POSITIVE_NUMBER,
-                  required: isCompleted
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="careerRating"
-                label="CR"
-                value={formData.careerRating}
-                onChange={(value) => setFormData({ ...formData, careerRating: value })}
-                placeholder="92"
-                keyboardType="number"
-                validation={{
-                  pattern: /^\d+$/,
-                  required: isCompleted,
-                  custom: (value: string) => {
-                    const num = parseInt(value);
-                    if (value && (isNaN(num) || num < 0)) {
-                      return 'CR deve ser um número positivo';
-                    }
-                    return null;
-                  }
-                }}
-                required={isCompleted}
-                className="mobile-form-field"
-              />
               <div className="mobile-form-field">
-                <Label htmlFor="status" className="label-text mobile-form-label">
-                Status
-              </Label>
-                <Select value={formData.status} onValueChange={(value: Flight['status']) => setFormData({ ...formData, status: value })}>
+                <Label htmlFor="serviceType" className="label-text mobile-form-label">
+                  Tipo de Serviço
+                </Label>
+                <Select 
+                  value={formData.serviceType} 
+                  onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
+                >
                   <SelectTrigger className="mt-1 mobile-form-input">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <MobileInput
-                id="date"
-                label="Data"
-                value={formData.date}
-                onChange={(value) => setFormData({ ...formData, date: value })}
-                keyboardType="date"
-                validation={{
-                  required: true
-                }}
-                required
-                className="mobile-form-field"
-              />
-            </div>
-          </MobileFormSection>
-
-          <MobileFormSection title="Informações Adicionais" className="mobile-form-section">
-            {/* Linha 6: Rota */}
-            <MobileInput
-              id="route"
-              label="Rota"
-              value={formData.route}
-              onChange={(value) => setFormData({ ...formData, route: value })}
-              placeholder="SBGR DCT SBRJ"
-              keyboardType="text"
-              className="mobile-form-field"
-            />
-
-            {/* Linha 7: Tipo de Serviço */}
-            <div className="mobile-form-field">
-              <Label htmlFor="serviceType" className="label-text mobile-form-label">
-                Tipo de Serviço
-              </Label>
-              <Select 
-                value={formData.serviceType} 
-                onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
-              >
-                <SelectTrigger className="mt-1 mobile-form-input">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="employee">
-                    <div className="flex items-center">
-                      <Building2 className="h-4 w-4 mr-2" />
-                      <span>Funcionário</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="freelance">
-                    <div className="flex items-center">
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      <span>Autônomo</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Linha 8: Informações de aeroportos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <MobileInput
-                id="originAirportName"
-                label="Aeroporto de Origem"
-                value={formData.originAirportName}
-                onChange={(value) => setFormData({ ...formData, originAirportName: value })}
-                placeholder="Nome do aeroporto será buscado automaticamente"
-                keyboardType="text"
-                disabled
-                className="mobile-form-field"
-              />
-              <MobileInput
-                id="destinationAirportName"
-                label="Aeroporto de Destino"
-                value={formData.destinationAirportName}
-                onChange={(value) => setFormData({ ...formData, destinationAirportName: value })}
-                placeholder="Nome do aeroporto será buscado automaticamente"
-                keyboardType="text"
-                disabled
-                className="mobile-form-field"
-              />
-            </div>
-
-            {/* Linha 9: Países de origem e destino */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="mobile-form-field">
-                <Label htmlFor="originCountry" className="label-text mobile-form-label">
-                  País de Origem
-                </Label>
-                <Select 
-                  value={formData.originCountry} 
-                  onValueChange={(value) => setFormData({ ...formData, originCountry: value })}
-                >
-                  <SelectTrigger className="mt-1 mobile-form-input">
-                    <SelectValue placeholder="Selecione o país de origem" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="mobile-form-field">
-                <Label htmlFor="destinationCountry" className="label-text mobile-form-label">
-                  País de Destino
-                </Label>
-                <Select 
-                  value={formData.destinationCountry} 
-                  onValueChange={(value) => setFormData({ ...formData, destinationCountry: value })}
-                >
-                  <SelectTrigger className="mt-1 mobile-form-input">
-                    <SelectValue placeholder="Selecione o país de destino" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        {country.name}
+                    <SelectItem value="employee">
+                      <div className="flex items-center">
+                        <Building2 className="h-4 w-4 mr-2" />
+                        <span>Funcionário</span>
+                      </div>
                     </SelectItem>
-                    ))}
+                    <SelectItem value="freelance">
+                      <div className="flex items-center">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        <span>Autônomo</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              <MobileTextarea
+                id="notes"
+                label="Observações"
+                value={formData.notes}
+                onChange={(value) => setFormData({ ...formData, notes: value })}
+                placeholder="Comentários sobre o voo..."
+                rows={5}
+                maxLength={500}
+                className="mobile-form-field"
+              />
             </div>
 
-            {/* Linha 10: Observações */}
-            <MobileTextarea
-              id="notes"
-              label="Observações"
-              value={formData.notes}
-              onChange={(value) => setFormData({ ...formData, notes: value })}
-              placeholder="Comentários sobre o voo..."
-              rows={3}
-              maxLength={500}
-              className="mobile-form-field"
-            />
-          </MobileFormSection>
+            {/* COLUNA 2: ROTA E AEROPORTOS */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                <MapPin className="h-5 w-5 text-green-500" />
+                <h3 className="font-semibold text-foreground">Rota e Aeroportos</h3>
+              </div>
 
-          {/* Botões */}
-          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setOpen(false)}
-              className="mobile-touch-target order-2 sm:order-1"
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button 
-              type="submit" 
-              variant="hud"
-              className="mobile-touch-target order-1 sm:order-2"
-            >
-              {flight ? 'Atualizar Voo' : 'Salvar Voo'}
-            </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <MobileInput
+                  id="departure"
+                  label="Origem (ICAO)"
+                  value={formData.departure}
+                  onChange={(value) => setFormData({ ...formData, departure: value.toUpperCase() })}
+                  placeholder="SBGR"
+                  keyboardType="text"
+                  validation={{
+                    ...VALIDATIONS.ICAO,
+                    required: true
+                  }}
+                  required
+                  maxLength={4}
+                  autoComplete="off"
+                  className="mobile-form-field"
+                />
+                <MobileInput
+                  id="arrival"
+                  label="Destino (ICAO)"
+                  value={formData.arrival}
+                  onChange={(value) => setFormData({ ...formData, arrival: value.toUpperCase() })}
+                  placeholder="SBRJ"
+                  keyboardType="text"
+                  validation={{
+                    ...VALIDATIONS.ICAO,
+                    required: true
+                  }}
+                  required
+                  maxLength={4}
+                  autoComplete="off"
+                  className="mobile-form-field"
+                />
+              </div>
+
+              <MobileInput
+                id="route"
+                label="Rota"
+                value={formData.route}
+                onChange={(value) => setFormData({ ...formData, route: value })}
+                placeholder="SBGR DCT SBRJ"
+                keyboardType="text"
+                className="mobile-form-field"
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="mobile-form-field">
+                  <Label htmlFor="originCountry" className="label-text mobile-form-label">
+                    País Origem
+                  </Label>
+                  <Select 
+                    value={formData.originCountry} 
+                    onValueChange={(value) => setFormData({ ...formData, originCountry: value })}
+                  >
+                    <SelectTrigger className="mt-1 mobile-form-input">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {countries.map((country) => (
+                        <SelectItem key={country.code} value={country.code}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="mobile-form-field">
+                  <Label htmlFor="destinationCountry" className="label-text mobile-form-label">
+                    País Destino
+                  </Label>
+                  <Select 
+                    value={formData.destinationCountry} 
+                    onValueChange={(value) => setFormData({ ...formData, destinationCountry: value })}
+                  >
+                    <SelectTrigger className="mt-1 mobile-form-input">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {countries.map((country) => (
+                        <SelectItem key={country.code} value={country.code}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <MobileInput
+                  id="originAirportName"
+                  label="Nome do Aeroporto de Origem"
+                  value={formData.originAirportName}
+                  onChange={(value) => setFormData({ ...formData, originAirportName: value })}
+                  placeholder="Automático"
+                  keyboardType="text"
+                  disabled
+                  className="mobile-form-field opacity-80"
+                />
+                <MobileInput
+                  id="destinationAirportName"
+                  label="Nome do Aeroporto de Destino"
+                  value={formData.destinationAirportName}
+                  onChange={(value) => setFormData({ ...formData, destinationAirportName: value })}
+                  placeholder="Automático"
+                  keyboardType="text"
+                  disabled
+                  className="mobile-form-field opacity-80"
+                />
+              </div>
+            </div>
+
+            {/* COLUNA 3: PERFORMANCE E MÉTRICAS */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                <Gauge className="h-5 w-5 text-purple-500" />
+                <h3 className="font-semibold text-foreground">Performance</h3>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <MobileInput
+                  id="departureTime"
+                  label="Decolagem"
+                  value={formData.departureTime}
+                  onChange={(value) => setFormData({ ...formData, departureTime: value })}
+                  keyboardType="time"
+                  validation={{
+                    required: isCompleted || isActive
+                  }}
+                  required={isCompleted || isActive}
+                  className="mobile-form-field [&_input]:dark:[color-scheme:dark]"
+                />
+                <MobileInput
+                  id="arrivalTime"
+                  label="Pouso"
+                  value={formData.arrivalTime}
+                  onChange={(value) => setFormData({ ...formData, arrivalTime: value })}
+                  keyboardType="time"
+                  validation={{
+                    required: isCompleted
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field [&_input]:dark:[color-scheme:dark]"
+                />
+                <MobileInput
+                  id="flightTime"
+                  label="Duração"
+                  value={formData.flightTime}
+                  onChange={(value) => setFormData({ ...formData, flightTime: value })}
+                  placeholder="1h 30m"
+                  keyboardType="text"
+                  validation={{
+                    required: isCompleted
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <MobileInput
+                  id="distance"
+                  label="Dist (nm)"
+                  value={formData.distance}
+                  onChange={(value) => setFormData({ ...formData, distance: value })}
+                  placeholder="365"
+                  keyboardType="number"
+                  validation={{
+                    ...VALIDATIONS.POSITIVE_NUMBER,
+                    required: isCompleted
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field"
+                />
+                <MobileInput
+                  id="fuelUsed"
+                  label={flightSettings.getFuelUnitLabel()}
+                  value={formData.fuelUsed}
+                  onChange={(value) => setFormData({ ...formData, fuelUsed: value })}
+                  placeholder={flightSettings.getFuelUnitPlaceholder()}
+                  keyboardType="decimal"
+                  validation={{
+                    pattern: /^\d+(\.\d+)?$/,
+                    required: isCompleted,
+                    custom: (value: string) => {
+                      const num = parseFloat(value);
+                      if (value && (isNaN(num) || num < 0)) {
+                        return 'Positivo';
+                      }
+                      return null;
+                    }
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field [&>label]:whitespace-nowrap"
+                />
+                <MobileInput
+                  id="landingRate"
+                  label="Ldg Rate"
+                  value={formData.landingRate}
+                  onChange={(value) => setFormData({ ...formData, landingRate: value })}
+                  placeholder="-156"
+                  keyboardType="number"
+                  validation={{
+                    ...VALIDATIONS.LANDING_RATE,
+                    required: isCompleted
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <MobileInput
+                  id="experiencePoints"
+                  label="XP"
+                  value={formData.experiencePoints}
+                  onChange={(value) => setFormData({ ...formData, experiencePoints: value })}
+                  placeholder="1250"
+                  keyboardType="number"
+                  validation={{
+                    ...VALIDATIONS.POSITIVE_NUMBER,
+                    required: isCompleted
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field"
+                />
+                <MobileInput
+                  id="careerRating"
+                  label="CR"
+                  value={formData.careerRating}
+                  onChange={(value) => setFormData({ ...formData, careerRating: value })}
+                  placeholder="92"
+                  keyboardType="number"
+                  validation={{
+                    pattern: /^\d+$/,
+                    required: isCompleted,
+                    custom: (value: string) => {
+                      const num = parseInt(value);
+                      if (value && (isNaN(num) || num < 0)) {
+                        return 'Positivo';
+                      }
+                      return null;
+                    }
+                  }}
+                  required={isCompleted}
+                  className="mobile-form-field"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 mt-auto">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setOpen(false)}
+                  className="mobile-touch-target order-2 sm:order-1 flex-1 sm:flex-none"
+                >
+                  {t('common.cancel')}
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="hud"
+                  className="mobile-touch-target order-1 sm:order-2 flex-1 sm:flex-none"
+                >
+                  {flight ? 'Atualizar' : 'Salvar Voo'}
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
         <AirportManualInputDialog
