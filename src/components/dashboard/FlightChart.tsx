@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { format, startOfMonth, subMonths, eachMonthOfInterval } from 'date-fns';
 
 interface ChartDataPoint {
   date: string;
@@ -47,7 +48,7 @@ export const FlightChart = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Usar useMemo para evitar loop infinito
+  // Usar useMemo para evitar loop infinito e reprocessar dados
   const chartData = useMemo(() => {
     if (!flights || flights.length === 0) {
       return [];
@@ -57,9 +58,9 @@ export const FlightChart = () => {
     const monthlyData: { [key: string]: { flights: number; cr: number } } = {};
 
     flights.forEach((flight) => {
-      // Extrair ano-mês da data (formato: YYYY-MM)
-      const date = new Date(flight.date);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      // Extrair ano-mês da data (formato: YYYY-MM) de forma segura
+      // Assumindo formato ISO YYYY-MM-DD vindo do Supabase
+      const monthKey = flight.date.substring(0, 7);
 
       if (!monthlyData[monthKey]) {
         monthlyData[monthKey] = { flights: 0, cr: 0 };
@@ -69,23 +70,47 @@ export const FlightChart = () => {
       monthlyData[monthKey].cr += flight.careerRating || 0;
     });
 
-    // Converter para array e ordenar por data
-    const sortedData = Object.keys(monthlyData)
-      .sort()
-      .map((key) => ({
-        date: key,
-        flights: monthlyData[key].flights,
-        cr: monthlyData[key].cr,
-      }));
+    // Definir intervalo de datas baseado no filtro
+    const now = new Date();
+    const currentMonthStart = startOfMonth(now);
+    let startDate: Date;
 
-    // Aplicar filtro baseado no período selecionado
-    let dataToShow: ChartDataPoint[];
     if (filterPeriod === 'all') {
-      dataToShow = sortedData;
+      // Encontrar a data mais antiga nos voos
+      const dates = flights.map(f => new Date(f.date).getTime());
+      // Se por algum motivo as datas forem inválidas, fallback para 12 meses
+      if (dates.some(isNaN)) {
+        startDate = subMonths(currentMonthStart, 11);
+      } else {
+        startDate = startOfMonth(new Date(Math.min(...dates)));
+      }
     } else {
       const monthsToShow = parseInt(filterPeriod);
-      dataToShow = sortedData.slice(-monthsToShow);
+      // Subtrair monthsToShow - 1 para incluir o mês atual na contagem
+      // Ex: 3 meses = Mês Atual + 2 anteriores
+      startDate = subMonths(currentMonthStart, monthsToShow - 1);
     }
+
+    // Garantir que startDate não seja depois de currentMonthStart (caso de dados futuros errados ou vazio)
+    if (startDate > currentMonthStart) {
+      startDate = subMonths(currentMonthStart, parseInt(filterPeriod === 'all' ? '11' : filterPeriod) - 1);
+    }
+
+    // Gerar intervalo de meses
+    const interval = eachMonthOfInterval({
+      start: startDate,
+      end: currentMonthStart
+    });
+
+    // Mapear intervalo para dados, preenchendo meses vazios com 0
+    const dataToShow = interval.map(date => {
+      const key = format(date, 'yyyy-MM');
+      return {
+        date: key,
+        flights: monthlyData[key]?.flights || 0,
+        cr: monthlyData[key]?.cr || 0
+      };
+    });
 
     return dataToShow;
   }, [flights, filterPeriod]);

@@ -100,8 +100,12 @@ export const useSupabaseFlights = () => {
         serviceType: item.service_type || 'employee',
         originCountry: item.origin_country || '',
         destinationCountry: item.destination_country || '',
-        originAirportInfo: item.origin_airport_info || undefined,
-        destinationAirportInfo: item.destination_airport_info || undefined
+        originAirportInfo: typeof item.origin_airport_info === 'string' 
+          ? JSON.parse(item.origin_airport_info) 
+          : item.origin_airport_info || undefined,
+        destinationAirportInfo: typeof item.destination_airport_info === 'string'
+          ? JSON.parse(item.destination_airport_info)
+          : item.destination_airport_info || undefined
       }));
 
       setFlights(flightData);

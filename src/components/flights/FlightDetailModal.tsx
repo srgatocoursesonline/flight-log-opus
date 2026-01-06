@@ -19,6 +19,7 @@ import {
   Calendar,
   X
 } from 'lucide-react';
+import { fetchAirportByIcao } from '@/lib/airportService';
 import { Flight } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';

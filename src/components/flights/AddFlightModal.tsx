@@ -30,6 +30,7 @@ import { useFlightDraft, type FlightFormData } from '@/hooks/business/useFlightD
 import { useFlightSettings } from '@/hooks/business/useFlightSettings';
 import { countries } from '@/lib/data/countries';
 import { fetchAirportByIcao, saveManualAirport, type AirportInfo } from '@/lib/airportService';
+import { autoFillAirportInfo, validateIcaoCode } from '@/lib/airportAutoFillService';
 import { AirportManualInputDialog } from './AirportManualInputDialog';
 
 interface AddFlightModalProps {
@@ -178,21 +179,50 @@ useEffect(() => {
     
     setLastCheckedDeparture(icaoCode);
     
-    fetchAirportByIcao(icaoCode).then(result => {
+    // Validação do código ICAO
+    const validation = validateIcaoCode(icaoCode);
+    if (!validation.valid) {
+      toast({
+        title: "Aviso",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Usar novo serviço de preenchimento automático
+    autoFillAirportInfo(icaoCode, { enableLogging: true }).then(result => {
       if (result.success && result.data) {
         setFormData(prev => ({
           ...prev,
           originAirportName: result.data.name || '',
           originCountry: prev.originCountry || result.data.country_code || ''
         }));
+        
+        toast({
+          title: "Sucesso",
+          description: `Aeroporto de origem: ${result.data.name}`,
+          variant: "default",
+        });
       } else if (!result.success && open) {
         // Só abrir popup se o modal estiver aberto
         setManualInputIcao(icaoCode);
         setManualInputType('departure');
         setShowManualInputDialog(true);
+        
+        toast({
+          title: "Aeroporto não encontrado",
+          description: result.error || 'Origem não encontrada na base de dados',
+          variant: "destructive",
+        });
       }
     }).catch(error => {
       console.error('Erro ao buscar aeroporto de origem:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao buscar informações do aeroporto de origem",
+        variant: "destructive",
+      });
     });
   }
 }, [formData.departure, open, lastCheckedDeparture, formData.originAirportName, flight]);
@@ -214,7 +244,19 @@ useEffect(() => {
     
     setLastCheckedArrival(icaoCode);
     
-    fetchAirportByIcao(icaoCode).then(result => {
+    // Validação do código ICAO
+    const validation = validateIcaoCode(icaoCode);
+    if (!validation.valid) {
+      toast({
+        title: "Aviso",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Usar novo serviço de preenchimento automático
+    autoFillAirportInfo(icaoCode, { enableLogging: true }).then(result => {
       if (result.success && result.data) {
         setFormData(prev => ({
           ...prev,
@@ -222,14 +264,31 @@ useEffect(() => {
           destinationCity: result.data.city || '',
           destinationCountry: prev.destinationCountry || result.data.country_code || ''
         }));
+        
+        toast({
+          title: "Sucesso",
+          description: `Aeroporto de destino: ${result.data.name}`,
+          variant: "default",
+        });
       } else if (!result.success && open) {
         // Só abrir popup se o modal estiver aberto
         setManualInputIcao(icaoCode);
         setManualInputType('arrival');
         setShowManualInputDialog(true);
+        
+        toast({
+          title: "Aeroporto não encontrado",
+          description: result.error || 'Destino não encontrado na base de dados',
+          variant: "destructive",
+        });
       }
     }).catch(error => {
       console.error('Erro ao buscar aeroporto de destino:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao buscar informações do aeroporto de destino",
+        variant: "destructive",
+      });
     });
   }
 }, [formData.arrival, open, lastCheckedArrival, formData.destinationAirportName, flight]);
