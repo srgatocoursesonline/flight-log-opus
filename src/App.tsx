@@ -25,6 +25,7 @@ import FlightMaps from "./pages/FlightMaps";
 import Maintenance from "./pages/Maintenance";
 import Purchases from "./pages/Purchases";
 import FinancialReports from "./pages/FinancialReports";
+import Reports from "./pages/Reports";
 import Companies from "./pages/Companies";
 import TodCalculatorPage from "./pages/TodCalculator";
 import FlightPlannerPage from "./pages/FlightPlanner";
@@ -95,6 +96,7 @@ const AppContent = () => {
           <Route path="manutencao" element={<Maintenance />} />
           <Route path="compras" element={<Purchases />} />
           <Route path="relatorios-financeiros" element={<FinancialReports />} />
+          <Route path="reports" element={<Reports />} />
           <Route path="companies" element={<Companies />} />
           <Route path="tod-calculator" element={<TodCalculatorPage />} />
           <Route path="flight-planner" element={<FlightPlannerPage />} />

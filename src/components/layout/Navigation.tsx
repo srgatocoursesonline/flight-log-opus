@@ -23,6 +23,7 @@ import {
   Building2,
   Calculator,
   Map,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MSFSLogo } from "@/components/ui/msfs-logo";
@@ -63,6 +64,13 @@ const menuStructure = {
         { to: "/financial", icon: DollarSign, labelKey: "navigation.financial" },
         { to: "/compras", icon: ShoppingCart, labelKey: "navigation.purchases" },
         { to: "/relatorios-financeiros", icon: BarChart3, labelKey: "navigation.financialReports" },
+      ],
+    },
+    {
+      key: "analytics",
+      labelKey: "navigation.analytics",
+      items: [
+        { to: "/reports", icon: FileText, labelKey: "navigation.reports" },
       ],
     },
     {

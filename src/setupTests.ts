@@ -45,3 +45,38 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 });
+
+// Mock do i18n
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: jest.fn(),
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: jest.fn(),
+  },
+}));
+
+jest.mock('i18next', () => ({
+  use: jest.fn().mockReturnThis(),
+  init: jest.fn(),
+  t: (key: string) => key,
+}));
+
+jest.mock('i18next-browser-languagedetector', () => ({
+  default: {
+    type: 'languageDetector',
+  },
+}));
+
+// Mock do lib/utils
+jest.mock('@/lib/utils', () => ({
+  cn: (...inputs: any[]) => inputs.filter(Boolean).join(' '),
+  formatCurrency: (value: number) => `$${value.toFixed(2)}`,
+  formatDate: (date: string | Date) => new Date(date).toLocaleDateString(),
+  formatDuration: (minutes: number) => `${Math.floor(minutes / 60)}h ${minutes % 60}m`,
+  formatDistance: (km: number) => `${km.toFixed(0)} km`,
+}));

@@ -572,19 +572,19 @@
   border-radius: 3px !important;
 }
 
-/* Thumb (indicador) - Invisível por padrão */
+/* Thumb (indicador) - Invisï¿½vel por padrï¿½o */
 .scrollbar-hover-reveal::-webkit-scrollbar-thumb {
   background: transparent !important;
   border-radius: 3px !important;
   transition: background 0.3s ease, width 0.2s ease !important;
 }
 
-/* Thumb aparece quando a sidebar está em hover */
+/* Thumb aparece quando a sidebar estï¿½ em hover */
 .scrollbar-hover-reveal:hover::-webkit-scrollbar-thumb {
   background: rgba(59, 130, 246, 0.25) !important;
 }
 
-/* Thumb em estado hover (quando o mouse está sobre o thumb) */
+/* Thumb em estado hover (quando o mouse estï¿½ sobre o thumb) */
 .scrollbar-hover-reveal:hover::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.45) !important;
   width: 8px !important;
@@ -606,3 +606,212 @@
   scrollbar-width: thin !important;
 }
 
+/* ============================================
+   REPORTS & ANALYTICS RESPONSIVE STYLES
+   ============================================ */
+
+/* Reports container */
+.reports-container {
+  @apply min-h-screen bg-background;
+}
+
+/* Reports header responsive */
+.reports-header {
+  @apply border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40;
+}
+
+.reports-header-content {
+  @apply container mx-auto px-4 py-4;
+}
+
+.reports-title-section {
+  @apply flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4;
+}
+
+.reports-actions {
+  @apply flex flex-col sm:flex-row gap-2 lg:gap-3;
+}
+
+/* Filter sidebar responsive */
+.reports-filter-sidebar {
+  @apply bg-card border-r transition-all duration-300;
+}
+
+.reports-filter-sidebar-mobile {
+  @apply lg:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm;
+}
+
+.reports-filter-sidebar-content {
+  @apply fixed left-0 top-0 h-full w-80 max-w-[80vw] bg-card border-r shadow-lg;
+}
+
+/* Reports tabs responsive */
+.reports-tabs-list {
+  @apply grid w-full grid-cols-2 lg:grid-cols-5 min-w-fit;
+}
+
+.reports-tab-trigger {
+  @apply flex items-center gap-2 text-xs lg:text-sm;
+}
+
+/* Quick report cards responsive */
+.reports-quick-cards-desktop {
+  @apply hidden lg:grid lg:grid-cols-3 xl:grid-cols-6 gap-4;
+}
+
+.reports-quick-cards-tablet {
+  @apply hidden md:grid lg:hidden md:grid-cols-2 gap-4;
+}
+
+.reports-quick-cards-mobile {
+  @apply md:hidden;
+}
+
+.reports-quick-cards-carousel {
+  @apply flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory;
+}
+
+.reports-quick-card-mobile {
+  @apply flex-shrink-0 w-64 hover:shadow-md transition-shadow snap-start;
+}
+
+/* Reports content area */
+.reports-content-area {
+  @apply flex-1 lg:ml-80;
+}
+
+.reports-content-container {
+  @apply container mx-auto px-4 py-6;
+}
+
+/* Mobile optimizations for reports */
+@media (max-width: 768px) {
+  .reports-header-content {
+    @apply px-3 py-3;
+  }
+  
+  .reports-title-section h1 {
+    @apply text-xl;
+  }
+  
+  .reports-actions {
+    @apply gap-2;
+  }
+  
+  .reports-content-container {
+    @apply px-3 py-4;
+  }
+  
+  .reports-tabs-list {
+    @apply text-xs;
+  }
+  
+  .reports-tab-trigger {
+    @apply px-2 py-1.5;
+  }
+  
+  /* Reduce card padding on mobile */
+  .reports-quick-card-mobile .card-header {
+    @apply pb-2;
+  }
+  
+  .reports-quick-card-mobile .card-content {
+    @apply pt-0;
+  }
+}
+
+/* Tablet optimizations for reports */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .reports-filter-sidebar {
+    @apply w-64;
+  }
+  
+  .reports-content-area {
+    @apply lg:ml-64;
+  }
+}
+
+/* Desktop optimizations for reports */
+@media (min-width: 1024px) {
+  .reports-filter-sidebar {
+    @apply w-80;
+  }
+  
+  .reports-content-area {
+    @apply ml-80;
+  }
+}
+
+/* Reports animation classes */
+.reports-fade-in {
+  animation: reportsFadeIn 0.5s ease-out;
+}
+
+@keyframes reportsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reports-slide-in {
+  animation: reportsSlideIn 0.3s ease-out;
+}
+
+@keyframes reportsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Reports loading states */
+.reports-loading-skeleton {
+  @apply animate-pulse bg-muted rounded;
+}
+
+.reports-loading-card {
+  @apply space-y-3;
+}
+
+.reports-loading-card .reports-loading-skeleton:nth-child(1) {
+  @apply h-4 w-3/4;
+}
+
+.reports-loading-card .reports-loading-skeleton:nth-child(2) {
+  @apply h-8 w-1/2;
+}
+
+.reports-loading-card .reports-loading-skeleton:nth-child(3) {
+  @apply h-3 w-full;
+}
+
+/* Reports hover effects */
+.reports-card-hover {
+  @apply transition-all duration-200 hover:shadow-md hover:border-primary/20;
+}
+
+.reports-button-hover {
+  @apply transition-all duration-200 hover:scale-105 hover:shadow-sm;
+}
+
+/* Reports status indicators */
+.reports-status-synced {
+  @apply bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400;
+}
+
+.reports-status-syncing {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400;
+}
+
+.reports-status-error {
+  @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
+}

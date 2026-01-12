@@ -2,9 +2,10 @@
 
 <div align="center">
   <img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-5.6.2-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Supabase-2.56.0-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4.17-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Vite-5.4.19-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
 </div>
 
 <div align="center">
@@ -16,53 +17,80 @@
 
 ---
 
-## 📁 **Nova Estrutura do Projeto**
+## 📁 **Estrutura Atual do Projeto**
 
-O projeto foi completamente reorganizado seguindo as melhores práticas de organização de código e arquitetura limpa.
+O projeto está organizado seguindo uma arquitetura híbrida com componentes bem definidos e separação clara de responsabilidades.
 
-### 🏗️ **Frontend - Arquitetura FSD (Feature Sliced Design)**
+### 🏗️ **Frontend - Arquitetura Baseada em Componentes**
 
 ```
 src/
-├── app/           # Configuração e inicialização da aplicação
-├── processes/     # Processos de negócio complexos
-├── pages/         # Páginas da aplicação
-├── widgets/       # Componentes complexos reutilizáveis
-├── features/      # Funcionalidades independentes
-├── entities/      # Modelos de dados e entidades
-└── shared/        # Código compartilhado (UI, utils, types)
+├── components/        # Componentes organizados por funcionalidade
+│   ├── career/       # Componentes de carreira e perfil
+│   ├── dashboard/    # Dashboard principal e widgets
+│   ├── financial/    # Sistema financeiro
+│   ├── flight/       # Componentes de voo
+│   ├── goals/        # Sistema de metas
+│   ├── maintenance/  # Gestão de manutenção
+│   ├── maps/         # Mapas e visualizações geográficas
+│   └── ui/           # Componentes de interface (shadcn/ui)
+├── contexts/         # Contextos React (Auth, etc.)
+├── entities/         # Modelos de dados e entidades
+├── hooks/            # Hooks customizados
+│   ├── business/     # Lógica de negócio
+│   ├── goals/        # Hooks de metas
+│   ├── supabase/     # Integração com Supabase
+│   └── ui/           # Hooks de interface
+├── lib/              # Bibliotecas e configurações
+│   ├── config/       # Configurações
+│   ├── data/         # Dados estáticos
+│   └── services/     # Serviços externos
+├── pages/            # Páginas da aplicação
+├── types/            # Definições de tipos TypeScript
+└── utils/            # Utilitários e helpers
 ```
 
-### 🏢 **Backend - Arquitetura MVC**
+### 🏢 **Backend - API Express com TypeScript**
 
 ```
 backend/src/
-├── controllers/   # Controladores REST
-├── models/        # Modelos de dados
-├── middleware/    # Middlewares
-├── validators/    # Validações
-├── config/        # Configurações
-└── utils/         # Utilitários
+├── routes/           # Rotas da API
+├── services/         # Serviços de negócio
+│   ├── airportService.ts
+│   └── flightTrackingService.ts
+└── utils/            # Utilitários do backend
+    └── flightCalculations.ts
 ```
 
-### 📚 **Organização de Documentação**
+### 🎮 **Companion MSFS - Integração com Flight Simulator**
+
+```
+companion/
+├── companion-msfs.ts # Serviço principal de integração
+├── package.json      # Dependências específicas MSFS
+└── .env.example      # Configurações de exemplo
+```
+
+### 📚 **Documentação Organizada**
 
 ```
 docs/
-├── api/           # Documentação de APIs
-├── guides/        # Guias e tutoriais
-├── database/      # Documentação de banco de dados
-├── deployment/    # Guias de deployment
-└── development/   # Documentação de desenvolvimento
+├── api/              # Documentação de APIs
+├── features/         # Documentação de funcionalidades
+├── fixes/            # Histórico de correções
+├── guides/           # Guias e tutoriais
+└── project/          # Documentação do projeto
 ```
 
-### 🔧 **Scripts Organizados**
+### 🗄️ **Banco de Dados - Supabase**
 
 ```
-scripts/
-├── debug/         # Scripts de debug e teste
-├── database/      # Scripts de banco de dados
-└── deployment/    # Scripts de deployment
+database/
+├── core/             # Estruturas principais
+├── migrations/       # Migrações do banco
+├── triggers/         # Triggers e funções
+├── views/            # Views do banco
+└── storage/          # Configurações de storage
 ```
 
 ---
@@ -88,8 +116,8 @@ npm run dev
 
 | Ferramenta | Versão Mínima | Status |
 |------------|---------------|--------|
-| Node.js | 22.16.0+ | ✅ Obrigatório |
-| npm | 10.9.2+ | 🚀 Recomendado |
+| Node.js | 18.0.0+ | ✅ Obrigatório |
+| npm | 9.0.0+ | 🚀 Recomendado |
 
 ### 🛠️ Scripts Disponíveis
 
@@ -97,8 +125,12 @@ npm run dev
 |---------|-----------|-----|
 | `npm run dev` | 🔥 Servidor de desenvolvimento | Desenvolvimento local |
 | `npm run build` | 📦 Build de produção | Deploy |
+| `npm run build:dev` | 🔧 Build de desenvolvimento | Teste local |
 | `npm run preview` | 👀 Preview do build | Teste pré-deploy |
 | `npm run lint` | 🔍 Análise de código | Qualidade |
+| `npm run test` | 🧪 Executar testes | Testes unitários |
+| `npm run test:watch` | 👀 Testes em modo watch | Desenvolvimento TDD |
+| `npm run test:coverage` | 📊 Cobertura de testes | Análise de qualidade |
 
 ---
 
@@ -122,6 +154,20 @@ npm run dev
 | **React Router** | 6.30.1 | 🛣️ Roteamento SPA | ✅ Estável |
 | **Leaflet** | 1.9.4 | 🗺️ Mapas interativos | ✅ Estável |
 | **i18next** | 25.4.2 | 🌍 Internacionalização | ✅ Estável |
+| **Chart.js** | 4.5.0 | 📈 Gráficos avançados | ✅ Estável |
+| **Radix UI** | Latest | 🎛️ Componentes acessíveis | ✅ Estável |
+
+<div align="center">
+  <h4>⚙️ Backend & Integração</h4>
+</div>
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **Express** | 4.18.2 | 🌐 Servidor web | ✅ Estável |
+| **Node.js** | 18.0.0+ | 🚀 Runtime JavaScript | ✅ Estável |
+| **WebSocket** | 8.14.2 | 🔄 Comunicação em tempo real | ✅ Estável |
+| **SimConnect** | 4.0.0 | 🎮 Integração MSFS 2024 | ✅ Estável |
+| **JWT** | 9.0.2 | 🔐 Autenticação | ✅ Estável |
 
 ---
 
@@ -194,11 +240,25 @@ npm run dev
 
 > **Conexão direta com Microsoft Flight Simulator**
 
-- 🔄 **Tracking Automático** - Voos detectados automaticamente
-- 📊 **Telemetria Completa** - Dados de voo em tempo real
-- 🗺️ **Resolução de Aeroportos** - Identificação automática de ICAOs
-- 📈 **Estatísticas Avançadas** - Métricas detalhadas de performance
-- 🛩️ **Histórico Integrado** - Voos MSFS no dashboard principal
+- 🔄 **Tracking Automático** - Voos detectados automaticamente via SimConnect
+- 📊 **Telemetria Completa** - Dados de voo em tempo real (altitude, velocidade, posição)
+- 🗺️ **Resolução de Aeroportos** - Identificação automática de ICAOs e aeroportos
+- 📈 **Estatísticas Avançadas** - Métricas detalhadas de performance de voo
+- 🛩️ **Histórico Integrado** - Voos MSFS automaticamente no dashboard principal
+- 🎛️ **Companion Service** - Serviço dedicado para comunicação com o simulador
+- 📡 **WebSocket Real-time** - Comunicação bidirecional em tempo real
+
+### 🛠️ Ferramentas de Desenvolvimento
+
+> **Utilitários para desenvolvedores e usuários avançados**
+
+- 🔍 **Airport Search Tool** - Ferramenta de busca avançada de aeroportos
+- 🧮 **TOD Calculator** - Calculadora de Top of Descent para voos IFR
+- 📊 **Flight Planner** - Planejador de voos com cálculos automáticos
+- 🗺️ **Flight Maps** - Visualização de rotas em mapas interativos
+- 📈 **Real-time Tracking** - Monitoramento de voos em tempo real
+- 🔧 **Diagnostic Tools** - Ferramentas de diagnóstico e debug do sistema
+- 📱 **Responsive Testing** - Testes de responsividade em diferentes dispositivos
 
 ---
 
@@ -220,22 +280,22 @@ O projeto está hospedado no **Cloudflare Pages** com:
 
 ## 🔄 **Mudanças Recentes**
 
-### 📅 **Consolidação & Globalização - Dezembro 2025**
+### 📅 **Atualização Janeiro 2025**
 
-- ✅ **Internacionalização Completa**: Implementação total de i18n (PT-BR/EN-US) com suporte a formatação de moeda e data regional.
-- ✅ **Gestão de Carreira & Perfil**: Integração profunda entre estatísticas financeiras e rating de carreira (CR) no perfil do usuário.
-- ✅ **Refatoração de Tipagem**: Eliminação de tipos implícitos `any` e melhoria na segurança de tipos em todo o projeto.
-- ✅ **Estabilidade de Runtime**: Correção de erros críticos de lifecycle (hooks) em componentes de gráficos e modais.
-- ✅ **Otimização de Dashboards**: Gráficos Recharts agora são totalmente reativos e seguem o tema do sistema.
+- ✅ **Stack Atualizada**: Atualização para as versões mais recentes do React (18.3.1), TypeScript (5.8.3) e Vite (5.4.19)
+- ✅ **Integração MSFS Completa**: Sistema companion totalmente funcional com SimConnect para tracking automático de voos
+- ✅ **Ferramentas Avançadas**: Implementação de calculadoras TOD, planejador de voos e ferramentas de diagnóstico
+- ✅ **Sistema de Testes**: Configuração completa do Jest com cobertura de testes e modo watch
+- ✅ **Otimização de Performance**: Implementação de virtualização para listas grandes e otimizações de renderização
+- ✅ **Melhoria na Arquitetura**: Organização melhorada dos componentes e hooks com separação clara de responsabilidades
 
-### 📅 **Reorganização Completa - 2024**
+### 📅 **Consolidação & Globalização - Dezembro 2024**
 
-- ✅ **Estrutura FSD** implementada no frontend
-- ✅ **Arquitetura MVC** aplicada no backend  
-- ✅ **Documentação reorganizada** em `/docs`
-- ✅ **Scripts organizados** por funcionalidade
-- ✅ **Build otimizado** com Vite e TypeScript
-- ✅ **Configurações centralizadas** em `/config`
+- ✅ **Internacionalização Completa**: Implementação total de i18n (PT-BR/EN-US) com suporte a formatação de moeda e data regional
+- ✅ **Gestão de Carreira & Perfil**: Integração profunda entre estatísticas financeiras e rating de carreira (CR) no perfil do usuário
+- ✅ **Refatoração de Tipagem**: Eliminação de tipos implícitos `any` e melhoria na segurança de tipos em todo o projeto
+- ✅ **Estabilidade de Runtime**: Correção de erros críticos de lifecycle (hooks) em componentes de gráficos e modais
+- ✅ **Otimização de Dashboards**: Gráficos Recharts agora são totalmente reativos e seguem o tema do sistema
 
 ---
 
@@ -244,15 +304,25 @@ O projeto está hospedado no **Cloudflare Pages** com:
 ### 📖 **Guias Rápidos**
 
 - **[📋 Setup do Supabase](docs/guides/SUPABASE_SETUP_GUIDE.md)** - Configuração inicial do banco
-- **[🗺️ API Financeira](docs/api/FINANCIAL_SYSTEM_API.md)** - Documentação da API
-- **[🎨 Sistema de Animações](docs/ANIMACOES_CSS.md)** - Animações CSS/JS
-- **[🌍 Sistema i18n](docs/SISTEMA_I18N.md)** - Internacionalização
+- **[🎮 Integração MSFS](docs/guides/MSFS_INTEGRATION_GUIDE.md)** - Configuração do Flight Simulator
+- **[📡 Flight Tracking](docs/guides/FLIGHT_TRACKING_SETUP.md)** - Setup do sistema de tracking
+- **[🗺️ Sistema de Aeroportos](docs/guides/AIRPORT_SEARCH_SYSTEM.md)** - Documentação do sistema de aeroportos
+- **[🗺️ API Financeira](docs/api/FINANCIAL_SYSTEM_API.md)** - Documentação da API financeira
+- **[🎛️ Sistema de Configuração](docs/api/FLIGHT_CONFIGURATION_SYSTEM.md)** - API de configurações
 
 ### 🔧 **Documentação Técnica**
 
-- **[📊 Análise do Projeto](docs/PROJETO_ANALISE.md)** - Visão geral técnica
-- **[🏗️ Estrutura do Projeto](docs/PROJECT_STRUCTURE.md)** - Organização de código
-- **[🎯 Próximos Passos](docs/PROXIMOS_PASSOS.md)** - Roadmap técnico
+- **[📊 Análise do Projeto](docs/project/PROJETO_ANALISE.md)** - Visão geral técnica
+- **[🏗️ Estrutura do Projeto](docs/project/PROJECT_STRUCTURE.md)** - Organização de código
+- **[🎯 Próximos Passos](docs/project/PROXIMOS_PASSOS.md)** - Roadmap técnico
+- **[🎨 Sistema de Animações](docs/features/ANIMACOES_CSS.md)** - Animações CSS/JS
+- **[🌍 Sistema i18n](docs/features/SISTEMA_I18N.md)** - Internacionalização
+
+### 🐛 **Correções e Melhorias**
+
+- **[🔧 Correções de Header](docs/fixes/CORRECOES_HEADER.md)** - Melhorias na interface
+- **[⚡ Otimização de Cache](docs/fixes/OPTIMIZATION_AIRPORT_CACHE.md)** - Performance de aeroportos
+- **[📋 Lista Virtualizada](docs/fixes/BUGFIX-VirtualizedList.md)** - Correções de performance
 
 ---
 

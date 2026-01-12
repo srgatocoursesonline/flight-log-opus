@@ -24,13 +24,15 @@ const ptBR = {
       // Seções
       operational: "Operacional",
       financialSection: "Financeiro",
+      analytics: "Análises",
       business: "Negócios",
       tools: "Ferramentas Úteis",
       administrative: "Administrativo",
       companies: "Minhas Empresas",
       todCalculator: "Calculadora TOD",
       flightPlanner: "Planejador de Voo",
-      airportSearch: "Busca de Aeroportos"
+      airportSearch: "Busca de Aeroportos",
+      reports: "Relatórios"
     },
 
     // Flight Planner
@@ -609,6 +611,90 @@ const ptBR = {
       firefighting: "Luta Aérea Contra Incêndios",
       searchRescue: "Busca e Salvamento",
       aerialConstruction: "Construção Aérea"
+    },
+
+    // Reports & Analytics
+    reports: {
+      title: "Relatórios e Análises",
+      subtitle: "Análise abrangente das suas operações de voo, finanças e manutenção",
+      dashboard: "Dashboard",
+      dashboardShort: "Início",
+      flights: "Voos",
+      flightsShort: "Voos",
+      financial: "Financeiro",
+      financialShort: "Dinheiro",
+      maintenance: "Manutenção",
+      maintenanceShort: "Manut",
+      geographic: "Geográfico",
+      geographicShort: "Mapa",
+      filters: "Filtros",
+      refresh: "Atualizar",
+      export: "Exportar",
+      lastUpdated: "Última atualização",
+      syncing: "Sincronizando...",
+      synced: "Sincronizado",
+      comingSoon: "Em breve",
+      
+      // Quick Overview
+      quickOverview: "Visão Geral Rápida",
+      totalFlights: "Total de Voos",
+      flightHours: "Horas de Voo",
+      uniqueAirports: "Aeroportos Únicos",
+      totalRevenue: "Receita Total",
+      maintenanceCosts: "Custos de Manutenção",
+      completionRate: "Taxa de Conclusão",
+      thisMonth: "este mês",
+      thisQuarter: "este trimestre",
+      totalTime: "tempo total",
+      visited: "visitados",
+      onTime: "no prazo",
+      
+      // Date Range Filters
+      dateRange: "Período",
+      last7Days: "Últimos 7 dias",
+      last30Days: "Últimos 30 dias",
+      last3Months: "3 meses",
+      last6Months: "6 meses",
+      lastYear: "Último ano",
+      allTime: "Todo período",
+      customRange: "Período personalizado",
+      from: "De",
+      to: "Até",
+      selectDate: "Selecionar data",
+      
+      // Other Filters
+      aircraft: "Aeronaves",
+      airports: "Aeroportos",
+      status: "Status",
+      completed: "Concluído",
+      scheduled: "Agendado",
+      cancelled: "Cancelado",
+      delayed: "Atrasado",
+      
+      // Comparison
+      comparison: "Comparação",
+      enableComparison: "Comparar com período anterior",
+      previousPeriod: "Período anterior",
+      yearAgo: "Mesmo período ano passado",
+      customPeriod: "Período personalizado",
+      
+      // Advanced Filters
+      advancedFilters: "Filtros Avançados",
+      clearAll: "Limpar",
+      
+      // Report Sections
+      overview: "Visão Geral",
+      overviewDescription: "Principais métricas e indicadores de desempenho",
+      recentActivity: "Atividade Recente",
+      recentActivityDescription: "Últimos voos, transações e manutenções",
+      flightReports: "Relatórios de Voo",
+      flightReportsDescription: "Análise abrangente de voos e relatórios de logbook",
+      financialReports: "Relatórios Financeiros",
+      financialReportsDescription: "Análise de receitas, despesas e rentabilidade",
+      maintenanceReports: "Relatórios de Manutenção",
+      maintenanceReportsDescription: "Custos de manutenção, cronogramas e acompanhamento de conformidade",
+      geographicVisualization: "Visualização Geográfica",
+      geographicVisualizationDescription: "Mapas interativos mostrando rotas de voo e estatísticas de aeroportos"
     }
   }
 };
