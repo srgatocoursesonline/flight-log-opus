@@ -47,15 +47,6 @@
     --status-cancelled: 0 84.2% 60.2%;
     --status-diverted: 27 87% 51%;
     --status-emergency: 0 74% 42%;
-
-    /* Efeitos HUD tokenizados (antes variáveis fantasma no tailwind.config) */
-    --gradient-primary: linear-gradient(135deg, hsl(207 89% 61%), hsl(207 91% 46%));
-    --gradient-surface: linear-gradient(180deg, hsl(var(--card) / 0.88), hsl(var(--card) / 0.98));
-    --gradient-glass: linear-gradient(135deg, hsl(var(--card) / 0.72), hsl(var(--card) / 0.94));
-    --gradient-hero: radial-gradient(120% 120% at 50% 0%, hsl(216 88% 20%) 0%, hsl(221 83% 9%) 52%, hsl(222 84% 5%) 100%);
-    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.35);
-    --shadow-cockpit: 0 12px 40px -12px hsl(222 84% 4% / 0.6), 0 2px 8px hsl(222 84% 4% / 0.3);
-    --shadow-panel: 0 1px 2px hsl(222 84% 4% / 0.14), 0 8px 24px -8px hsl(222 84% 4% / 0.22);
   }
 
   .dark {
@@ -101,8 +92,20 @@
     --status-cancelled: 0 84% 65%;
     --status-diverted: 27 90% 58%;
     --status-emergency: 0 72% 56%;
+  }
 
-    /* Efeitos HUD tokenizados (dark) */
+  /* Efeitos HUD tokenizados — apenas no modo novo (clássico permanece idêntico) */
+  .ui-new {
+    --gradient-primary: linear-gradient(135deg, hsl(207 89% 61%), hsl(207 91% 46%));
+    --gradient-surface: linear-gradient(180deg, hsl(var(--card) / 0.88), hsl(var(--card) / 0.98));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--card) / 0.72), hsl(var(--card) / 0.94));
+    --gradient-hero: radial-gradient(120% 120% at 50% 0%, hsl(216 88% 20%) 0%, hsl(221 83% 9%) 52%, hsl(222 84% 5%) 100%);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.35);
+    --shadow-cockpit: 0 12px 40px -12px hsl(222 84% 4% / 0.6), 0 2px 8px hsl(222 84% 4% / 0.3);
+    --shadow-panel: 0 1px 2px hsl(222 84% 4% / 0.14), 0 8px 24px -8px hsl(222 84% 4% / 0.22);
+  }
+
+  .dark.ui-new {
     --gradient-primary: linear-gradient(135deg, hsl(207 91% 59%), hsl(210 90% 44%));
     --gradient-surface: linear-gradient(180deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.96));
     --gradient-glass: linear-gradient(135deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.9));
@@ -235,6 +238,64 @@
 .ui-new .bg-gradient-primary {
   background-image: var(--gradient-primary);
 }
+
+/* ============================================
+   MOTION SYSTEM
+   ============================================ */
+
+/* Acessibilidade: respeita preferência do sistema (global) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Entrada 3-beat: surge, ultrapassa sutilmente, assenta (modo novo) */
+@keyframes entrance-beat {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.004);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ui-new .fade-in,
+.ui-new .mobile-slide-up,
+.ui-new .mobile-fade-in,
+.ui-new .animate-fade-up {
+  animation: entrance-beat var(--duration-base) var(--ease-out-quart) backwards;
+}
+
+/* Stagger em cascata: adicione .stagger no contêiner (modo novo).
+   Passo de 40ms com jitter de +8ms nos pares para não soar mecânico. */
+.ui-new .stagger > * {
+  animation: entrance-beat var(--duration-base) var(--ease-out-quart) backwards;
+}
+
+.ui-new .stagger > *:nth-child(1)  { animation-delay: 40ms; }
+.ui-new .stagger > *:nth-child(2)  { animation-delay: 88ms; }
+.ui-new .stagger > *:nth-child(3)  { animation-delay: 120ms; }
+.ui-new .stagger > *:nth-child(4)  { animation-delay: 168ms; }
+.ui-new .stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.ui-new .stagger > *:nth-child(6)  { animation-delay: 248ms; }
+.ui-new .stagger > *:nth-child(7)  { animation-delay: 280ms; }
+.ui-new .stagger > *:nth-child(8)  { animation-delay: 328ms; }
+.ui-new .stagger > *:nth-child(9)  { animation-delay: 360ms; }
+.ui-new .stagger > *:nth-child(10) { animation-delay: 408ms; }
+.ui-new .stagger > *:nth-child(11) { animation-delay: 440ms; }
+.ui-new .stagger > *:nth-child(n+12) { animation-delay: 480ms; }
 
 /* Financial Status Animations */
 .financial-status-container {

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -19,9 +20,9 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         // Cockpit-themed variants
-        hud: "bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow border border-primary/20",
-        glass: "glass-panel text-foreground hover:bg-muted/50 border border-border/50",
-        radar: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_hsl(var(--accent)/0.3)]",
+        hud: "bg-gradient-primary text-primary-foreground hover:opacity-90 border border-primary/20 ui-new:shadow-glow ui-new:hover:opacity-100 ui-new:hover:brightness-110 ui-new:active:brightness-95",
+        glass: "glass-panel text-foreground hover:bg-muted/50 border border-border/50 ui-new:transition-all ui-new:duration-200 ui-new:hover:border-primary/40",
+        radar: "bg-accent text-accent-foreground hover:bg-accent/90 ui-new:shadow-glow",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -41,17 +42,29 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  loading?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        disabled={disabled || loading}
+        aria-busy={loading || undefined}
         {...props}
-      />
+      >
+        {loading && !asChild ? (
+          <>
+            <Loader2 className="animate-spin" aria-hidden="true" />
+            {children}
+          </>
+        ) : (
+          children
+        )}
+      </Comp>
     )
   }
 )

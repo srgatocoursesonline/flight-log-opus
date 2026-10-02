@@ -4,10 +4,16 @@ import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useUIMode } from "@/hooks/ui/useUIMode";
 import { Button } from "@/components/ui/button";
 import {
   Home,
@@ -95,6 +101,7 @@ interface MobileDrawerProps {
 export const MobileDrawer = ({ open, onOpenChange }: MobileDrawerProps) => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { isNewUI } = useUIMode();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   // Carregar estado das seções do localStorage
@@ -167,32 +174,35 @@ export const MobileDrawer = ({ open, onOpenChange }: MobileDrawerProps) => {
     onOpenChange(false); // Fechar drawer ao navegar
   };
 
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden h-10 w-10 hover:bg-accent"
-          aria-label="Abrir menu"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent 
-        side="left" 
-        className="w-[80%] max-w-sm p-0 glass-panel border-r border-border/50"
-      >
-        <SheetHeader className="p-6 pb-4 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <MSFSLogo size="md" className="pulse-glow" />
+  const triggerButton = (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="lg:hidden h-10 w-10 hover:bg-accent"
+      aria-label="Abrir menu"
+    >
+      <Menu className="h-5 w-5" />
+    </Button>
+  );
+
+  const drawerBody = (
+    <>
+      <div className="p-6 pb-4 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <MSFSLogo size="md" className="pulse-glow" />
+          {isNewUI ? (
+            <DrawerTitle className="text-lg font-semibold">
+              MSFS Career Manager
+            </DrawerTitle>
+          ) : (
             <SheetTitle className="text-lg font-semibold">
               MSFS Career Manager
             </SheetTitle>
-          </div>
-        </SheetHeader>
+          )}
+        </div>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4">
           {/* Dashboard - sempre no topo */}
           <div className="mb-6">
             <NavLink
@@ -285,6 +295,32 @@ export const MobileDrawer = ({ open, onOpenChange }: MobileDrawerProps) => {
             })}
           </div>
         </div>
+    </>
+  );
+
+  if (isNewUI) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange} direction="left">
+        <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
+        <DrawerContent className="inset-y-0 left-0 h-full w-[80%] max-w-sm p-0 glass-panel border-r border-border/50">
+          <div
+            aria-hidden="true"
+            className="absolute right-1.5 top-1/2 h-10 w-1 -translate-y-1/2 rounded-full bg-muted-foreground/40"
+          />
+          {drawerBody}
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>{triggerButton}</SheetTrigger>
+      <SheetContent
+        side="left"
+        className="w-[80%] max-w-sm p-0 glass-panel border-r border-border/50"
+      >
+        {drawerBody}
       </SheetContent>
     </Sheet>
   );
