@@ -2,11 +2,17 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Microsoft Flight Simulator 2024 - Career Manager</title>
     <meta name="description" content="Gerencie sua carreira no Microsoft Flight Simulator 2024 com registro detalhado de voos, estatísticas e acompanhamento de progressão." />
     <meta name="author" content="FS24 Career Manager" />
-    <meta name="theme-color" content="#1e40af" />
+    <meta name="theme-color" content="#020817" />
+
+    <!-- iOS standalone -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MSFS 2024" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -29,9 +35,10 @@
 
   <body>
     <script>
-      // Aplicar tema escuro como padrão
+      // Aplicar tema (dark padrão) e modo de UI (clássico padrão) antes do paint
       const theme = localStorage.getItem('flight-log-theme') || 'dark';
-      document.documentElement.className = theme;
+      const uiMode = localStorage.getItem('flight-log-ui-mode') === 'new' ? 'new' : 'classic';
+      document.documentElement.className = theme + ' ui-' + uiMode;
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

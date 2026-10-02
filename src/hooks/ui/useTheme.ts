@@ -5,13 +5,18 @@ type Theme = 'dark' | 'light';
 // Função para aplicar tema imediatamente
 const applyTheme = (theme: Theme) => {
   const root = document.documentElement;
-  
+
   // Remover classe anterior
   root.classList.remove('light', 'dark');
-  
+
   // Adicionar nova classe
   root.classList.add(theme);
-  
+
+  // Sincronizar theme-color do browser/PWA com o tema ativo
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', theme === 'dark' ? '#020817' : '#ffffff');
+
   // Salvar no localStorage
   localStorage.setItem('flight-log-theme', theme);
 };

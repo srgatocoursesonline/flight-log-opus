@@ -33,6 +33,29 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Motion system */
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-slow: 400ms;
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* Status de voo (mapa único — consumido por hooks, badges e gráficos) */
+    --status-planned: 215.4 16.3% 46.9%;
+    --status-active: 38 92% 50%;
+    --status-completed: 142 76% 36%;
+    --status-cancelled: 0 84.2% 60.2%;
+    --status-diverted: 27 87% 51%;
+    --status-emergency: 0 74% 42%;
+
+    /* Efeitos HUD tokenizados (antes variáveis fantasma no tailwind.config) */
+    --gradient-primary: linear-gradient(135deg, hsl(207 89% 61%), hsl(207 91% 46%));
+    --gradient-surface: linear-gradient(180deg, hsl(var(--card) / 0.88), hsl(var(--card) / 0.98));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--card) / 0.72), hsl(var(--card) / 0.94));
+    --gradient-hero: radial-gradient(120% 120% at 50% 0%, hsl(216 88% 20%) 0%, hsl(221 83% 9%) 52%, hsl(222 84% 5%) 100%);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.35);
+    --shadow-cockpit: 0 12px 40px -12px hsl(222 84% 4% / 0.6), 0 2px 8px hsl(222 84% 4% / 0.3);
+    --shadow-panel: 0 1px 2px hsl(222 84% 4% / 0.14), 0 8px 24px -8px hsl(222 84% 4% / 0.22);
   }
 
   .dark {
@@ -64,6 +87,29 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Motion system */
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-slow: 400ms;
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* Status de voo (dark) */
+    --status-planned: 215 20.2% 65.1%;
+    --status-active: 38 92% 55%;
+    --status-completed: 142 71% 45%;
+    --status-cancelled: 0 84% 65%;
+    --status-diverted: 27 90% 58%;
+    --status-emergency: 0 72% 56%;
+
+    /* Efeitos HUD tokenizados (dark) */
+    --gradient-primary: linear-gradient(135deg, hsl(207 91% 59%), hsl(210 90% 44%));
+    --gradient-surface: linear-gradient(180deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.96));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.9));
+    --gradient-hero: radial-gradient(120% 120% at 50% 0%, hsl(216 88% 18%) 0%, hsl(221 83% 8%) 52%, hsl(222 84% 4.9%) 100%);
+    --shadow-glow: 0 0 28px hsl(var(--primary) / 0.4);
+    --shadow-cockpit: 0 16px 48px -12px hsl(0 0% 0% / 0.7), 0 2px 8px hsl(0 0% 0% / 0.4);
+    --shadow-panel: 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -8px hsl(0 0% 0% / 0.5);
   }
 }
 
@@ -144,6 +190,50 @@
 
 .mobile-trend {
   @apply text-xs font-medium;
+}
+
+/* ============================================
+   CLASSES UTILITÁRIAS (definições reais — antes fantasma)
+   Mudanças visuais ficam sob .ui-new (modo novo);
+   o modo clássico permanece pixel-idêntico.
+   ============================================ */
+
+.mobile-scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ui-new .mobile-safe-area {
+  padding-top: max(0px, env(safe-area-inset-top));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+.ui-new .mobile-container {
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+}
+
+.ui-new .mobile-page-layout {
+  @apply px-3 py-4 space-y-4;
+}
+
+/* Botão HUD (usado em FlightPlanner) — base real no modo novo */
+.ui-new .hud-button {
+  @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-md border border-primary/30 bg-primary/10 text-primary text-sm font-medium;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+
+.ui-new .hud-button:hover {
+  @apply bg-primary/20 border-primary/50;
+}
+
+.ui-new .hud-button:disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
+/* Gradiente tokenizado do botão HUD vence o flat apenas no modo novo */
+.ui-new .bg-gradient-primary {
+  background-image: var(--gradient-primary);
 }
 
 /* Financial Status Animations */
