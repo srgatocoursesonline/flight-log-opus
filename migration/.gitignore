@@ -1,3 +1,7 @@
 supabase_full.dump
 *.dump
+/plain.sql
+/public_plain.sql
+/auth_plain.sql
 .db_credentials
+restore_detalhado.log*
