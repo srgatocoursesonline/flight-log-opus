@@ -1,52 +1,63 @@
 {
+  "id": "/",
   "name": "Microsoft Flight Simulator 2024 - Career Manager",
   "short_name": "MSFS 2024",
   "description": "Gerencie sua carreira no Microsoft Flight Simulator 2024 com registro detalhado de voos, estatísticas e acompanhamento de progressão.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#1e40af",
-  "background_color": "#0f1419",
+  "orientation": "any",
+  "theme_color": "#020817",
+  "background_color": "#020817",
   "categories": ["productivity", "games", "utilities"],
-  "lang": "en-US",
+  "lang": "pt-BR",
   "icons": [
     {
       "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "New Flight",
-      "short_name": "New Flight",
-      "description": "Log a new flight",
-      "url": "/flights/new",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Registrar voo",
+      "short_name": "Voos",
+      "description": "Registrar e gerenciar voos",
+      "url": "/flights",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View your flight statistics",
+      "description": "Ver estatísticas de voo",
       "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mapas",
+      "short_name": "Mapas",
+      "description": "Ver rotas de voo no mapa",
+      "url": "/maps",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
     }
   ],
   "prefer_related_applications": false

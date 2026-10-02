@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { autoRefresh } from "@/utils/autoRefresh";
 import { useUIMode } from "@/hooks/ui/useUIMode";
+import { isPWAInstallAvailable, isStandalone, isIOS, promptPWAInstall } from "@/lib/pwa";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ExpenseCategoriesManager } from "@/components/financial/ExpenseCategoriesManager";
 import { RevenueCategoriesManager } from "@/components/financial/RevenueCategoriesManager";
@@ -18,6 +20,24 @@ import MaintenanceItemsManager from "@/components/maintenance/MaintenanceItemsMa
 const Settings = () => {
   const { t } = useTranslation();
   const { mode, setMode } = useUIMode();
+
+  // PWA install
+  const [standalone] = useState(isStandalone());
+  const [installAvailable, setInstallAvailable] = useState(isPWAInstallAvailable());
+  const iosDevice = isIOS();
+
+  useEffect(() => {
+    const onAvailable = () => setInstallAvailable(true);
+    window.addEventListener('pwa-install-available', onAvailable);
+    return () => window.removeEventListener('pwa-install-available', onAvailable);
+  }, []);
+
+  const handleInstall = async () => {
+    const outcome = await promptPWAInstall();
+    if (outcome === 'accepted') {
+      toast.success('Aplicativo instalado!');
+    }
+  };
 
   // Estados para controlar seções abertas/fechadas - TODAS RECOLHIDAS POR PADRÃO
   const [openSections, setOpenSections] = useState({
@@ -317,6 +337,22 @@ const Settings = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
+
+                {!standalone && (installAvailable || iosDevice) && (
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-medium text-foreground">{t('settings.app.install')}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {iosDevice ? t('settings.app.installIOSDesc') : t('settings.app.installDesc')}
+                      </p>
+                    </div>
+                    {!iosDevice && (
+                      <Button size="sm" variant="hud" onClick={handleInstall} className="shrink-0">
+                        {t('settings.app.installButton')}
+                      </Button>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <div>

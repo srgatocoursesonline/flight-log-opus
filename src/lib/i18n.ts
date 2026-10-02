@@ -229,6 +229,10 @@ const ptBR = {
         uiModeDesc: "Escolha entre o visual clássico e o novo cockpit. Você pode alternar quando quiser.",
         uiModeClassic: "Clássico",
         uiModeNew: "Novo cockpit",
+        install: "Instalar aplicativo",
+        installDesc: "Instale o Career Manager como aplicativo no seu dispositivo.",
+        installIOSDesc: "No iPhone/iPad: toque em Compartilhar e depois em “Adicionar à Tela de Início”.",
+        installButton: "Instalar",
         light: "Claro",
         dark: "Escuro",
         system: "Sistema"
@@ -962,6 +966,10 @@ const enUS = {
         uiModeDesc: "Choose between the classic and the new cockpit look. Switch anytime.",
         uiModeClassic: "Classic",
         uiModeNew: "New cockpit",
+        install: "Install app",
+        installDesc: "Install Career Manager as an app on your device.",
+        installIOSDesc: "On iPhone/iPad: tap Share, then “Add to Home Screen”.",
+        installButton: "Install",
         light: "Light",
         dark: "Dark",
         system: "System"
