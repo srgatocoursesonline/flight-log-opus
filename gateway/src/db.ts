@@ -63,13 +63,26 @@ interface JwtClaimsAlias {
 }
 void (0 as unknown as JwtClaimsAlias);
 
+/**
+ * Transação como service_role (BYPASSRLS) para operações de autenticação
+ * (users/sessions/refresh_tokens) — espelha o GoTrue, que tem controle
+ * total sobre o schema auth independentemente das policies.
+ */
 export async function withDb<T>(
   fn: (client: any) => Promise<T>,
 ): Promise<T> {
   const client = await pool.connect();
   try {
-    const result = await fn(client);
-    return result;
+    await client.query('BEGIN');
+    await client.query("SELECT set_config('role', 'service_role', true)");
+    try {
+      const result = await fn(client);
+      await client.query('COMMIT');
+      return result;
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    }
   } finally {
     client.release();
   }

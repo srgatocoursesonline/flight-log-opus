@@ -2,7 +2,7 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { config } from '../config.js';
-import { withDb, transaction, type JwtClaims } from '../db.js';
+import { withDb, type JwtClaims } from '../db.js';
 import { signAccessToken, verifyAnyToken } from '../keys.js';
 
 export const authRouter = Router();
@@ -104,9 +104,9 @@ async function createSession(
   const sessionId = crypto.randomUUID();
   const refreshToken = crypto.randomBytes(24).toString('hex');
   await client.query(
-    `INSERT INTO auth.sessions (id, user_id, user_agent, ip, aal, amr)
-     VALUES ($1, $2, $3, NULLIF($4, '')::inet, 'aal1', $5)`,
-    [sessionId, user.id, userAgent.slice(0, 255), ip, JSON.stringify([])],
+    `INSERT INTO auth.sessions (id, user_id, user_agent, ip, aal)
+     VALUES ($1, $2, $3, NULLIF($4, '')::inet, 'aal1')`,
+    [sessionId, user.id, userAgent.slice(0, 255), ip],
   );
   await client.query(
     `INSERT INTO auth.refresh_tokens (token, session_id, user_id)
@@ -193,13 +193,13 @@ authRouter.post('/signup', async (req, res, next) => {
       }
 
       const requireConfirmation = !!config.smtp.host;
-      await transaction(client, async () => {
+      do {
         const inserted = await client.query(
           `INSERT INTO auth.users (id, aud, role, email, encrypted_password,
              email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
              confirmation_token, confirmation_sent_at)
            VALUES (gen_random_uuid(), 'authenticated', 'authenticated', $1,
-             crypt($2, gen_salt('bf', 10)),
+             extensions.crypt($2, extensions.gen_salt('bf', 10)),
              CASE WHEN $3::bool THEN now() ELSE NULL END,
              now(), now(), $4::jsonb, $5::jsonb,
              CASE WHEN $3::bool THEN '' ELSE $6 END,
@@ -243,7 +243,7 @@ authRouter.post('/signup', async (req, res, next) => {
           console.error('[auth] falha ao enviar e-mail de confirmação:', mailError);
         }
         res.status(200).json({ user: userPayload(user) });
-      });
+      } while (0);
     });
   } catch (e) {
     next(e);
@@ -271,7 +271,7 @@ authRouter.post('/token', async (req, res, next) => {
           return authError(res, 400, 'invalid_grant', 'Invalid login credentials');
         }
         const ok = await client.query(
-          `SELECT crypt($1, encrypted_password) = encrypted_password AS valid
+          `SELECT extensions.crypt($1, encrypted_password) = encrypted_password AS valid
              FROM auth.users WHERE id = $2`,
           [password, user.id],
         );
@@ -281,7 +281,7 @@ authRouter.post('/token', async (req, res, next) => {
         if (!user.email_confirmed_at && !!config.smtp.host) {
           return authError(res, 400, 'user_not_confirmed', 'Email not confirmed');
         }
-        await transaction(client, async () => {
+        do {
           await client.query('UPDATE auth.users SET last_sign_in_at = now(), updated_at = now() WHERE id = $1', [user.id]);
           const { sessionId, refreshToken } = await createSession(
             client,
@@ -290,7 +290,7 @@ authRouter.post('/token', async (req, res, next) => {
             (req.headers['x-forwarded-for'] ?? '').toString().split(',')[0],
           );
           res.json(sessionBody(user, sessionId, refreshToken));
-        });
+        } while (0);
       });
       return;
     }
@@ -315,7 +315,7 @@ authRouter.post('/token', async (req, res, next) => {
         if (user.banned_until && new Date(user.banned_until) > new Date()) {
           return authError(res, 400, 'invalid_grant', 'Invalid Refresh Token');
         }
-        await transaction(client, async () => {
+        do {
           // rotação: revoga o token antigo, cria novo na mesma sessão
           await client.query(`UPDATE auth.refresh_tokens SET revoked = true, updated_at = now() WHERE token = $1`, [user.rt_token]);
           const newRefresh = crypto.randomBytes(24).toString('hex');
@@ -325,7 +325,7 @@ authRouter.post('/token', async (req, res, next) => {
             [newRefresh, user.session_id, user.id, user.rt_token],
           );
           res.json(sessionBody({ ...user, last_sign_in_at: user.last_sign_in_at }, user.session_id, newRefresh));
-        });
+        } while (0);
       });
       return;
     }
@@ -376,13 +376,13 @@ authRouter.put('/user', async (req, res, next) => {
       const meta = parseJsonField(user.raw_user_meta_data);
       const incomingMeta = parseJsonField(req.body?.data);
       const merged = { ...meta, ...incomingMeta };
-      await transaction(client, async () => {
+      do {
         await client.query(`UPDATE auth.users SET raw_user_meta_data = $2::jsonb, updated_at = now() WHERE id = $1`, [
           user.id,
           JSON.stringify(merged),
         ]);
         res.json(userPayload({ ...user, raw_user_meta_data: merged }));
-      });
+      } while (0);
     });
   } catch (e) {
     next(e);
@@ -397,10 +397,10 @@ authRouter.post('/logout', async (req, res, next) => {
     const { claims, expired } = bearer(req);
     if (claims?.session_id) {
       await withDb(async (client) => {
-        await transaction(client, async () => {
+        do {
           await client.query(`UPDATE auth.refresh_tokens SET revoked = true, updated_at = now() WHERE session_id = $1`, [claims.session_id]);
           await client.query(`UPDATE auth.sessions SET deleted_at = now(), updated_at = now() WHERE id = $1`, [claims.session_id]);
-        });
+        } while (0);
       });
     }
     res.status(204).end();
@@ -426,7 +426,7 @@ authRouter.post('/recover', async (req, res, next) => {
       const user = found.rows[0] as AuthUserRow | undefined;
       if (user) {
         const token = hmacToken();
-        await transaction(client, async () => {
+        do {
           await client.query(
             `UPDATE auth.users SET recovery_token = $2, recovery_sent_at = now(), updated_at = now() WHERE id = $1`,
             [user.id, token],
@@ -444,7 +444,7 @@ authRouter.post('/recover', async (req, res, next) => {
           } catch (mailError) {
             console.error('[auth] falha SMTP (recover):', mailError);
           }
-        });
+        } while (0);
       }
       // Sempre 200 (não vaza existência)
       res.status(200).json({ data: null, message: 'If your email exists in our database you will receive recovery instructions.' });
@@ -476,7 +476,7 @@ authRouter.post('/verify', async (req, res, next) => {
       if (!user || (email && user.email && user.email.toLowerCase() !== email)) {
         return authError(res, 404, 'invalid_token', 'Invalid token is provided');
       }
-      await transaction(client, async () => {
+      do {
         if (type === 'signup') {
           await client.query(
             `UPDATE auth.users SET email_confirmed_at = COALESCE(email_confirmed_at, now()),
@@ -497,7 +497,7 @@ authRouter.post('/verify', async (req, res, next) => {
           (req.headers['x-forwarded-for'] ?? '').toString().split(',')[0],
         );
         res.json(sessionBody(user, sessionId, refreshToken));
-      });
+      } while (0);
     });
   } catch (e) {
     next(e);
