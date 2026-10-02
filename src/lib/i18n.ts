@@ -731,13 +731,15 @@ const enUS = {
       // Seções
       operational: "Operational",
       financialSection: "Financial",
+      analytics: "Analytics",
       business: "Business",
       tools: "Useful Tools",
       administrative: "Administrative",
       companies: "My Companies",
       todCalculator: "TOD Calculator",
       flightPlanner: "Flight Planner",
-      airportSearch: "Airport Search"
+      airportSearch: "Airport Search",
+      reports: "Reports"
     },
 
     // Flight Planner

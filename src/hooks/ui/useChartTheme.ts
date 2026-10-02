@@ -73,6 +73,5 @@ export const useChartTheme = (): ChartTheme => {
     });
 
     return { ...colors, isDark: theme === 'dark' };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 };

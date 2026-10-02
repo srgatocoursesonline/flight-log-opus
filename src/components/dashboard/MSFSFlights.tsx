@@ -209,19 +209,19 @@ export const MSFSFlights = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
-                  {stats.totalFlights}
+                  {stats.totalFlights ?? 0}
                 </div>
                 <div className="text-xs text-readable-muted">{t('common.flights')}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
-                  {formatFlightTime(stats.totalFlightTime)}
+                  {formatFlightTime(stats.totalFlightTime ?? 0)}
                 </div>
                 <div className="text-xs text-readable-muted">{t('common.totalHours')}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">
-                  {Math.round(stats.totalDistance)} NM
+                  {Math.round(stats.totalDistance ?? 0)} NM
                 </div>
                 <div className="text-xs text-readable-muted">{t('common.distance')}</div>
               </div>
