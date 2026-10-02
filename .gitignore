@@ -29,6 +29,14 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+
+# Gateway/db secrets e dumps de migração
+backend/.env
+gateway/.env
+gateway/.env.production
+migration/.db_credentials
+migration/*.dump
 
 # Build artifacts
 build/

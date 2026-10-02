@@ -281,7 +281,7 @@ function broadcastToAll(message: any) {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -293,7 +293,7 @@ app.get('/health', (req, res) => {
 });
 
 // Listar sessões ativas
-app.get('/sessions', (req, res) => {
+app.get('/sessions', (_req, res) => {
   const sessionList = Array.from(sessions.values()).map(session => ({
     sessionId: session.sessionId,
     userId: session.userId,

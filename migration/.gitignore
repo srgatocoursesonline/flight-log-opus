@@ -1,0 +1,3 @@
+supabase_full.dump
+*.dump
+.db_credentials

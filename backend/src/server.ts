@@ -46,7 +46,7 @@ const CONFIG = {
 class FlightLogServer {
   private app: express.Application;
   private wsServer!: WebSocketServer;
-  private supabase!: SupabaseClient;
+  private supabase: SupabaseClient | null = null;
   private clients: Set<WebSocket> = new Set();
 
   constructor() {
