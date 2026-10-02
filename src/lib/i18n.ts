@@ -225,6 +225,10 @@ const ptBR = {
         selectLanguage: "Selecione o idioma",
         theme: "Tema",
         selectTheme: "Selecione o tema",
+        uiMode: "Visual da interface",
+        uiModeDesc: "Escolha entre o visual clássico e o novo cockpit. Você pode alternar quando quiser.",
+        uiModeClassic: "Clássico",
+        uiModeNew: "Novo cockpit",
         light: "Claro",
         dark: "Escuro",
         system: "Sistema"
@@ -345,7 +349,9 @@ const ptBR = {
     // Status Bar
     statusBar: {
       online: "ONLINE",
-      appName: "Microsoft Flight Simulator 2024"
+      appName: "Microsoft Flight Simulator 2024",
+      uiModeNew: "Ativar o novo visual",
+      uiModeClassic: "Voltar ao visual clássico"
     },
 
     // App Info
@@ -952,6 +958,10 @@ const enUS = {
         selectLanguage: "Select language",
         theme: "Theme",
         selectTheme: "Select theme",
+        uiMode: "Interface look",
+        uiModeDesc: "Choose between the classic and the new cockpit look. Switch anytime.",
+        uiModeClassic: "Classic",
+        uiModeNew: "New cockpit",
         light: "Light",
         dark: "Dark",
         system: "System"
@@ -1072,7 +1082,9 @@ const enUS = {
     // Status Bar
     statusBar: {
       online: "ONLINE",
-      appName: "Microsoft Flight Simulator 2024"
+      appName: "Microsoft Flight Simulator 2024",
+      uiModeNew: "Try the new look",
+      uiModeClassic: "Back to classic look"
     },
 
     // App Info

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { DEFAULT_FLIGHT_STATUSES as DEFAULT_FLIGHT_STATUS } from '@/lib/flight-status';
 
 export interface FlightStatus {
   id: string;
@@ -10,69 +11,6 @@ export interface FlightStatus {
   isActive: boolean;
   hourlyMultiplier?: number; // Multiplicador para CR por hora (ex: 1.5 para voos especiais)
 }
-
-const DEFAULT_FLIGHT_STATUS: FlightStatus[] = [
-  {
-    id: 'planned',
-    name: 'Planejado',
-    color: '#6B7280',
-    icon: '📅',
-    description: 'Voo agendado para execução',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0
-  },
-  {
-    id: 'active',
-    name: 'Em Voo',
-    color: '#F59E0B',
-    icon: '✈️',
-    description: 'Voo atualmente em execução',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0
-  },
-  {
-    id: 'completed',
-    name: 'Concluído',
-    color: '#10B981',
-    icon: '✅',
-    description: 'Voo concluído com sucesso',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0
-  },
-  {
-    id: 'cancelled',
-    name: 'Cancelado',
-    color: '#EF4444',
-    icon: '❌',
-    description: 'Voo cancelado',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 0
-  },
-  {
-    id: 'delayed',
-    name: 'Atrasado',
-    color: '#F97316',
-    icon: '⏰',
-    description: 'Voo com atraso operacional',
-    isDefault: false,
-    isActive: true,
-    hourlyMultiplier: 1.0
-  },
-  {
-    id: 'emergency',
-    name: 'Emergência',
-    color: '#DC2626',
-    icon: '🚨',
-    description: 'Voo com situação de emergência',
-    isDefault: false,
-    isActive: true,
-    hourlyMultiplier: 1.5
-  }
-];
 
 const STORAGE_KEY = 'msfs-flight-status';
 

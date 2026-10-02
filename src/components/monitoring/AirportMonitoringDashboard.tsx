@@ -165,11 +165,11 @@ export function AirportMonitoringDashboard({
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Taxa de Sucesso</CardTitle>
             {successRate >= 90 ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-success" />
             ) : successRate >= 70 ? (
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
             ) : (
-              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <AlertTriangle className="h-4 w-4 text-destructive" />
             )}
           </CardHeader>
           <CardContent>
@@ -213,9 +213,9 @@ export function AirportMonitoringDashboard({
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Falhas</CardTitle>
             {stats.failedRequests > 0 ? (
-              <TrendingDown className="h-4 w-4 text-red-500" />
+              <TrendingDown className="h-4 w-4 text-destructive" />
             ) : (
-              <TrendingUp className="h-4 w-4 text-green-500" />
+              <TrendingUp className="h-4 w-4 text-success" />
             )}
           </CardHeader>
           <CardContent>
@@ -264,7 +264,7 @@ export function AirportMonitoringDashboard({
                 onClick={handleClearCache}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                className="flex items-center gap-2 text-destructive hover:text-destructive/80"
               >
                 <Trash2 className="w-4 h-4" />
                 Limpar Cache
@@ -292,15 +292,15 @@ export function AirportMonitoringDashboard({
                       key={index} 
                       className={`flex items-center justify-between p-3 rounded-lg border ${
                         log.success 
-                          ? 'bg-green-50 border-green-200' 
-                          : 'bg-red-50 border-red-200'
+                          ? 'bg-success/10 border-success/30'
+                          : 'bg-destructive/10 border-destructive/30'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         {log.success ? (
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          <CheckCircle className="w-5 h-5 text-success" />
                         ) : (
-                          <AlertTriangle className="w-5 h-5 text-red-600" />
+                          <AlertTriangle className="w-5 h-5 text-destructive" />
                         )}
                         <div>
                           <div className="font-medium">{log.icaoCode}</div>

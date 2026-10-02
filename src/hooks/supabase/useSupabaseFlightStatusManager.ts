@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { DEFAULT_FLIGHT_STATUSES } from '@/lib/flight-status';
 
 export interface FlightStatus {
   id: string;
@@ -18,62 +19,7 @@ export interface FlightStatus {
   hourlyMultiplier: number;
 }
 
-const defaultStatuses: Omit<FlightStatus, 'id'>[] = [
-  {
-    name: 'Planejado',
-    color: '#6B7280',
-    icon: '📅',
-    description: 'Voo agendado para execução',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0,
-  },
-  {
-    name: 'Em Voo',
-    color: '#F59E0B',
-    icon: '✈️',
-    description: 'Voo atualmente em execução',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0,
-  },
-  {
-    name: 'Concluído',
-    color: '#10B981',
-    icon: '✅',
-    description: 'Voo concluído com sucesso',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0,
-  },
-  {
-    name: 'Cancelado',
-    color: '#EF4444',
-    icon: '❌',
-    description: 'Voo cancelado',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 0.0,
-  },
-  {
-    name: 'Atrasado',
-    color: '#F97316',
-    icon: '⏰',
-    description: 'Voo com atraso operacional',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.0,
-  },
-  {
-    name: 'Emergência',
-    color: '#DC2626',
-    icon: '🚨',
-    description: 'Voo com situação de emergência',
-    isDefault: true,
-    isActive: true,
-    hourlyMultiplier: 1.5,
-  },
-];
+const defaultStatuses: Omit<FlightStatus, 'id'>[] = DEFAULT_FLIGHT_STATUSES;
 
 export const useSupabaseFlightStatusManager = () => {
   const { user } = useAuth();

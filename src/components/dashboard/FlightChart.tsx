@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
+import { useChartTheme } from '@/hooks/ui/useChartTheme';
 import { format, startOfMonth, subMonths, eachMonthOfInterval } from 'date-fns';
 
 interface ChartDataPoint {
@@ -11,42 +12,26 @@ interface ChartDataPoint {
 }
 
 // Função para obter as cores baseado no tema
-const getChartColors = () => {
-  const isDark = document.documentElement.classList.contains('dark');
-  return {
-    flightLine: isDark ? '#60a5fa' : '#3b82f6',  // blue-400 : blue-500
-    flightDot: isDark ? '#60a5fa' : '#3b82f6',
-    crLine: isDark ? '#34d399' : '#10b981',      // emerald-400 : emerald-500
-    crDot: isDark ? '#34d399' : '#10b981',
-    grid: isDark ? '#1f2937' : '#e5e7eb',        // gray-800 : gray-200
-    text: isDark ? '#9ca3af' : '#6b7280',        // gray-400 : gray-500
-    tooltipBg: isDark ? '#1f2937' : '#ffffff',
-    tooltipBorder: isDark ? '#374151' : '#e5e7eb',
-    tooltipText: isDark ? '#f3f4f6' : '#1f2937',
-  };
-};
+const getChartColors = (isDark: boolean) => ({
+  flightLine: isDark ? '#60a5fa' : '#3b82f6',  // blue-400 : blue-500
+  flightDot: isDark ? '#60a5fa' : '#3b82f6',
+  crLine: isDark ? '#34d399' : '#10b981',      // emerald-400 : emerald-500
+  crDot: isDark ? '#34d399' : '#10b981',
+  grid: isDark ? '#1f2937' : '#e5e7eb',        // gray-800 : gray-200
+  text: isDark ? '#9ca3af' : '#6b7280',        // gray-400 : gray-500
+  tooltipBg: isDark ? '#1f2937' : '#ffffff',
+  tooltipBorder: isDark ? '#374151' : '#e5e7eb',
+  tooltipText: isDark ? '#f3f4f6' : '#1f2937',
+});
 
 type FilterPeriod = '3' | '6' | '12' | 'all';
 
 export const FlightChart = () => {
   const { t, i18n } = useTranslation();
   const { flights, isLoading } = useSupabaseFlights();
-  const [colors, setColors] = useState(getChartColors());
+  const { isDark } = useChartTheme();
+  const colors = useMemo(() => getChartColors(isDark), [isDark]);
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('6');
-
-  // Atualizar cores quando o tema mudar
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setColors(getChartColors());
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   // Usar useMemo para evitar loop infinito e reprocessar dados
   const chartData = useMemo(() => {

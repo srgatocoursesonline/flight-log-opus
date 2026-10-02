@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Wifi, WifiOff, Battery, Signal } from "lucide-react";
+import { Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { UIModeToggle } from "@/components/ui/ui-mode-toggle";
 import { ProfileDropdown } from "./ProfileDropdown";
 
 export const StatusBar = () => {
@@ -60,9 +61,9 @@ export const StatusBar = () => {
             ) : (
               <WifiOff className="h-3 w-3 lg:h-4 lg:w-4 text-destructive" />
             )}
-            <Signal className="h-3 w-3 lg:h-4 lg:w-4 text-success" />
-            <Battery className="h-3 w-3 lg:h-4 lg:w-4 text-warning" />
           </div>
+          <div className="h-4 w-px bg-border hidden sm:block" />
+          <UIModeToggle />
         </div>
       </div>
     </div>

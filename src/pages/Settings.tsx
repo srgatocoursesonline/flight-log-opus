@@ -1,10 +1,12 @@
-import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight, Trophy, Wrench } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Shield, Database, Smartphone, ChevronDown, ChevronRight, Trophy, Wrench, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { autoRefresh } from "@/utils/autoRefresh";
+import { useUIMode } from "@/hooks/ui/useUIMode";
+import { cn } from "@/lib/utils";
 import { ExpenseCategoriesManager } from "@/components/financial/ExpenseCategoriesManager";
 import { RevenueCategoriesManager } from "@/components/financial/RevenueCategoriesManager";
 import { FinancialSettingsManager } from "@/components/financial/FinancialSettingsManager";
@@ -15,6 +17,7 @@ import MaintenanceItemsManager from "@/components/maintenance/MaintenanceItemsMa
 
 const Settings = () => {
   const { t } = useTranslation();
+  const { mode, setMode } = useUIMode();
 
   // Estados para controlar seções abertas/fechadas - TODAS RECOLHIDAS POR PADRÃO
   const [openSections, setOpenSections] = useState({
@@ -269,6 +272,44 @@ const Settings = () => {
 
             <CollapsibleContent className="settings-content">
               <div className="px-6 pb-6 space-y-4 border-t border-border/50">
+                <div>
+                  <h4 className="font-medium text-foreground">{t('settings.app.uiMode')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('settings.app.uiModeDesc')}</p>
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setUIMode('classic')}
+                      aria-pressed={mode === 'classic'}
+                      className={cn(
+                        "flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg border p-3 text-sm transition-all duration-200",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        mode === 'classic'
+                          ? "border-primary bg-primary/10 text-primary font-medium"
+                          : "border-border hover:border-primary/40 text-muted-foreground"
+                      )}
+                    >
+                      <span>{t('settings.app.uiModeClassic')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUIMode('new')}
+                      aria-pressed={mode === 'new'}
+                      className={cn(
+                        "flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg border p-3 text-sm transition-all duration-200",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        mode === 'new'
+                          ? "border-primary bg-primary/10 text-primary font-medium"
+                          : "border-border hover:border-primary/40 text-muted-foreground"
+                      )}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {t('settings.app.uiModeNew')}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-foreground">{t('settings.flights.offlineMode')}</h4>

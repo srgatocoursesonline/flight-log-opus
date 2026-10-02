@@ -206,9 +206,9 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.ui-new .mobile-safe-area {
-  padding-top: max(0px, env(safe-area-inset-top));
-  padding-bottom: max(0px, env(safe-area-inset-bottom));
+.mobile-safe-area {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .ui-new .mobile-container {
@@ -237,6 +237,12 @@
 /* Gradiente tokenizado do botão HUD vence o flat apenas no modo novo */
 .ui-new .bg-gradient-primary {
   background-image: var(--gradient-primary);
+}
+
+/* Fundo hero das telas de auth — no modo novo usa o gradiente tokenizado
+   (no clássico, o gradiente utilitário hardcoded permanece) */
+.ui-new .hud-hero-bg {
+  background-image: var(--gradient-hero);
 }
 
 /* ============================================
@@ -367,6 +373,12 @@
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 40px hsl(var(--primary) / 0.3);
   border-color: hsl(var(--primary) / 0.6);
+}
+
+/* Modo novo: hover mais contido (lift 4px, glow suave) */
+.ui-new .stats-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 32px hsl(var(--primary) / 0.22);
 }
 
 .pulse-glow {
@@ -541,23 +553,23 @@
   @apply opacity-100;
 }
 
-/* Financial Colors - Revenue and Expense */
+/* Financial Colors - Revenue and Expense (tokens semânticos) */
 .revenue-amount {
   @apply font-mono font-semibold text-xs;
-  color: hsl(142 76% 36%); /* Green for light mode */
+  color: hsl(var(--success));
 }
 
 .dark .revenue-amount {
-  color: hsl(142 69% 58%); /* Lighter green for dark mode */
+  color: hsl(var(--success) / 0.95);
 }
 
 .expense-amount {
   @apply font-mono font-semibold text-xs;
-  color: hsl(0 84% 60%); /* Red for light mode */
+  color: hsl(var(--destructive) / 0.9);
 }
 
 .dark .expense-amount {
-  color: hsl(0 91% 71%); /* Lighter red for dark mode */
+  color: hsl(0 91% 71%);
 }
 
 /* Gradient backgrounds */
@@ -954,15 +966,20 @@
   @apply transition-all duration-200 hover:scale-105 hover:shadow-sm;
 }
 
-/* Reports status indicators */
+/* Reports status indicators (tokens semânticos em vez de paleta crua) */
 .reports-status-synced {
-  @apply bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400;
+  @apply bg-success/10 text-success;
 }
 
 .reports-status-syncing {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400;
+  @apply bg-warning/10 text-warning;
 }
 
 .reports-status-error {
-  @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
+  @apply bg-destructive/10 text-destructive;
+}
+
+/* destructive dark é escuro demais para texto — clareia (padrão do design system) */
+.dark .reports-status-error {
+  color: hsl(0 91% 71%);
 }

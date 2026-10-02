@@ -334,7 +334,7 @@ export function RoutesReport({ filters }: RoutesReportProps) {
       sortable: true,
       render: (value: number) => (
         <div className={`font-mono text-sm ${
-          value > 0 ? 'text-green-600' : value < 0 ? 'text-red-600' : 'text-muted-foreground'
+          value > 0 ? 'text-success' : value < 0 ? 'text-destructive' : 'text-muted-foreground'
         }`}>
           {value > 0 ? '+' : ''}{value}
         </div>
@@ -348,7 +348,7 @@ export function RoutesReport({ filters }: RoutesReportProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center text-red-600">
+          <div className="text-center text-destructive">
             <p>Erro ao carregar dados das rotas: {error.message}</p>
             <Button variant="outline" className="mt-2" onClick={() => window.location.reload()}>
               Tentar Novamente

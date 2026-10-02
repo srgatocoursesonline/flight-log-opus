@@ -56,12 +56,12 @@ export const RecentFlights = () => {
       <div className="space-y-4">
         {isLoading ? (
           <div className="text-center py-4">
-            <Plane className="h-8 w-8 text-blue-600 mx-auto mb-2 animate-pulse" />
+            <Plane className="h-8 w-8 text-primary mx-auto mb-2 animate-pulse" />
             <p className="text-sm text-readable-muted">{t('common.loading')}</p>
           </div>
         ) : recentFlights.length === 0 ? (
           <div className="text-center py-8">
-            <Plane className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+            <Plane className="h-8 w-8 text-primary mx-auto mb-3" />
             <p className="text-sm text-readable-muted mb-3">{t('recentFlights.noFlights')}</p>
             <Button size="sm" variant="hud" onClick={navigateToAddFlight}>
               {t('recentFlights.logFirstFlight')}
@@ -76,32 +76,32 @@ export const RecentFlights = () => {
               onClick={() => handleFlightClick(flight)}
             >
               <div className="rounded-lg bg-primary/10 p-3 icon-hover">
-                <Plane className="h-5 w-5 text-blue-600" />
+                <Plane className="h-5 w-5 text-primary" />
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-foreground font-mono">{flight.departure}</span>
                   <div className="h-px flex-1 bg-border" />
-                  <Plane className="h-3 w-3 text-blue-600" />
+                  <Plane className="h-3 w-3 text-primary" />
                   <div className="h-px flex-1 bg-border" />
                   <span className="font-semibold text-foreground font-mono">{flight.arrival}</span>
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-readable-muted">
                   <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-blue-600" />
+                    <MapPin className="h-3 w-3 text-primary" />
                     {flight.aircraft}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-blue-600" />
+                    <Clock className="h-3 w-3 text-primary" />
                     {flight.flightTime}
                   </div>
                 </div>
               </div>
 
               <div className="text-right">
-                <div className="text-lg font-bold text-green-500 font-mono">
+                <div className="text-lg font-bold text-success font-mono">
                   {flight.careerRating}
                 </div>
                 <div className="text-xs text-readable-muted uppercase">

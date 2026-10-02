@@ -40,9 +40,9 @@ export function KPICard({
     
     switch (change.type) {
       case 'increase':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <TrendingUp className="h-4 w-4 text-success" />;
       case 'decrease':
-        return <TrendingDown className="h-4 w-4 text-red-500" />;
+        return <TrendingDown className="h-4 w-4 text-destructive" />;
       default:
         return <Minus className="h-4 w-4 text-gray-500" />;
     }
@@ -53,9 +53,9 @@ export function KPICard({
     
     switch (change.type) {
       case 'increase':
-        return 'text-green-600';
+        return 'text-success';
       case 'decrease':
-        return 'text-red-600';
+        return 'text-destructive';
       default:
         return 'text-muted-foreground';
     }

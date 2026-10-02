@@ -40,10 +40,10 @@ function HudCorners({
       className={cn(hudCornersVariants({ size, trigger }), className)}
       {...props}
     >
-      <span className="absolute left-0 top-0 border-l-2 border-t-2 border-primary/40" />
-      <span className="absolute right-0 top-0 border-r-2 border-t-2 border-primary/40" />
-      <span className="absolute bottom-0 left-0 border-b-2 border-l-2 border-primary/40" />
-      <span className="absolute bottom-0 right-0 border-b-2 border-r-2 border-primary/40" />
+      <span className="absolute left-0 top-0 border-l-2 border-t-2 border-primary/30" />
+      <span className="absolute right-0 top-0 border-r-2 border-t-2 border-primary/30" />
+      <span className="absolute bottom-0 left-0 border-b-2 border-l-2 border-primary/30" />
+      <span className="absolute bottom-0 right-0 border-b-2 border-r-2 border-primary/30" />
     </div>
   )
 }

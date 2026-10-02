@@ -9,7 +9,7 @@ export const AppLayout = () => {
       <StatusBar />
       <div className="flex">
         <Navigation />
-        <main className="flex-1 lg:ml-64 pt-16 lg:pt-12 mobile-bottom-nav-padding mobile-safe-area">
+        <main className="flex-1 lg:ml-64 pt-[calc(4rem+var(--safe-top,0px))] lg:pt-[calc(3rem+var(--safe-top,0px))] mobile-bottom-nav-padding mobile-safe-area">
           <div className="mobile-container">
             <ErrorBoundary>
               <Outlet />

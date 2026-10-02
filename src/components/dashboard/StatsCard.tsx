@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { HudCorners } from "@/components/ui/hud-corners";
 
 const formatNumber = (value: string | number, lng: string = 'pt-BR'): string => {
   if (typeof value === 'string') return value;
@@ -39,7 +40,7 @@ export const StatsCard = ({
             {title}
           </p>
           <div className="mt-1 flex items-baseline gap-2">
-            <p className={cn("mobile-value font-mono", valueColor || "text-green-600 dark:text-green-400")}>
+            <p className={cn("mobile-value font-mono", valueColor || "text-success")}>
               {formatNumber(value, i18n.language)}
             </p>
             {trend && (
@@ -67,10 +68,7 @@ export const StatsCard = ({
       </div>
 
       {/* HUD-style corner decorations */}
-      <div className="absolute top-0 left-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-l-2 border-primary/30 transition-all duration-300" />
-      <div className="absolute top-0 right-0 w-3 h-3 xs:w-4 xs:h-4 border-t-2 border-r-2 border-primary/30 transition-all duration-300" />
-      <div className="absolute bottom-0 left-0 w-3 h-3 xs:w-4 xs:h-4 border-b-2 border-l-2 border-primary/30 transition-all duration-300" />
-      <div className="absolute bottom-0 right-0 w-3 h-3 xs:w-4 xs:h-4 border-b-2 border-r-2 border-primary/30 transition-all duration-300" />
+      <HudCorners size="sm" />
     </div>
   );
 };

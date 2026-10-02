@@ -399,7 +399,7 @@ export const Navigation = () => {
         />
 
         {/* Mobile Bottom Bar */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-border/50">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-border/50 mobile-safe-area pb-[calc(0.5rem+var(--safe-bottom,0px))]">
             <div className="flex items-center justify-around py-2 px-4">
               {/* 4 atalhos principais */}
               {getBottomBarItems().map((item) => {
@@ -416,9 +416,9 @@ export const Navigation = () => {
                     onClick={() => handleNavClick(item.to)}
                     className={({ isActive: navIsActive }) =>
                       cn(
-                        "flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] justify-center",
+                        "flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] justify-center ui-new:active:scale-95",
                         navIsActive || isActive
-                          ? "text-primary bg-primary/10"
+                          ? "text-primary bg-primary/10 ui-new:shadow-glow"
                           : "text-readable-muted hover:text-readable",
                         isLoading && "opacity-75"
                       )

@@ -50,7 +50,7 @@ export const QuickReportCards: React.FC = () => {
           value: 0,
           subtitle: t('reports.thisMonth', 'this month'),
           icon: Plane,
-          color: 'text-blue-600',
+          color: 'text-primary',
           loading: true
         },
         {
@@ -58,7 +58,7 @@ export const QuickReportCards: React.FC = () => {
           value: '0h',
           subtitle: t('reports.totalTime', 'total time'),
           icon: Clock,
-          color: 'text-green-600',
+          color: 'text-success',
           loading: true
         },
         {
@@ -113,7 +113,7 @@ export const QuickReportCards: React.FC = () => {
           direction: 'neutral' as const
         },
         icon: Plane,
-        color: 'text-blue-600',
+        color: 'text-primary',
         loading: false
       },
       {
@@ -126,7 +126,7 @@ export const QuickReportCards: React.FC = () => {
           direction: 'neutral' as const
         },
         icon: Clock,
-        color: 'text-green-600',
+        color: 'text-success',
         loading: false
       },
       {
@@ -193,8 +193,8 @@ export const QuickReportCards: React.FC = () => {
     return (
       <div className={cn(
         "flex items-center gap-1 text-xs font-medium",
-        isPositive && "text-green-600",
-        isNegative && "text-red-600",
+        isPositive && "text-success",
+        isNegative && "text-destructive",
         change.direction === 'neutral' && "text-muted-foreground"
       )}>
         {isPositive && <TrendingUp className="h-3 w-3" />}

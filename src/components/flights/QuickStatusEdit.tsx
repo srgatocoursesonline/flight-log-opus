@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/popover';
 import { Flight, useSupabaseFlights } from '@/hooks/supabase/useSupabaseFlights';
 import { useSupabaseFlightStatusManager } from '@/hooks/supabase/useSupabaseFlightStatusManager';
+import { DEFAULT_FLIGHT_STATUSES } from '@/lib/flight-status';
 import { cn } from '@/lib/utils';
 
 interface QuickStatusEditProps {
@@ -117,10 +118,12 @@ export const QuickStatusEdit = ({ flight }: QuickStatusEditProps) => {
   // Fallback para status padrão se não houver customizados
   if (statusOptions.length === 0) {
     statusOptions.push(
-      { value: 'planned', label: t('common.planned'), icon: '📅', color: '#6B7280' },
-      { value: 'active', label: t('common.active'), icon: '✈️', color: '#F59E0B' },
-      { value: 'completed', label: t('common.completed'), icon: '✅', color: '#10B981' },
-      { value: 'cancelled', label: t('common.cancelled'), icon: '❌', color: '#EF4444' }
+      ...DEFAULT_FLIGHT_STATUSES.slice(0, 4).map(s => ({
+        value: s.id,
+        label: s.name,
+        icon: s.icon,
+        color: s.color,
+      }))
     );
   }
 

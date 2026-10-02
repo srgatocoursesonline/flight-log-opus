@@ -14,6 +14,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { supabase } from '@/lib/supabase';
+import { useChartTheme } from '@/hooks/ui/useChartTheme';
 
 // Hook personalizado para lidar com o tamanho da tela com debounce
 const useScreenSize = () => {
@@ -66,6 +67,9 @@ const ChartCRFlights = React.memo(({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
   const [chartKey, setChartKey] = useState(0); // Forçar re-renderização do gráfico
+
+  // Tema do gráfico (reage à troca dark/light)
+  const { isDark } = useChartTheme();
   
   // Usar o hook personalizado para obter o tamanho da tela
   const { width } = useScreenSize();
@@ -268,7 +272,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
     const crData = processedData.map(item => item.cr);
     const flightsData = processedData.map(item => item.flights);
 
-    const isDarkMode = document.documentElement.classList.contains('dark');
+    const isDarkMode = isDark;
     const crColor = isDarkMode ? '#3B82F6' : '#2563eb';
     const flightsColor = isDarkMode ? '#10B981' : '#059669';
 
@@ -305,7 +309,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
         },
       ],
     });
-  }, [filter, flights, selectedMonth, selectedYear]);
+  }, [filter, flights, selectedMonth, selectedYear, isDark]);
 
   const isDayView = filter === 'day';
   const isMonthView = filter === 'month';
@@ -337,7 +341,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
           boxWidth: 8,
           boxHeight: 8,
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#f8fafc' : '#334155';
           },
           font: {
@@ -350,19 +354,19 @@ const ChartCRFlights = React.memo(({ userId }) => {
       },
       tooltip: {
         backgroundColor: (context) => {
-          const isDarkMode = document.documentElement.classList.contains('dark');
+          const isDarkMode = isDark;
           return isDarkMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.8)';
         },
         titleColor: (context) => {
-          const isDarkMode = document.documentElement.classList.contains('dark');
+          const isDarkMode = isDark;
           return isDarkMode ? '#f8fafc' : '#1e293b';
         },
         bodyColor: (context) => {
-          const isDarkMode = document.documentElement.classList.contains('dark');
+          const isDarkMode = isDark;
           return isDarkMode ? '#f8fafc' : '#1e293b';
         },
         borderColor: (context) => {
-          const isDarkMode = document.documentElement.classList.contains('dark');
+          const isDarkMode = isDark;
           return isDarkMode ? '#475569' : '#cbd5e1';
         },
         borderWidth: 1,
@@ -395,13 +399,13 @@ const ChartCRFlights = React.memo(({ userId }) => {
         title: {
           display: false,
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#f8fafc' : '#334155';
           },
         },
         ticks: {
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#cbd5e1' : '#64748b';
           },
           maxRotation: 0,
@@ -426,7 +430,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
         },
         grid: {
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? 'rgba(71, 85, 105, 0.2)' : 'rgba(203, 213, 225, 0.5)';
           },
         },
@@ -438,13 +442,13 @@ const ChartCRFlights = React.memo(({ userId }) => {
         title: {
           display: false,
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#f8fafc' : '#334155';
           },
         },
         ticks: {
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#cbd5e1' : '#64748b';
           },
           callback: function(value) {
@@ -462,7 +466,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
         },
         grid: {
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? 'rgba(71, 85, 105, 0.2)' : 'rgba(203, 213, 225, 0.5)';
           },
         },
@@ -474,13 +478,13 @@ const ChartCRFlights = React.memo(({ userId }) => {
         title: {
           display: false,
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#f8fafc' : '#334155';
           },
         },
         ticks: {
           color: (context) => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = isDark;
             return isDarkMode ? '#cbd5e1' : '#64748b';
           },
           maxTicksLimit: width < 640 ? 4 : 6,
@@ -502,7 +506,7 @@ const ChartCRFlights = React.memo(({ userId }) => {
     year: 'Ano',
   };
 
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const isDarkMode = isDark;
 
   if (loading) {
     return (

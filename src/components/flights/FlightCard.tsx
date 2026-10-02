@@ -153,7 +153,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           subtitle={flight.aircraft}
           value={`${flight.departure} → ${flight.arrival}`}
           badge={getStatusBadge(flight.status)}
-          icon={<Plane className="h-5 w-5 text-blue-600" />}
+          icon={<Plane className="h-5 w-5 text-primary" />}
           secondaryActions={[
             {
               label: 'Editar',
@@ -172,12 +172,12 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           ]}
           details={[
             {
-              icon: <Clock className="h-4 w-4 text-blue-600" />,
+              icon: <Clock className="h-4 w-4 text-primary" />,
               label: 'Duração',
               value: flight.flightTime || 'N/A'
             },
             {
-              icon: <Calendar className="h-4 w-4 text-blue-600" />,
+              icon: <Calendar className="h-4 w-4 text-primary" />,
               label: 'Data',
               value: formatDate(flight.date)
             },
@@ -196,8 +196,8 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
         {/* Header com Callsign, Aircraft e Status */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-600/20 mobile-icon-container">
-                <Plane className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-primary/20 mobile-icon-container">
+                <Plane className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-foreground font-mono mobile-card-title">
@@ -244,7 +244,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-blue-600" />
+                <MapPin className="h-4 w-4 text-primary" />
                 <span className="text-sm description-text font-mono">
                   {flight.departure} → {flight.arrival}
                 </span>
@@ -256,13 +256,13 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-600" />
+              <Clock className="h-4 w-4 text-primary" />
               <span className="text-sm description-text">
                 {flight.departureTime || 'N/A'} - {flight.arrivalTime || 'N/A'}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-primary" />
               <span className="text-sm description-text">
                 {formatDate(flight.date)}
               </span>
@@ -272,35 +272,35 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           {/* Métricas de Performance */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
             <div className="text-center p-3 bg-muted/20 rounded-lg">
-              <Clock className="h-4 w-4 text-blue-600 mx-auto mb-1" />
+              <Clock className="h-4 w-4 text-primary mx-auto mb-1" />
               <p className="text-xs text-readable-muted">Duração</p>
               <p className="text-sm font-semibold description-text font-mono">
                 {flight.flightTime || 'N/A'}
               </p>
             </div>
             <div className="text-center p-3 bg-muted/20 rounded-lg">
-              <Route className="h-4 w-4 text-blue-600 mx-auto mb-1" />
+              <Route className="h-4 w-4 text-primary mx-auto mb-1" />
               <p className="text-xs text-readable-muted">Distância</p>
               <p className="text-sm font-semibold text-foreground font-mono">
                 {flight.distance ? `${flight.distance} nm` : 'N/A'}
               </p>
             </div>
             <div className="text-center p-3 bg-muted/20 rounded-lg">
-              <TrendingDown className="h-4 w-4 mx-auto mb-1 text-blue-600" />
+              <TrendingDown className="h-4 w-4 mx-auto mb-1 text-primary" />
               <p className="text-xs text-readable-muted">Landing</p>
               <p className={cn('text-sm font-semibold font-mono', flight.landingRate ? getLandingRateColor(flight.landingRate) : 'text-readable-muted')}>
                 {flight.landingRate ? `${flight.landingRate} fpm` : 'N/A'}
               </p>
             </div>
             <div className="text-center p-3 bg-muted/20 rounded-lg">
-              <Star className="h-4 w-4 mx-auto mb-1 text-blue-600" />
+              <Star className="h-4 w-4 mx-auto mb-1 text-primary" />
               <p className="text-xs text-readable-muted">XP</p>
               <p className={cn('text-sm font-semibold font-mono', flight.experiencePoints ? 'text-foreground' : 'text-readable-muted')}>
                 {flight.experiencePoints || 'N/A'}
               </p>
             </div>
             <div className="text-center p-3 bg-muted/20 rounded-lg">
-              <Star className="h-4 w-4 mx-auto mb-1 text-blue-600" />
+              <Star className="h-4 w-4 mx-auto mb-1 text-primary" />
               <p className="text-xs text-readable-muted">CR</p>
               <p className={cn('text-sm font-semibold font-mono', flight.careerRating ? 'text-foreground' : 'text-readable-muted')}>
                 {flight.careerRating || 'N/A'}
@@ -311,7 +311,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
           {/* Informações Extras */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <Fuel className="h-4 w-4 text-blue-600" />
+              <Fuel className="h-4 w-4 text-primary" />
               <span className="text-readable-muted">Combustível:</span>
               <span className="text-foreground font-mono">
                 {flight.fuelUsed ? `${flight.fuelUsed} ${flightSettings.fuelUnit}` : 'N/A'}
@@ -319,7 +319,7 @@ export const FlightCard = ({ flight }: FlightCardProps) => {
             </div>
             {flight.route && (
               <div className="flex items-center gap-2">
-                <Route className="h-4 w-4 text-blue-600" />
+                <Route className="h-4 w-4 text-primary" />
                 <span className="text-readable-muted">Rota:</span>
                 <span className="text-foreground font-mono text-xs">{flight.route}</span>
               </div>

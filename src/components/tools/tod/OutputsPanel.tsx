@@ -46,14 +46,14 @@ export function OutputsPanel({ outputs }: OutputsPanelProps) {
                 'Glideslope',
                 outputs.glideslopeDeg.toString(),
                 '°',
-                'text-blue-600'
+                'text-primary'
               )}
               {createOutputCard(
                 <TrendingDown className="h-5 w-5" />,
                 'Velocidade Vertical',
                 outputs.verticalSpeedFpm.toString(),
                 'fpm',
-                'text-red-500'
+                'text-destructive'
               )}
             </div>
             
@@ -70,7 +70,7 @@ export function OutputsPanel({ outputs }: OutputsPanelProps) {
                 'Tempo Estimado',
                 outputs.estimatedTimeMin.toString(),
                 'min',
-                'text-green-600'
+                'text-success'
               )}
             </div>
 
