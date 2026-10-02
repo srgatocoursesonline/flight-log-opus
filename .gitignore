@@ -46,3 +46,8 @@ coverage/
 # Misc
 .cache/
 .temp/
+# Skills de agentes (cópias/symlinks derivados — fonte canônica: .agents/skills/)
+.claude/
+.kiro/skills/
+agent/
+data/skills/
